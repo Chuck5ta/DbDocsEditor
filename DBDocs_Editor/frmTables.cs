@@ -54,6 +54,7 @@ namespace DBDocs_Editor
 
         private void btnQuit_Click(object sender, EventArgs e)
         {
+            ProgSettings.ShowThisForm(ProgSettings.mainForm);
             Close();
         }
 
@@ -67,9 +68,6 @@ namespace DBDocs_Editor
 
         private void frmTables_Load(object sender, EventArgs e)
         {
-            //Temporarily set one of the db params to trigger an update of the connection values
-            ProgSettings.DbName = "NewM0";
-            
             // The following command reads all the columns for the selected table
             DataSet dbViewList = ProgSettings.SelectRows("SELECT T.TABLE_NAME AS TableName, T.ENGINE AS TableEngine, T.TABLE_COMMENT AS TableComment FROM INFORMATION_SCHEMA.Tables T WHERE T.TABLE_NAME <> 'dtproperties' AND T.TABLE_SCHEMA <> 'INFORMATION_SCHEMA' AND t.Table_schema='" + ProgSettings.DbName + "' ORDER BY T.TABLE_NAME");
 
