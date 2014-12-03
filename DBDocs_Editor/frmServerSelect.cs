@@ -7,6 +7,7 @@ namespace DBDocs_Editor
     public partial class frmServerSelect : Form
     {
         private bool blnEditmode = false;
+        private List<ProgSettings.ConnectionInfo> serverList = new List<ProgSettings.ConnectionInfo>();
 
         public frmServerSelect()
         {
@@ -20,7 +21,41 @@ namespace DBDocs_Editor
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            if (blnEditmode == false)
+            {   // When saving a new item, we only need to add it to the listbox and update the registry
+                lstServers.Items.Add(txtServerName.Text + "-" + txtDefaultDB.Text);
+            }
+            else
+            {   // When editing a connection, we have to allow for a changed servername and delete the old entry
+                var selectedServer = lstServers.SelectedIndex;
 
+                if (selectedServer > 0)
+                {
+                    if (serverList.Count > 0)
+                    {
+                        var thisServer = serverList[selectedServer - 1];
+                        var dummyServerName = thisServer.ServerNameorIp;
+                        var dummyDefaultDb = thisServer.DatabaseName;
+
+                        // Delete the old connection from the registry
+                        ProgSettings.DeleteConnection(dummyServerName + "-" + dummyDefaultDb);
+                    }
+                }
+            }
+            ProgSettings.DbName = txtDefaultDB.Text;
+            ProgSettings.ServerName = txtServerName.Text;
+            ProgSettings.UserName = txtUsername.Text;
+            ProgSettings.Password = txtPassword.Text;
+
+            ProgSettings.WriteRegistry();
+
+            // Repopulate from datastore
+            frmServerSelect_Load(sender, e);
+
+            // Set the screen to 'Normal' Mode
+            ToggleControls(false);
+
+            btnConnect.Enabled = false;
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
@@ -98,9 +133,34 @@ namespace DBDocs_Editor
         {
             int selectedServer = lstServers.SelectedIndex;
 
-            btnEdit.Enabled = true;
-            btnDelete.Enabled = true;
-            btnConnect.Enabled = true;
+            if(serverList.Count>0)
+            {
+                if (selectedServer >= 0)
+                {
+                    ProgSettings.ConnectionInfo thisServer = serverList[selectedServer];
+
+                    txtServerName.Text = thisServer.ServerNameorIp;
+                    txtUsername.Text = thisServer.DatabaseUserName;
+                    txtPassword.Text = thisServer.DatabasePassword;
+                    txtDefaultDB.Text = thisServer.DatabaseName;
+
+                    btnEdit.Enabled = true;
+                    btnDelete.Enabled = true;
+                    btnConnect.Enabled = true;
+                }
+                else
+                {
+                    btnEdit.Enabled = false; // Can't edit the localhost entry
+                    btnDelete.Enabled = false; // Can't delete the localhost entry
+                    btnConnect.Enabled = false;
+                }
+            }
+            else
+            {
+                btnEdit.Enabled = false; // Can't edit the localhost entry
+                btnDelete.Enabled = false; // Can't delete the localhost entry
+                btnConnect.Enabled = false;
+            }
         }
 
         private void frmServerSelect_Load(object sender, EventArgs e)
@@ -108,7 +168,16 @@ namespace DBDocs_Editor
             lstServers.Items.Clear();
 
             //// Add default entry
-            lstServers.Items.Add("localhost-*");
+            //lstServers.Items.Add("localhost-*");
+
+            serverList = ProgSettings.PopulateConnections();
+            if (serverList == null) return;
+            if (serverList.Count <= 0) return;
+
+            foreach (var thisConnection in serverList)
+            {
+                lstServers.Items.Add(thisConnection.ServerNameorIp + "-" + thisConnection.DatabaseName);
+            }
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -118,7 +187,7 @@ namespace DBDocs_Editor
             ProgSettings.UserName = txtUsername.Text;
             ProgSettings.ServerName = txtServerName.Text;
 
-            if (txtDefaultDB.Text != "*")
+            if (!txtDefaultDB.Text.Contains("*"))
             {
                 // Display Table List screen
                 var tablesScreen = new frmTables { Text = "DBDocs: Using database " + txtDefaultDB.Text };
@@ -136,6 +205,8 @@ namespace DBDocs_Editor
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            ProgSettings.DeleteConnection(txtServerName.Text + "-" + txtDefaultDB.Text);
+            lstServers.Items.RemoveAt(lstServers.SelectedIndex);
         }
     }
 }

@@ -154,6 +154,89 @@ namespace DBDocs_Editor
             }
         }
 
+        /// <summary>
+        /// Writes the connection setting into the registry.
+        /// </summary>
+        public static void WriteRegistry()
+        { // The name of the key must include a valid root.
+            const string userRoot = "HKEY_CURRENT_USER";
+            const string subkey = "Software\\MaNGOS\\DBDocsEditor\\Connections";
+            const string keyName = userRoot + "\\" + subkey;
+
+            // Concat all the login requirements into a single field
+            string[] connectionString = { serverName, userName, password, dbName };
+
+            // Write in into the registry as a key call "<servername>-<dbname>"
+            Registry.SetValue(keyName, serverName + "-" + DbName, connectionString);
+
+            // Rebuild the internal list of connections
+            PopulateConnections();
+        }
+
+        /// <summary>
+        /// Deletes the connection setting from the registry. Has Two uses: a) The delete the selected connect entry, b) To remove the old entry when a server connnection is renamed
+        /// </summary>
+        /// <param name="keyname">The keyname.</param>
+        public static void DeleteConnection(string keyname)
+        {
+            const string subkey = "Software\\MaNGOS\\DBDocsEditor\\Connections";
+
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(subkey, true))
+            {
+                if (key == null)
+                {
+                    // Key doesn't exist. Do whatever you want to handle this case
+                }
+                else
+                {
+                    key.DeleteValue(keyname);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Populates the connection information from the registry and returns a list of the entries.
+        /// </summary>
+        /// <returns></returns>
+        public static List<ConnectionInfo> PopulateConnections()
+        {
+            const string userRoot = "HKEY_CURRENT_USER";
+            const string subkey = "Software\\MaNGOS\\DBDocsEditor\\Connections";
+
+            RegistryKey rk = Registry.CurrentUser;
+
+            // Open a subKey as read-only
+            RegistryKey dbDocsKey = rk.OpenSubKey(subkey);
+            if (dbDocsKey != null)
+            {
+                var names = dbDocsKey.GetValueNames();
+
+                if (names.GetLength(0) > 0)
+                {
+                    var allconnections = new List<ConnectionInfo>();
+                    var connections = new ConnectionInfo();
+
+                    // For every Connection entry in the registry
+                    foreach (String connectionstring in names)
+                    {
+                        var theseValues = (string[])Registry.GetValue(userRoot + "\\" + subkey, connectionstring, "");
+
+                        // Populate a connectionInfo structure with the values from the registry
+                        connections.ServerNameorIp = theseValues[0];
+                        connections.DatabaseUserName = theseValues[1];
+                        connections.DatabasePassword = theseValues[2];
+                        connections.DatabaseName = theseValues[3];
+
+                        // Add the structure to a list
+                        allconnections.Add(connections);
+                    }
+                    return allconnections;
+                }
+            }
+            return null;
+        }
+
+
         public static string SetLocalisationModifier(string langsetting)
         {
             if (langsetting.Length > 2)
@@ -178,6 +261,15 @@ namespace DBDocs_Editor
             lstLangs.Items.Add("ENGLISH  - EN");
             lstLangs.Items.Add("FRANCAIS - FR");
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
+        }
+
+
+        public struct ConnectionInfo
+        {
+            public string ServerNameorIp;
+            public string DatabaseName;
+            public string DatabaseUserName;
+            public string DatabasePassword;
         }
     }
 }
