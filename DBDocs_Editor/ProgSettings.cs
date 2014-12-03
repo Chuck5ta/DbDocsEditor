@@ -135,6 +135,24 @@ namespace DBDocs_Editor
             return myDataset;
         }
 
+        public static string SetLocalisationModifier(string langsetting)
+        {
+            if (langsetting.Length > 2)
+            {
+                langsetting = langsetting.Substring(langsetting.Length - 2);
+            }
+            if (langsetting == "EN")
+            {
+                langsetting = "";
+            }
+
+            if (!string.IsNullOrEmpty(langsetting))
+            {
+                langsetting = "_" + langsetting;
+            }
+            return langsetting;
+        }
+
         public static void LoadLangs(ListBox lstLangs)
         {
             lstLangs.Items.Clear();

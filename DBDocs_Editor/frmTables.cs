@@ -20,7 +20,36 @@ namespace DBDocs_Editor
         /// <param name="e"></param>
         private void lstTables_SelectedIndexChanged(object sender, EventArgs e)
         {
+            string selectedTable = lstTables.Text;
+            txtTableName.Text = selectedTable;
 
+            if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
+            string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Text);
+
+            var dbViewList = ProgSettings.SelectRows("SELECT TableNotes FROM dbdocstable" + selectedLang + " where TableName='" + selectedTable + "'");
+            if (dbViewList != null)
+            {
+                if (dbViewList.Tables[0].Rows.Count > 0)
+                {
+                    txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotes"].ToString();
+                    chkDBDocsEntry.Checked = true;
+
+                    //Check for Subtables
+                }
+                else  // No dbdocs match
+                {
+                    txtTableNotes.Text = "";
+                    chkDBDocsEntry.Checked = false;
+                }
+            }
+            else  // No dbdocs match
+            {
+                txtTableNotes.Text = "";
+                chkDBDocsEntry.Checked = false;
+            }
+
+            btnShowFields.Enabled = true;
+            btnSave.Enabled = true;
         }
 
         private void btnQuit_Click(object sender, EventArgs e)
