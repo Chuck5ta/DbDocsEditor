@@ -21,7 +21,27 @@ namespace DBDocs_Editor
         /// <param name="e"></param>
         private void lstsubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
+            string selectedSubtable = lstsubtables.Text;
+            txtSubtableName.Text = selectedSubtable;
 
+            if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
+            string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Items[lstLangs.SelectedIndex].ToString());
+
+            var dbViewList = ProgSettings.SelectRows("SELECT * FROM dbdocssubtables" + selectedLang + " where subtablename='" + selectedSubtable + "'");
+            if (dbViewList.Tables[0].Rows.Count > 0)
+            {
+                for (int thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
+                {
+                    txtSubtableNotes.Text = dbViewList.Tables[0].Rows[thisRow]["subtablecontent"].ToString();
+                    chkDBDocsEntry.Checked = true;
+                    MessageBox.Show("TODO: Need to read templates rather than content");
+                }
+            }
+            else  // No dbdocs match
+            {
+                txtSubtableName.Text = "";
+                chkDBDocsEntry.Checked = false;
+            }
         }
 
         private void btnQuit_Click(object sender, EventArgs e)
@@ -31,7 +51,44 @@ namespace DBDocs_Editor
 
         private void frmsubtables_Load(object sender, EventArgs e)
         {
+            System.Data.DataSet dbViewList;
+            if (string.IsNullOrEmpty(subTableId))
+            {
+                // The following command reads all the columns for all the subtables
+                dbViewList = ProgSettings.SelectRows("SELECT subtablename from dbdocssubtables");
+            }
+            else
+            {
+                // The following command reads all the columns for just the selected subtable
+                dbViewList = ProgSettings.SelectRows("SELECT subtablename from dbdocssubtables where subtableid=" + subTableId);
+            }
 
+            // Did we return anything
+            if (dbViewList == null) return;
+
+            // Do we have rows
+            if (dbViewList.Tables[0].Rows.Count <= 0) return;
+
+            lstsubtables.Items.Clear();
+
+            // for each Field returned, populate the listbox with the table name
+            for (var thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
+            {
+                var fieldName = dbViewList.Tables[0].Rows[thisRow]["subtablename"].ToString();
+                lstsubtables.Items.Add(fieldName);
+            }
+
+            ProgSettings.LoadLangs(lstLangs);
+
+            if (!string.IsNullOrEmpty(subTableId))
+            {   //Select the first entry if we passed in an Id
+                if (lstsubtables.SelectedIndex < 0) lstsubtables.SelectedIndex = 0;
+                Text = "SubTable: " + lstsubtables.Text;
+            }
+            else
+            { 
+                Text = "SubTables"; 
+            }
         }
 
         private void btnSave_Click(object sender, EventArgs e)

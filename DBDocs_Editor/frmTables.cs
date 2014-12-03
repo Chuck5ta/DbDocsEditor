@@ -35,6 +35,7 @@ namespace DBDocs_Editor
                     chkDBDocsEntry.Checked = true;
 
                     //Check for Subtables
+                    ProgSettings.ExtractSubTables(txtTableNotes.Text, lstSubtables);
                 }
                 else  // No dbdocs match
                 {
@@ -138,10 +139,20 @@ namespace DBDocs_Editor
 
         private void btnShowSubtables_Click(object sender, EventArgs e)
         {
+            var subTableScreen = new frmSubtables { subTableId = "" };
+            subTableScreen.Show();
         }
 
         private void lstSubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // The subtable entry in the listbox starts xx:, to need to trim everything after the :
+            string subTableId = lstSubtables.Text;
+            if (subTableId.Contains(":"))
+            {
+                subTableId = subTableId.Substring(0, subTableId.IndexOf(":"));
+                var subTableScreen = new frmSubtables { subTableId = subTableId };
+                subTableScreen.Show();
+            }
         }
     }
 }

@@ -318,6 +318,53 @@ namespace DBDocs_Editor
             return null;
         }
 
+        private static string GetSubtables(string subTableText)
+        {
+            var startPos = 1;
+            var retString = "";
+
+            while (startPos > 0)
+            {        //¬subtable:xxx¬
+                startPos = subTableText.IndexOf("¬subtable:", startPos + 1, System.StringComparison.Ordinal);
+                if (startPos > 0)
+                {
+                    startPos = startPos + 10;
+                }
+                if (startPos <= 0) continue;
+
+                var endPos = subTableText.IndexOf("¬", startPos + 1, System.StringComparison.Ordinal);
+                retString = retString + subTableText.Substring(startPos, endPos - startPos) + ",";
+            }
+            return retString;
+        }
+
+        public static void ExtractSubTables(string SourceText, ListBox lstSubTables)
+        {
+            lstSubTables.Items.Clear();
+            if (SourceText.Contains("¬subtable:"))
+            {
+                string subtables = GetSubtables(SourceText);
+                string[] stringSeparators = new string[] { "," };
+                string[] subarray = subtables.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string tableid in subarray)
+                {
+                    if (!string.IsNullOrEmpty(tableid))
+                    {
+                        System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
+                        dbViewSubtable = ProgSettings.SelectRows("SELECT subtablename FROM dbdocssubtables where subtableid=" + tableid);
+                        if (dbViewSubtable != null)
+                        {
+                            if (dbViewSubtable.Tables[0].Rows.Count > 0)
+                            {
+                                lstSubTables.Items.Add(subtables.Replace(",", "") + ":" + dbViewSubtable.Tables[0].Rows[0]["subtablename"].ToString());
+                            }
+                        }
+                    }
+                }
+//                MessageBox.Show("Found subtables: " + subtables);
+            }
+        }
 
         public static string SetLocalisationModifier(string langsetting)
         {
