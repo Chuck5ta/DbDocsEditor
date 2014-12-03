@@ -13,8 +13,9 @@ namespace DBDocs_Editor
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var mainform = new frmTables();
-            mainform.Text = "DBDocs Editor v0.0.1";
+            var mainform = new frmServerSelect();
+            ProgSettings.mainForm = mainform;
+            mainform.Text = "DBDocs Editor v0.0.2";
             Application.Run(mainform);
         }
     }

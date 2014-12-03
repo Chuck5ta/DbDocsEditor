@@ -47,6 +47,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmDatabaseSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDatabaseSelect.Designer.cs">
+      <DependentUpon>frmDatabaseSelect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmServerSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmServerSelect.Designer.cs">
+      <DependentUpon>frmServerSelect.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmSubtables.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -68,6 +80,12 @@
     <Compile Include="DbDocsEditor.cs" />
     <Compile Include="ProgSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="frmDatabaseSelect.resx">
+      <DependentUpon>frmDatabaseSelect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmServerSelect.resx">
+      <DependentUpon>frmServerSelect.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmSubtables.resx">
       <DependentUpon>frmSubtables.cs</DependentUpon>
     </EmbeddedResource>

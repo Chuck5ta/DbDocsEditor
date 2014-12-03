@@ -9,11 +9,13 @@ namespace DBDocs_Editor
 {
     public class ProgSettings
     {   // Common Functions will be added in here
-        private static string dbName = "newm0";
-        private static string serverName = "localhost";
-        private static string userName = "root";
-        private static string password = "mangos";
+        private static string dbName = "";
+        private static string serverName = "";
+        private static string userName = "";
+        private static string password = "";
         public static string sqldBconn = "";
+        public static Form mainForm;
+
         /// <summary>
         /// Gets or sets the password.
         /// </summary>
@@ -133,6 +135,23 @@ namespace DBDocs_Editor
             adapter.Dispose();
             conn.Close();
             return myDataset;
+        }
+
+        /// <summary>
+        /// Redisplays the form 'formName' passed
+        /// </summary>
+        /// <param name="formName"></param>
+
+        public static void ShowThisForm(Form formName)
+        {
+            foreach (Form frm in Application.OpenForms)
+            {
+                if (frm == formName)
+                {
+                    frm.Show();
+                    return;
+                }
+            }
         }
 
         public static string SetLocalisationModifier(string langsetting)
