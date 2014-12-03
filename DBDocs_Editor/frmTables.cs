@@ -59,6 +59,10 @@ namespace DBDocs_Editor
 
         private void btnShowFields_Click(object sender, EventArgs e)
         {
+            string selectedTable = lstTables.Text;
+
+            var fieldScreen = new frmFields { TableName = selectedTable };
+            fieldScreen.Show();
         }
 
         private void frmTables_Load(object sender, EventArgs e)
