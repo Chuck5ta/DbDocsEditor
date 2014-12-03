@@ -86,9 +86,47 @@ namespace DBDocs_Editor
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            var dbDocsTableOutput = new StringBuilder();
+            string outputFolder = Application.ExecutablePath;
 
+            // Strip the Executable name from the path
+            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
+
+            string selectedField = lstFields.Text;
+            txtFieldName.Text = selectedField;
+
+            if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
+            string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Items[lstLangs.SelectedIndex].ToString());
+
+            //delete from `dbdocsfields` where `tableName`= 'creature' and `fieldName`= 'entry';
+            //insert  into `dbdocsfields`(`tableName`,`fieldName`,`tableNotes`) values ('creature','entry','xxxx');
+            dbDocsTableOutput.AppendLine("delete from `dbdocsfields" + selectedLang + "` where `tableName`= '" + TableName + " and `fieldName`= '" + selectedField + "';");
+            dbDocsTableOutput.AppendLine("insert  into `dbdocsfields" + selectedLang + "`(`tableName`,`fieldName`,`tableNotes`) values ('" + TableName + "','" + selectedField + "','" + txtFieldNotes.Text + "');");
+
+            // If the output folder doesnt exist, create it
+            if (!Directory.Exists(outputFolder + @"\"))
+            {
+                Directory.CreateDirectory(outputFolder + @"\");
+            }
+
+            // Open the file for append and write the entries to it
+            using (var outfile = new StreamWriter(outputFolder + @"\dbdocsFields" + selectedLang + ".SQL", true))
+            {
+                outfile.Write(dbDocsTableOutput.ToString());
+            }
+
+            //Now the next part, updating the db directly
+            if (chkDBDocsEntry.Checked == false)
+            {       //INSERT
+                ProgSettings.FieldInsert(TableName, selectedField, txtFieldNotes.Text);
+            }
+            else
+            {       //UPDATE
+                ProgSettings.FieldUpdate(TableName, selectedField, txtFieldNotes.Text);
+            }
+
+            MessageBox.Show("Save Complete");
         }
-
         private void lstSubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
 

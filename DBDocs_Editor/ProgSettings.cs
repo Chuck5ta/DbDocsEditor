@@ -177,6 +177,49 @@ namespace DBDocs_Editor
         }
 
         /// <summary>
+        /// Inserts a record into the dbdocsfields table
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <param name="fieldNotes">The field notes.</param>
+        public static void FieldInsert(string tableName, string fieldName, string fieldNotes)
+        {
+            var conn = new MySqlConnection(sqldBconn);
+            var cmd = new MySqlCommand("", conn);
+            cmd.Connection.Open();
+            cmd.CommandText = "insert  into `dbdocsfields`(`tableName`,`fieldName`,`fieldNotes`) "
+                              + "VALUES (@tablename, @fieldname, @tablenotes)";
+
+            cmd.Parameters.AddWithValue("@tablename", tableName);
+            cmd.Parameters.AddWithValue("@fieldName", fieldName);
+            cmd.Parameters.AddWithValue("@fieldNotes", fieldNotes);
+
+            cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+        }
+
+        /// <summary>
+        /// Updates a record in the dbdocsfields table
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <param name="fieldNotes">The field notes.</param>
+        public static void FieldUpdate(string tableName, string fieldName, string fieldNotes)
+        {
+            var conn = new MySqlConnection(sqldBconn);
+            var cmd = new MySqlCommand("", conn);
+            cmd.Connection.Open();
+            cmd.CommandText = "update `dbdocsfields` set `fieldnotes`=@fieldNotes where `tablename`=@tablename and `fieldname`=@fieldname";
+
+            cmd.Parameters.AddWithValue("@tablename", tableName);
+            cmd.Parameters.AddWithValue("@fieldName", fieldName);
+            cmd.Parameters.AddWithValue("@fieldNotes", fieldNotes);
+
+            cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+        }
+
+        /// <summary>
         /// Redisplays the form 'formName' passed
         /// </summary>
         /// <param name="formName"></param>
