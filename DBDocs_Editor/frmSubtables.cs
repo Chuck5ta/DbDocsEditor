@@ -93,7 +93,50 @@ namespace DBDocs_Editor
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            StringBuilder dbDocsTableOutput = new StringBuilder();
+            string outputFolder = Application.ExecutablePath;
 
+            // Strip the Executable name from the path
+            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
+
+            string selectedField = lstsubtables.Text;
+            txtSubtableName.Text = selectedField;
+
+            if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
+            string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Items[lstLangs.SelectedIndex].ToString());
+
+            // If the output folder doesnt exist, create it
+            if (!Directory.Exists(outputFolder + @"\"))
+            {
+                Directory.CreateDirectory(outputFolder + @"\");
+            }
+
+            // This table save works a little different to the others, since this is a table with an id we can use that to perform the insert/update logic
+
+            if (!string.IsNullOrEmpty(subTableId))
+            { // This is an update to an existing subtable
+
+                //delete from `dbdocssubtables` where `subtableid`= xx;
+                //insert  into `dbdocstable`(`tableName`,`tableNotes`) values ('script_texts','xxxx');
+                dbDocsTableOutput.AppendLine("delete from `dbdocssubtables" + selectedLang + "` where `subtableId`= " + subTableId + ";");
+                dbDocsTableOutput.AppendLine("insert  into `dbdocssubtables" + selectedLang + "`(`subtableId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" + subTableId + ",'" + selectedField + "','" + txtSubtableNotes.Text + "','" + txtSubtableNotes.Text + "');");
+
+                ProgSettings.SubTableUpdate(subTableId, selectedField, txtSubtableNotes.Text, txtSubtableNotes.Text);
+
+            }
+            else
+            { // This is to insert a new subtable
+                string newSubtableId = ProgSettings.GetNewSubTableId();
+                dbDocsTableOutput.AppendLine("insert  into `dbdocssubtables" + selectedLang + "`(`subtableId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" + newSubtableId.ToString() + ",'" + selectedField + "','" + txtSubtableNotes.Text + "','" + txtSubtableNotes.Text + "');");
+                ProgSettings.SubTableInsert(newSubtableId, selectedField, txtSubtableNotes.Text, txtSubtableNotes.Text);
+                subTableId = newSubtableId.ToString();
+            }
+
+            // Open the file for append and write the entries to it
+            using (StreamWriter outfile = new StreamWriter(outputFolder + @"\dbdocssubtables" + selectedLang + ".SQL", true))
+            {
+                outfile.Write(dbDocsTableOutput.ToString());
+            }
         }
     }
 }

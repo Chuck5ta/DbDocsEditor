@@ -220,6 +220,51 @@ namespace DBDocs_Editor
         }
 
         /// <summary>
+        /// Inserts a record into the dbdocsfields table
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <param name="fieldNotes">The field notes.</param>
+        public static void SubTableInsert(string subTableId, string subTableName, string subTableContent, string subTableTemplate)
+        {
+            var conn = new MySqlConnection(sqldBconn);
+            var cmd = new MySqlCommand("", conn);
+            cmd.Connection.Open();
+            cmd.CommandText = "insert  into `dbdocssubtables`(subtableid,`subtableName`,`subtablecontent`,`subtabletemplate`) "
+                              + "VALUES (@subtableid, @subtableName, @subtablecontent, @subtabletemplate)";
+
+            cmd.Parameters.AddWithValue("@subtableid", subTableId);
+            cmd.Parameters.AddWithValue("@subtableName", subTableName);
+            cmd.Parameters.AddWithValue("@subtablecontent", subTableContent);
+            cmd.Parameters.AddWithValue("@subtabletemplate", subTableTemplate);
+
+            cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+        }
+
+        /// <summary>
+        /// Updates a record in the dbdocsfields table
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <param name="fieldNotes">The field notes.</param>
+        public static void SubTableUpdate(string subTableId, string subTableName, string subTableContent, string subTableTemplate)
+        {
+            var conn = new MySqlConnection(sqldBconn);
+            var cmd = new MySqlCommand("", conn);
+            cmd.Connection.Open();
+            cmd.CommandText = "update `dbdocssubtables` set `subtableName`=@subtableName,`subTableContent`=@subTableContent,`subTableTemplate`=@subTableTemplate where subTableId=@subTableId;";
+
+            cmd.Parameters.AddWithValue("@subtableid", subTableId);
+            cmd.Parameters.AddWithValue("@subtableName", subTableName);
+            cmd.Parameters.AddWithValue("@subtablecontent", subTableContent);
+            cmd.Parameters.AddWithValue("@subtabletemplate", subTableTemplate);
+
+            cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+        }
+
+        /// <summary>
         /// Redisplays the form 'formName' passed
         /// </summary>
         /// <param name="formName"></param>
@@ -392,7 +437,19 @@ namespace DBDocs_Editor
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
         }
 
-
+        public static string GetNewSubTableId()
+        {
+            System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
+            dbViewSubtable = ProgSettings.SelectRows("SELECT max(subtableid) as MaxId FROM dbdocssubtables");
+            if (dbViewSubtable != null)
+            {
+                if (dbViewSubtable.Tables[0].Rows.Count > 0)
+                {
+                    return Convert.ToString(Convert.ToInt32(dbViewSubtable.Tables[0].Rows[0]["MaxId"].ToString()) + 1);
+                }
+            }
+            return "0";
+        }
         public struct ConnectionInfo
         {
             public string ServerNameorIp;
