@@ -138,6 +138,45 @@ namespace DBDocs_Editor
         }
 
         /// <summary>
+        /// Inserts a record into the dbdocstable table
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="tableNotes">The table notes.</param>
+        public static void TableInsert(string tableName, string tableNotes)
+        {
+            var conn = new MySqlConnection(sqldBconn);
+            var cmd = new MySqlCommand("", conn);
+            cmd.Connection.Open();
+            cmd.CommandText = "insert  into `dbdocstable`(`tableName`,`tableNotes`) "
+                              + "VALUES (@tablename, @tablenotes)";
+
+            cmd.Parameters.AddWithValue("@tablename", tableName);
+            cmd.Parameters.AddWithValue("@tablenotes", tableNotes);
+
+            cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+        }
+
+        /// <summary>
+        /// Update a record in the dbdocstable table
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="tableNotes">The table notes.</param>
+        public static void TableUpdate(string tableName, string tableNotes)
+        {
+            var conn = new MySqlConnection(sqldBconn);
+            var cmd = new MySqlCommand("", conn);
+            cmd.Connection.Open();
+            cmd.CommandText = "update `dbdocstable` set `tablenotes`=@tableNotes where `tablename`=@tablename";
+
+            cmd.Parameters.AddWithValue("@tablename", tableName);
+            cmd.Parameters.AddWithValue("@tablenotes", tableNotes);
+
+            cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+        }
+
+        /// <summary>
         /// Redisplays the form 'formName' passed
         /// </summary>
         /// <param name="formName"></param>
