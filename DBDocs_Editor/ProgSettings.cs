@@ -253,12 +253,12 @@ namespace DBDocs_Editor
             var conn = new MySqlConnection(sqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
-            cmd.CommandText = "update `dbdocssubtables` set `subtableName`=@subtableName,`subTableContent`=@subTableContent,`subTableTemplate`=@subTableTemplate where subTableId=@subTableId;";
+            cmd.CommandText = "update `dbdocssubtables` set `subTableName`=@subTableName,`subTableContent`=@subTableContent,`subTableTemplate`=@subTableTemplate where subTableId=@subTableId;";
 
             cmd.Parameters.AddWithValue("@subtableid", subTableId);
             cmd.Parameters.AddWithValue("@subtableName", subTableName);
-            cmd.Parameters.AddWithValue("@subtablecontent", subTableContent);
-            cmd.Parameters.AddWithValue("@subtabletemplate", subTableTemplate);
+            cmd.Parameters.AddWithValue("@subTableContent", subTableContent);
+            cmd.Parameters.AddWithValue("@subTableTemplate", subTableTemplate);
 
             cmd.ExecuteNonQuery();
             cmd.Connection.Close();
@@ -363,6 +363,11 @@ namespace DBDocs_Editor
             return null;
         }
 
+        /// <summary>
+        /// Extracts the subtableId's from subtable markup and returns them comma delimited
+        /// </summary>
+        /// <param name="subTableText"></param>
+        /// <returns></returns>
         private static string GetSubtables(string subTableText)
         {
             var startPos = 1;
@@ -383,6 +388,11 @@ namespace DBDocs_Editor
             return retString;
         }
 
+        /// <summary>
+        /// Populates a listbox with the name of each subtable entry found in text
+        /// </summary>
+        /// <param name="SourceText"></param>
+        /// <param name="lstSubTables"></param>
         public static void ExtractSubTables(string SourceText, ListBox lstSubTables)
         {
             lstSubTables.Items.Clear();
@@ -411,6 +421,11 @@ namespace DBDocs_Editor
             }
         }
 
+        /// <summary>
+        /// Based on the language listbox entries, use the last 2 characters as language identifier. English (EN) has no prefix so it's removed 
+        /// </summary>
+        /// <param name="langsetting"></param>
+        /// <returns></returns>
         public static string SetLocalisationModifier(string langsetting)
         {
             if (langsetting.Length > 2)
@@ -429,6 +444,10 @@ namespace DBDocs_Editor
             return langsetting;
         }
 
+        /// <summary>
+        /// Populate the Language Listboxes
+        /// </summary>
+        /// <param name="lstLangs"></param>
         public static void LoadLangs(ListBox lstLangs)
         {
             lstLangs.Items.Clear();
@@ -437,6 +456,10 @@ namespace DBDocs_Editor
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// Looks up the next available subtableId
+        /// </summary>
+        /// <returns></returns>
         public static string GetNewSubTableId()
         {
             System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
@@ -450,6 +473,122 @@ namespace DBDocs_Editor
             }
             return "0";
         }
+
+
+        public static string LookupSubTableId(string subTableName)
+        {
+            System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
+            dbViewSubtable = ProgSettings.SelectRows("SELECT subtableid FROM dbdocssubtables where subtableName='" + subTableName + "';");
+            if (dbViewSubtable != null)
+            {
+                if (dbViewSubtable.Tables[0].Rows.Count > 0)
+                {
+                    return Convert.ToString(dbViewSubtable.Tables[0].Rows[0]["SubTableId"].ToString());
+                }
+            }
+            return "0";
+        }
+
+        /// <summary>
+        /// Attempts to Create a subtable template from a HTML table. This is messy and horrible. !!
+        /// - It is only used to attempt to convert the HTML table into the Template format, some user cleanup may be required.
+        /// </summary>
+        /// <param name="inText"></param>
+        /// <returns></returns>
+        public static string ConvertHtmlToTemplate(string inText)
+        {
+            inText = inText.Replace("valign=\"middle\"", "");
+            inText = inText.Replace("valign='middle'", "");
+            inText = inText.Replace("<tr bgcolor='#f0f0ff'>", "<tr>");
+            inText = inText.Replace("<tr bgcolor=\"#f0f0ff\">", "<tr>");
+            inText = inText.Replace("<tr bgcolor='#FFFFEE'>", "<tr>");
+            inText = inText.Replace("<tr bgcolor=\"#FFFFEE\">", "<tr>");
+            inText = inText.Replace("<tr bgcolor='#FEFEFF'>", "<tr>");
+            inText = inText.Replace("<tr bgcolor=\"#FEFEFF\">", "<tr>");
+
+            inText = inText.Replace("</table>", "");
+
+            inText = inText.Replace("<th align=left>", "<th align=left><");
+            inText = inText.Replace("<th align='left'>", "<th align='left'><");
+            inText = inText.Replace("<th align=\"left\">", "<th align=\"left\"><");
+
+            inText = inText.Replace("<th align=right>", "<th align=right>>");
+            inText = inText.Replace("<th align='right'>", "<th align='right'>>");
+            inText = inText.Replace("<th align=\"right\">", "<th align=\"right\">>");
+
+
+            // Clean up the alignment stuff
+            inText = inText.Replace("align='left'", "");
+            inText = inText.Replace("align=\"left\"", "");
+
+            inText = inText.Replace("align='centre'", "");
+            inText = inText.Replace("align=\"centre\"", "");
+            inText = inText.Replace("align='center'", "");
+            inText = inText.Replace("align=\"center\"", "");
+
+            inText = inText.Replace("align='right'", "");
+            inText = inText.Replace("align=\"right\"", "");
+
+            // Clean up iffy td entry
+            while (inText.Contains(" >"))
+            {
+                inText = inText.Replace(" >", ">");
+            }
+            inText = inText.Replace("</td><td>", "|");
+            inText = inText.Replace("</td></tr>", "");
+            inText = inText.Replace("<tr><td>", "");
+
+            // Clean up Table heading stuff
+            inText = inText.Replace("<th><b>", "<th>");
+            inText = inText.Replace("<<b>", "<");
+            inText = inText.Replace("</b></th>", "</th>");
+            inText = inText.Replace("<tr>" + "\r\n" + "<th>", "<th>");
+            inText = inText.Replace("<tr>" + "\r" + "<th>", "<th>");
+            inText = inText.Replace("<tr>" + "\n" + "<th>", "<th>");
+
+            inText = inText.Replace("</th>" + "\r\n" + "<th>", "|");
+            inText = inText.Replace("</th>" + "\r" + "<th>", "|");
+            inText = inText.Replace("</th>" + "\n" + "<th>", "|");
+
+            inText = inText.Replace("</th><th>", "|");
+
+            inText = inText.Replace("<tr><th>", "");
+            inText = inText.Replace("</th></tr>", "|");
+
+            inText = inText.Replace("<th>", "");
+            inText = inText.Replace("</th>", "");
+            inText = inText.Replace("<tr></tr>", "");
+            inText = inText.Replace("\r\n" + "\r\n", "\r\n");
+            inText = inText.Replace("\r" + "\r", "\r");
+            inText = inText.Replace("\n" + "\n", "\n");
+
+
+            if (inText.Contains("<table"))
+            {
+                int startPos = inText.IndexOf("<table");
+                int endPos = inText.IndexOf(">", startPos + 1) + 1;
+                string sourceText = inText.Substring(startPos, endPos - startPos);
+                inText = inText.Replace(sourceText, "").Trim();
+
+            }
+            inText = inText.Replace("><b>", ">");
+            return inText;
+        }
+
+        /// <summary>
+        /// Replace ' with an escaped \' so SQL is happy
+        /// </summary>
+        /// <param name="inSQL"></param>
+        /// <returns></returns>
+        public static string PrepareSqlString(string inSQL)
+        {
+            inSQL = inSQL.Replace("\'", "\\'");
+            return inSQL;
+        }
+
+        /// <summary>
+        /// Basic Connectin Information Structure
+        /// </summary>
         public struct ConnectionInfo
         {
             public string ServerNameorIp;

@@ -32,9 +32,18 @@ namespace DBDocs_Editor
             {
                 for (int thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
                 {
-                    txtSubtableNotes.Text = dbViewList.Tables[0].Rows[thisRow]["subtablecontent"].ToString();
+                    subTableId = dbViewList.Tables[0].Rows[thisRow]["subtableid"].ToString();
+                    txtSubtableContent.Text = dbViewList.Tables[0].Rows[thisRow]["subtablecontent"].ToString();
+                    txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[thisRow]["subtabletemplate"].ToString();
                     chkDBDocsEntry.Checked = true;
-                    MessageBox.Show("TODO: Need to read templates rather than content");
+
+                    if (string.IsNullOrEmpty(txtSubtableTemplate.Text))
+                    {   //If the template is missing, attempt to build it from the content, only for historic entries !!
+                        txtSubtableTemplate.Text = ProgSettings.ConvertHtmlToTemplate(txtSubtableContent.Text);
+                        
+                        //Save the updated Template
+                        btnSave_Click(sender, e);
+                    }
                 }
             }
             else  // No dbdocs match
@@ -119,16 +128,16 @@ namespace DBDocs_Editor
                 //delete from `dbdocssubtables` where `subtableid`= xx;
                 //insert  into `dbdocstable`(`tableName`,`tableNotes`) values ('script_texts','xxxx');
                 dbDocsTableOutput.AppendLine("delete from `dbdocssubtables" + selectedLang + "` where `subtableId`= " + subTableId + ";");
-                dbDocsTableOutput.AppendLine("insert  into `dbdocssubtables" + selectedLang + "`(`subtableId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" + subTableId + ",'" + selectedField + "','" + txtSubtableNotes.Text + "','" + txtSubtableNotes.Text + "');");
+                dbDocsTableOutput.AppendLine("insert  into `dbdocssubtables" + selectedLang + "`(`subtableId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" + subTableId + ",'" + selectedField + "','" + ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" + ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
 
-                ProgSettings.SubTableUpdate(subTableId, selectedField, txtSubtableNotes.Text, txtSubtableNotes.Text);
+                ProgSettings.SubTableUpdate(subTableId, selectedField, txtSubtableContent.Text, txtSubtableTemplate.Text);
 
             }
             else
             { // This is to insert a new subtable
                 string newSubtableId = ProgSettings.GetNewSubTableId();
-                dbDocsTableOutput.AppendLine("insert  into `dbdocssubtables" + selectedLang + "`(`subtableId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" + newSubtableId.ToString() + ",'" + selectedField + "','" + txtSubtableNotes.Text + "','" + txtSubtableNotes.Text + "');");
-                ProgSettings.SubTableInsert(newSubtableId, selectedField, txtSubtableNotes.Text, txtSubtableNotes.Text);
+                dbDocsTableOutput.AppendLine("insert  into `dbdocssubtables" + selectedLang + "`(`subtableId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" + newSubtableId.ToString() + ",'" + selectedField + "','" + ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" + ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
+                ProgSettings.SubTableInsert(newSubtableId, selectedField, txtSubtableContent.Text, txtSubtableTemplate.Text);
                 subTableId = newSubtableId.ToString();
             }
 
@@ -138,5 +147,11 @@ namespace DBDocs_Editor
                 outfile.Write(dbDocsTableOutput.ToString());
             }
         }
+
+
+        private void btnRebuildContent_Click(object sender, EventArgs e)
+        {
+        }
+
     }
 }
