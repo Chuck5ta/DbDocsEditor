@@ -48,9 +48,11 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.txtSubtableContent = new System.Windows.Forms.TextBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.webBrowse = new System.Windows.Forms.WebBrowser();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -159,6 +161,7 @@
             this.btnRenderContent.TabIndex = 13;
             this.btnRenderContent.Text = "Render Content";
             this.btnRenderContent.UseVisualStyleBackColor = true;
+            this.btnRenderContent.Click += new System.EventHandler(this.btnRenderContent_Click);
             // 
             // btnRebuildContent
             // 
@@ -245,12 +248,22 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.webBrowse);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Size = new System.Drawing.Size(441, 296);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Rendered HTML";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // webBrowse
+            // 
+            this.webBrowse.Location = new System.Drawing.Point(0, 0);
+            this.webBrowse.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.webBrowse.MinimumSize = new System.Drawing.Size(23, 22);
+            this.webBrowse.Name = "webBrowse";
+            this.webBrowse.Size = new System.Drawing.Size(441, 296);
+            this.webBrowse.TabIndex = 6;
             // 
             // frmSubtables
             // 
@@ -280,6 +293,7 @@
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.tabPage3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -307,6 +321,7 @@
         private System.Windows.Forms.TextBox txtSubtableContent;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.TextBox txtSubtableTemplate;
+        internal System.Windows.Forms.WebBrowser webBrowse;
     }
 }
 

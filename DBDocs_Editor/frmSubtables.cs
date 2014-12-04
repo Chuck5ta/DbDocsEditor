@@ -35,6 +35,10 @@ namespace DBDocs_Editor
                     subTableId = dbViewList.Tables[0].Rows[thisRow]["subtableid"].ToString();
                     txtSubtableContent.Text = dbViewList.Tables[0].Rows[thisRow]["subtablecontent"].ToString();
                     txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[thisRow]["subtabletemplate"].ToString();
+
+                    // Render the HTML
+                    webBrowse.DocumentText = txtSubtableContent.Text;
+
                     chkDBDocsEntry.Checked = true;
 
                     if (string.IsNullOrEmpty(txtSubtableTemplate.Text))
@@ -151,6 +155,21 @@ namespace DBDocs_Editor
 
         private void btnRebuildContent_Click(object sender, EventArgs e)
         {
+            if (txtSubtableTemplate.Text.Contains("\r\n"))
+            {
+                string header = txtSubtableTemplate.Text;
+                header = header.Substring(0,header.IndexOf("\r\n"));
+
+                string body = txtSubtableTemplate.Text;
+                body=body.Substring(body.IndexOf("\r\n")+2,body.Length-(body.IndexOf("\r\n")+2));
+
+                txtSubtableContent.Text = ProgSettings.ConvertTemplateToHtml(header,body);
+            }
+        }
+
+        private void btnRenderContent_Click(object sender, EventArgs e)
+        {
+            webBrowse.DocumentText = txtSubtableContent.Text;
         }
 
     }

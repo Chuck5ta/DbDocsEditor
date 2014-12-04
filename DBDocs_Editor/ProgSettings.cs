@@ -4,6 +4,7 @@ using System.Data;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using MySql.Data.MySqlClient;
+using System.Text;
 
 namespace DBDocs_Editor
 {
@@ -574,6 +575,113 @@ namespace DBDocs_Editor
             inText = inText.Replace("><b>", ">");
             return inText;
         }
+
+        /// <summary>
+        /// Converts the Template markup to HTML
+        /// </summary>
+        /// <param name="templateText"></param>
+        /// <returns></returns>
+        public static string ConvertTemplateToHtml(string templateHeader, string templateText)
+        {
+            bool blnBuild = false;
+            StringBuilder sbHtml = new StringBuilder();
+            string[] strHeaders = null;
+            if (templateHeader.EndsWith("|"))
+                templateHeader = templateHeader.Substring(0, templateHeader.Length - 1);
+
+            string[] stringSeparators = new string[] { "|" };
+            strHeaders = templateHeader.Trim().Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+            
+            string[] strHeaderCols = null;
+
+            if (templateText.Contains("|"))
+                blnBuild = true;
+
+            if (blnBuild == true)
+            {
+                sbHtml.AppendLine("<table border='1' cellspacing='1' cellpadding='3' bgcolor='#f0f0f0'>");
+                sbHtml.AppendLine("<tr bgcolor='#f0f0ff'>");
+                //"<thead>")
+
+                //Process the headers
+                strHeaderCols = new string[strHeaders.GetUpperBound(0) + 1];
+                for (int intHead = 0; intHead <= strHeaders.GetUpperBound(0); intHead++)
+                {
+                    if (strHeaders[intHead].StartsWith("<"))
+                    {
+                        sbHtml.AppendLine("<th align='left'><b>" + strHeaders[intHead].Substring(1) + "</b></th>");
+                        strHeaderCols[intHead] = "1";
+                    }
+                    else if (strHeaders[intHead].StartsWith(">"))
+                    {
+                        sbHtml.AppendLine("<th align='right'><b>" + strHeaders[intHead].Substring(1) + "</b></th>");
+                        strHeaderCols[intHead] = "2";
+                    }
+                    else
+                    {
+                        sbHtml.AppendLine("<th><b>" + strHeaders[intHead] + "</b></th>");
+                    }
+                }
+                //SbHtml.AppendLine("</thead>")
+            }
+
+            //Now need to process the body
+            string[] strLines = null;
+            string[] strBody = null;
+            string[] stringSeparators2 = new string[] { "\r\n" };
+            strLines = templateText.Split(stringSeparators2, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int intLines = 0; intLines <= strLines.GetUpperBound(0); intLines++)
+            {
+                if (blnBuild == true)
+                {
+                    strBody = strLines[intLines].Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+            
+                    if (intLines % 2 == 0)
+                    {
+                        //               sbHtml.Append("<tr bgcolor='#FAF8FA'>")
+                        sbHtml.Append("<tr bgcolor='#FFFFEE'>");
+                    }
+                    else
+                    {
+                        //                sbHtml.Append("<tr bgcolor='#F8FAFA'>")
+                        sbHtml.Append("<tr bgcolor='#FEFEFF'>");
+                    }
+
+                    for (int intFields = 0; intFields <= strBody.GetUpperBound(0); intFields++)
+                    {
+                        strBody[intFields] = strBody[intFields].Trim();
+                        if (strBody[intFields].Length > 0)
+                        {
+                            if (strHeaderCols[intFields] == "1")
+                            {
+                                sbHtml.Append("<td align='left' valign='middle'>" + strBody[intFields] + "</td>");
+                            }
+                            else if (strHeaderCols[intFields] == "2")
+                            {
+                                sbHtml.Append("<td align='right' valign='middle'>" + strBody[intFields] + "</td>");
+                            }
+                            else
+                            {
+                                sbHtml.Append("<td align='center' valign='middle'>" + strBody[intFields] + "</td>");
+                            }
+                        }
+                    }
+                    sbHtml.AppendLine("</tr>");
+                }
+                else
+                {
+                    sbHtml.AppendLine(strLines[intLines]);
+                }
+            }
+            if (blnBuild == true)
+                sbHtml.AppendLine("</table>");
+
+            
+//            //.Replace("<", "&lt;").Replace(">", "&gt;")
+            return sbHtml.ToString();
+        }
+
 
         /// <summary>
         /// Replace ' with an escaped \' so SQL is happy
