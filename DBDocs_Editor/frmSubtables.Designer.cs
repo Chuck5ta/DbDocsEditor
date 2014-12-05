@@ -40,12 +40,12 @@
             this.chkHasTemplate = new System.Windows.Forms.CheckBox();
             this.btnRenderContent = new System.Windows.Forms.Button();
             this.btnRebuildContent = new System.Windows.Forms.Button();
-            this.listBox1 = new System.Windows.Forms.ListBox();
             this.lstLangs = new System.Windows.Forms.ListBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.txtSubtableTemplate = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.chkUseEnglish = new System.Windows.Forms.CheckBox();
             this.txtSubtableContent = new System.Windows.Forms.TextBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.webBrowse = new System.Windows.Forms.WebBrowser();
@@ -123,6 +123,7 @@
             // 
             // btnSave
             // 
+            this.btnSave.Enabled = false;
             this.btnSave.Location = new System.Drawing.Point(177, 332);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(101, 23);
@@ -173,19 +174,6 @@
             this.btnRebuildContent.UseVisualStyleBackColor = true;
             this.btnRebuildContent.Click += new System.EventHandler(this.btnRebuildContent_Click);
             // 
-            // listBox1
-            // 
-            this.listBox1.ColumnWidth = 140;
-            this.listBox1.Font = new System.Drawing.Font("Arial Rounded MT Bold", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.HorizontalScrollbar = true;
-            this.listBox1.ItemHeight = 14;
-            this.listBox1.Location = new System.Drawing.Point(284, 361);
-            this.listBox1.MultiColumn = true;
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(441, 60);
-            this.listBox1.TabIndex = 15;
-            // 
             // lstLangs
             // 
             this.lstLangs.FormattingEnabled = true;
@@ -193,6 +181,18 @@
             this.lstLangs.Name = "lstLangs";
             this.lstLangs.Size = new System.Drawing.Size(98, 108);
             this.lstLangs.TabIndex = 16;
+            // 
+            // chkUseEnglish
+            // 
+            this.chkUseEnglish.AutoSize = true;
+            this.chkUseEnglish.Checked = true;
+            this.chkUseEnglish.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkUseEnglish.Location = new System.Drawing.Point(180, 265);
+            this.chkUseEnglish.Name = "chkUseEnglish";
+            this.chkUseEnglish.Size = new System.Drawing.Size(105, 17);
+            this.chkUseEnglish.TabIndex = 19;
+            this.chkUseEnglish.Text = "English if missing";
+            this.chkUseEnglish.UseVisualStyleBackColor = true;
             // 
             // tabControl1
             // 
@@ -272,7 +272,6 @@
             this.ClientSize = new System.Drawing.Size(737, 430);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.lstLangs);
-            this.Controls.Add(this.listBox1);
             this.Controls.Add(this.btnRenderContent);
             this.Controls.Add(this.btnRebuildContent);
             this.Controls.Add(this.chkHasTemplate);
@@ -285,6 +284,10 @@
             this.Controls.Add(this.btnQuit);
             this.Controls.Add(this.lstsubtables);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.chkUseEnglish);
+            this.DoubleBuffered = true;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "frmSubtables";
             this.Text = "subtables Form";
             this.Load += new System.EventHandler(this.frmsubtables_Load);
@@ -313,8 +316,8 @@
         private System.Windows.Forms.CheckBox chkHasTemplate;
         private System.Windows.Forms.Button btnRenderContent;
         private System.Windows.Forms.Button btnRebuildContent;
-        private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.ListBox lstLangs;
+        private System.Windows.Forms.CheckBox chkUseEnglish;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
@@ -324,4 +327,3 @@
         internal System.Windows.Forms.WebBrowser webBrowse;
     }
 }
-

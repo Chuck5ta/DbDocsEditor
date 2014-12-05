@@ -422,28 +422,28 @@ namespace DBDocs_Editor
             }
         }
 
-        /// <summary>
-        /// Based on the language listbox entries, use the last 2 characters as language identifier. English (EN) has no prefix so it's removed 
-        /// </summary>
-        /// <param name="langsetting"></param>
-        /// <returns></returns>
-        public static string SetLocalisationModifier(string langsetting)
-        {
-            if (langsetting.Length > 2)
-            {
-                langsetting = langsetting.Substring(langsetting.Length - 2);
-            }
-            if (langsetting == "EN")
-            {
-                langsetting = "";
-            }
+        ///// <summary>
+        ///// Based on the language listbox entries, use the last 2 characters as language identifier. English (EN) has no prefix so it's removed 
+        ///// </summary>
+        ///// <param name="langsetting"></param>
+        ///// <returns></returns>
+        //public static string SetLocalisationModifier(string langsetting)
+        //{
+        //    if (langsetting.Length > 2)
+        //    {
+        //        langsetting = langsetting.Substring(langsetting.Length - 2);
+        //    }
+        //    if (langsetting == "EN")
+        //    {
+        //        langsetting = "";
+        //    }
 
-            if (!string.IsNullOrEmpty(langsetting))
-            {
-                langsetting = "_" + langsetting;
-            }
-            return langsetting;
-        }
+        //    if (!string.IsNullOrEmpty(langsetting))
+        //    {
+        //        langsetting = "_" + langsetting;
+        //    }
+        //    return langsetting;
+        //}
 
         /// <summary>
         /// Populate the Language Listboxes
@@ -451,8 +451,25 @@ namespace DBDocs_Editor
         /// <param name="lstLangs"></param>
         public static void LoadLangs(ListBox lstLangs)
         {
-            lstLangs.Items.Add("ENGLISH  - EN");
-            lstLangs.Items.Add("FRANCAIS - FR");
+            // The following command reads all the columns for the selected table
+            var dbViewList = ProgSettings.SelectRows("SELECT * FROM dbdocslanguage");
+
+            // Did we return anything
+            if (dbViewList != null)
+            {
+                // Do we have rows
+                if (dbViewList.Tables[0].Rows.Count > 0)
+                {
+                    lstLangs.Items.Clear();
+
+                    // for each Field returned, populate the listbox with the table name
+                    for (var thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
+                    {
+                        var tableName = dbViewList.Tables[0].Rows[thisRow]["LanguageName"].ToString();
+                        lstLangs.Items.Add(tableName);
+                    }
+                }
+            }
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
         }
 

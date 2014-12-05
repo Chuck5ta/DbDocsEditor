@@ -27,14 +27,30 @@ namespace DBDocs_Editor
             txtFieldName.Text = selectedField;
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
-            string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Items[lstLangs.SelectedIndex].ToString());
 
-            var dbViewList = ProgSettings.SelectRows("SELECT FieldNotes FROM dbdocsfields" + selectedLang + " where TableName='" + TableName + "'" + " AND FieldName='" + selectedField + "'");
+            DataSet dbViewList = null;
+            if (lstLangs.SelectedIndex == 0)
+            {   // If English, connect to main table
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocsfields`.`FieldNotes` FROM `dbdocsfields` WHERE `FieldName` = '" + selectedField + "'");
+            }
+            else
+            {   // If Non-English, join to localised table and grab field
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocsfields_localised`.`FieldNotes`, `dbdocsfields`.`FieldNotes` as FieldNotesEnglish FROM `dbdocsfields` INNER JOIN `dbdocsfields_localised` ON `dbdocsfields`.`fieldId` = `dbdocsfields_localised`.`fieldId` where TableName='" + TableName + "'" + " AND FieldName='" + selectedField + "' (AND `dbdocsfields_localised`.`languageId`=" + lstLangs.SelectedIndex + "  OR `dbdocsfields`.`languageId`=0);");
+            }
+
             if (dbViewList != null)
             {
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
                     txtFieldNotes.Text = dbViewList.Tables[0].Rows[0]["FieldNotes"].ToString();
+                    if (chkUseEnglish.Checked == true)
+                    {
+                        if (string.IsNullOrEmpty(txtFieldNotes.Text))
+                        {
+                            txtFieldNotes.Text = dbViewList.Tables[0].Rows[0]["FieldNotesEnglish"].ToString();
+                        }
+                    }
+
                     chkDBDocsEntry.Checked = true;
 
                     //Check for Subtables
@@ -51,6 +67,8 @@ namespace DBDocs_Editor
                 txtFieldNotes.Text = "";
                 chkDBDocsEntry.Checked = false;
             }
+
+            btnSave.Enabled = true;
         }
 
         private void btnQuit_Click(object sender, EventArgs e)
@@ -87,47 +105,54 @@ namespace DBDocs_Editor
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            var dbDocsTableOutput = new StringBuilder();
-            string outputFolder = Application.ExecutablePath;
+        //    var dbDocsTableOutput = new StringBuilder();
+        //    string outputFolder = Application.ExecutablePath;
 
-            // Strip the Executable name from the path
-            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
+        //    // Strip the Executable name from the path
+        //    outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
 
-            string selectedField = lstFields.Text;
-            txtFieldName.Text = selectedField;
+        //    string selectedField = lstFields.Text;
+        //    txtFieldName.Text = selectedField;
 
-            if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
-            string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Items[lstLangs.SelectedIndex].ToString());
+        //    if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
+        //    string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Items[lstLangs.SelectedIndex].ToString());
 
-            //delete from `dbdocsfields` where `tableName`= 'creature' and `fieldName`= 'entry';
-            //insert  into `dbdocsfields`(`tableName`,`fieldName`,`tableNotes`) values ('creature','entry','xxxx');
-            dbDocsTableOutput.AppendLine("delete from `dbdocsfields" + selectedLang + "` where `tableName`= '" + TableName + " and `fieldName`= '" + selectedField + "';");
-            dbDocsTableOutput.AppendLine("insert  into `dbdocsfields" + selectedLang + "`(`tableName`,`fieldName`,`tableNotes`) values ('" + TableName + "','" + selectedField + "','" + txtFieldNotes.Text + "');");
+        //    //delete from `dbdocsfields` where `tableName`= 'creature' and `fieldName`= 'entry';
+        //    //insert  into `dbdocsfields`(`tableName`,`fieldName`,`tableNotes`) values ('creature','entry','xxxx');
+        //    dbDocsTableOutput.AppendLine("delete from `dbdocsfields" + selectedLang + "` where `tableName`= '" + TableName + " and `fieldName`= '" + selectedField + "';");
+        //    dbDocsTableOutput.AppendLine("insert  into `dbdocsfields" + selectedLang + "`(`tableName`,`fieldName`,`tableNotes`) values ('" + TableName + "','" + selectedField + "','" + txtFieldNotes.Text + "');");
 
-            // If the output folder doesnt exist, create it
-            if (!Directory.Exists(outputFolder + @"\"))
-            {
-                Directory.CreateDirectory(outputFolder + @"\");
-            }
+        //    // If the output folder doesnt exist, create it
+        //    if (!Directory.Exists(outputFolder + @"\"))
+        //    {
+        //        Directory.CreateDirectory(outputFolder + @"\");
+        //    }
 
-            // Open the file for append and write the entries to it
-            using (var outfile = new StreamWriter(outputFolder + @"\dbdocsFields" + selectedLang + ".SQL", true))
-            {
-                outfile.Write(dbDocsTableOutput.ToString());
-            }
+        //    // Open the file for append and write the entries to it
+        //    using (var outfile = new StreamWriter(outputFolder + @"\dbdocsFields" + selectedLang + ".SQL", true))
+        //    {
+        //        outfile.Write(dbDocsTableOutput.ToString());
+        //    }
 
-            //Now the next part, updating the db directly
-            if (chkDBDocsEntry.Checked == false)
-            {       //INSERT
-                ProgSettings.FieldInsert(TableName, selectedField, txtFieldNotes.Text);
-            }
-            else
-            {       //UPDATE
-                ProgSettings.FieldUpdate(TableName, selectedField, txtFieldNotes.Text);
-            }
+        //    //Now the next part, updating the db directly
+        //    if (chkDBDocsEntry.Checked == false)
+        //    {       //INSERT
+        //        ProgSettings.FieldInsert(TableName, selectedField, txtFieldNotes.Text);
+        //    }
+        //    else
+        //    {       //UPDATE
+        //        ProgSettings.FieldUpdate(TableName, selectedField, txtFieldNotes.Text);
+        //    }
 
             MessageBox.Show("Save Complete");
         }
+
+        private void btnShowSubtables_Click(object sender, EventArgs e)
+        {
+            var subTableScreen = new frmSubtables { subTableId = "" };
+            subTableScreen.Show();
+        }
+
         private void lstSubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
             // The subtable entry in the listbox starts xx:, to need to trim everything after the :

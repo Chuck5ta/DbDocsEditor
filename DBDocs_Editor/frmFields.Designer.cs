@@ -38,7 +38,9 @@
             this.chkDBDocsEntry = new System.Windows.Forms.CheckBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.lstSubtables = new System.Windows.Forms.ListBox();
+            this.btnShowSubtables = new System.Windows.Forms.Button();
             this.lstLangs = new System.Windows.Forms.ListBox();
+            this.chkUseEnglish = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -118,6 +120,7 @@
             // 
             // btnSave
             // 
+            this.btnSave.Enabled = false;
             this.btnSave.Location = new System.Drawing.Point(180, 332);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(101, 23);
@@ -140,13 +143,35 @@
             this.lstSubtables.TabIndex = 11;
             this.lstSubtables.SelectedIndexChanged += new System.EventHandler(this.lstSubtables_SelectedIndexChanged);
             // 
+            // btnShowSubtables
+            // 
+            this.btnShowSubtables.Location = new System.Drawing.Point(177, 395);
+            this.btnShowSubtables.Name = "btnShowSubtables";
+            this.btnShowSubtables.Size = new System.Drawing.Size(101, 23);
+            this.btnShowSubtables.TabIndex = 12;
+            this.btnShowSubtables.Text = "Show Subtables";
+            this.btnShowSubtables.UseVisualStyleBackColor = true;
+            this.btnShowSubtables.Click += new System.EventHandler(this.btnShowSubtables_Click);
+            // 
             // lstLangs
             // 
             this.lstLangs.FormattingEnabled = true;
             this.lstLangs.Location = new System.Drawing.Point(177, 112);
             this.lstLangs.Name = "lstLangs";
-            this.lstLangs.Size = new System.Drawing.Size(101, 108);
+            this.lstLangs.Size = new System.Drawing.Size(101, 147);
             this.lstLangs.TabIndex = 19;
+            // 
+            // chkUseEnglish
+            // 
+            this.chkUseEnglish.AutoSize = true;
+            this.chkUseEnglish.Checked = true;
+            this.chkUseEnglish.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkUseEnglish.Location = new System.Drawing.Point(180, 265);
+            this.chkUseEnglish.Name = "chkUseEnglish";
+            this.chkUseEnglish.Size = new System.Drawing.Size(105, 17);
+            this.chkUseEnglish.TabIndex = 19;
+            this.chkUseEnglish.Text = "English if missing";
+            this.chkUseEnglish.UseVisualStyleBackColor = true;
             // 
             // frmFields
             // 
@@ -155,6 +180,7 @@
             this.ClientSize = new System.Drawing.Size(737, 430);
             this.Controls.Add(this.lstLangs);
             this.Controls.Add(this.lstSubtables);
+            this.Controls.Add(this.btnShowSubtables);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.chkDBDocsEntry);
             this.Controls.Add(this.txtFieldNotes);
@@ -164,6 +190,8 @@
             this.Controls.Add(this.btnQuit);
             this.Controls.Add(this.lstFields);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.chkUseEnglish);
+            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "frmFields";
@@ -186,6 +214,8 @@
         private System.Windows.Forms.CheckBox chkDBDocsEntry;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.ListBox lstSubtables;
+        private System.Windows.Forms.Button btnShowSubtables;
         private System.Windows.Forms.ListBox lstLangs;
+        private System.Windows.Forms.CheckBox chkUseEnglish;
     }
 }

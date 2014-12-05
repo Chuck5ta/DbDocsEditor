@@ -24,14 +24,30 @@ namespace DBDocs_Editor
             txtTableName.Text = selectedTable;
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
-            string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Text);
 
-            var dbViewList = ProgSettings.SelectRows("SELECT TableNotes FROM dbdocstable" + selectedLang + " where TableName='" + selectedTable + "'");
+            DataSet dbViewList = null;
+            if (lstLangs.SelectedIndex == 0)
+            {   // If English, connect to main table
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable`.`tableNotes` FROM `dbdocstable` WHERE `tablename` = '" + selectedTable + "'"); 
+            }
+            else
+            {   // If Non-English, join to localised table and grab field
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable_localised`.`tableNotes`, `dbdocstable`.`tableNotes` as TableNotesEnglish FROM `dbdocstable` LEFT JOIN `dbdocstable_localised` ON `dbdocstable`.`tableId` = `dbdocstable_localised`.`tableId` WHERE `tablename` = '" + selectedTable + "' AND (`dbdocstable_localised`.`languageId`=" + lstLangs.SelectedIndex + " OR `dbdocstable`.`languageId`=0)"); 
+            }
+
             if (dbViewList != null)
             {
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
                     txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotes"].ToString();
+                    if (chkUseEnglish.Checked == true)
+                    {
+                        if (string.IsNullOrEmpty(txtTableNotes.Text))
+                        {
+                            txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotesEnglish"].ToString();
+                        }
+                    }
+
                     chkDBDocsEntry.Checked = true;
 
                     //Check for Subtables
@@ -90,49 +106,48 @@ namespace DBDocs_Editor
             }
 
             ProgSettings.LoadLangs(lstLangs);
-
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            var dbDocsTableOutput = new StringBuilder();
-            string outputFolder = Application.ExecutablePath;
+            //var dbDocsTableOutput = new StringBuilder();
+            //string outputFolder = Application.ExecutablePath;
 
-            // Strip the Executable name from the path
-            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
+            //// Strip the Executable name from the path
+            //outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
 
-            string selectedTable = lstTables.Text;
-            txtTableName.Text = selectedTable;
+            //string selectedTable = lstTables.Text;
+            //txtTableName.Text = selectedTable;
 
-            if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
-            string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Items[lstLangs.SelectedIndex].ToString());
+            //if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
+            //string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Items[lstLangs.SelectedIndex].ToString());
 
-            //delete from `dbdocstable` where `tableName`= 'creature';
-            //insert  into `dbdocstable`(`tableName`,`tableNotes`) values ('script_texts','xxxx');
-            dbDocsTableOutput.AppendLine("delete from `dbdocstable" + selectedLang + "` where `tableName`= '" + selectedTable + "';");
-            dbDocsTableOutput.AppendLine("insert  into `dbdocstable" + selectedLang + "`(`tableName`,`tableNotes`) values ('" + selectedTable + "','" + txtTableNotes.Text + "');");
+            ////delete from `dbdocstable` where `tableName`= 'creature';
+            ////insert  into `dbdocstable`(`tableName`,`tableNotes`) values ('script_texts','xxxx');
+            //dbDocsTableOutput.AppendLine("delete from `dbdocstable" + selectedLang + "` where `tableName`= '" + selectedTable + "';");
+            //dbDocsTableOutput.AppendLine("insert  into `dbdocstable" + selectedLang + "`(`tableName`,`tableNotes`) values ('" + selectedTable + "','" + txtTableNotes.Text + "');");
 
-            // If the output folder doesnt exist, create it
-            if (!Directory.Exists(outputFolder + @"\"))
-            {
-                Directory.CreateDirectory(outputFolder + @"\");
-            }
+            //// If the output folder doesnt exist, create it
+            //if (!Directory.Exists(outputFolder + @"\"))
+            //{
+            //    Directory.CreateDirectory(outputFolder + @"\");
+            //}
 
-            // Open the file for append and write the entries to it
-            using (var outfile = new StreamWriter(outputFolder + @"\dbdocsTable" + selectedLang + ".SQL", true))
-            {
-                outfile.Write(dbDocsTableOutput.ToString());
-            }
+            //// Open the file for append and write the entries to it
+            //using (var outfile = new StreamWriter(outputFolder + @"\dbdocsTable" + selectedLang + ".SQL", true))
+            //{
+            //    outfile.Write(dbDocsTableOutput.ToString());
+            //}
 
-            //Now the next part, updating the db directly
-            if (chkDBDocsEntry.Checked == false)
-            {       //INSERT
-                ProgSettings.TableInsert(selectedTable, txtTableNotes.Text);
-            }
-            else
-            {       //UPDATE
-                ProgSettings.TableUpdate(selectedTable, txtTableNotes.Text);
-            }
+            ////Now the next part, updating the db directly
+            //if (chkDBDocsEntry.Checked == false)
+            //{       //INSERT
+            //    ProgSettings.TableInsert(selectedTable, txtTableNotes.Text);
+            //}
+            //else
+            //{       //UPDATE
+            //    ProgSettings.TableUpdate(selectedTable, txtTableNotes.Text);
+            //}
 
             MessageBox.Show("Save Complete");
         }

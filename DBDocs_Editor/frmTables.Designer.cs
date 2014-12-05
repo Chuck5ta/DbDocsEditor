@@ -41,6 +41,7 @@
             this.btnShowFields = new System.Windows.Forms.Button();
             this.btnShowSubtables = new System.Windows.Forms.Button();
             this.lstLangs = new System.Windows.Forms.ListBox();
+            this.chkUseEnglish = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -169,8 +170,20 @@
             this.lstLangs.FormattingEnabled = true;
             this.lstLangs.Location = new System.Drawing.Point(177, 112);
             this.lstLangs.Name = "lstLangs";
-            this.lstLangs.Size = new System.Drawing.Size(101, 108);
+            this.lstLangs.Size = new System.Drawing.Size(101, 147);
             this.lstLangs.TabIndex = 18;
+            // 
+            // chkUseEnglish
+            // 
+            this.chkUseEnglish.AutoSize = true;
+            this.chkUseEnglish.Checked = true;
+            this.chkUseEnglish.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkUseEnglish.Location = new System.Drawing.Point(180, 265);
+            this.chkUseEnglish.Name = "chkUseEnglish";
+            this.chkUseEnglish.Size = new System.Drawing.Size(105, 17);
+            this.chkUseEnglish.TabIndex = 19;
+            this.chkUseEnglish.Text = "English if missing";
+            this.chkUseEnglish.UseVisualStyleBackColor = true;
             // 
             // frmTables
             // 
@@ -190,6 +203,7 @@
             this.Controls.Add(this.btnQuit);
             this.Controls.Add(this.lstTables);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.chkUseEnglish);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -216,5 +230,6 @@
         private System.Windows.Forms.Button btnShowFields;
         private System.Windows.Forms.Button btnShowSubtables;
         private System.Windows.Forms.ListBox lstLangs;
+        private System.Windows.Forms.CheckBox chkUseEnglish;
     }
 }
