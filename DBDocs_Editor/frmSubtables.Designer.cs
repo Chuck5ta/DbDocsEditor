@@ -45,10 +45,10 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.txtSubtableTemplate = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.chkUseEnglish = new System.Windows.Forms.CheckBox();
             this.txtSubtableContent = new System.Windows.Forms.TextBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.webBrowse = new System.Windows.Forms.WebBrowser();
+            this.chkUseEnglish = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -156,7 +156,7 @@
             // 
             // btnRenderContent
             // 
-            this.btnRenderContent.Location = new System.Drawing.Point(177, 226);
+            this.btnRenderContent.Location = new System.Drawing.Point(177, 284);
             this.btnRenderContent.Name = "btnRenderContent";
             this.btnRenderContent.Size = new System.Drawing.Size(101, 23);
             this.btnRenderContent.TabIndex = 13;
@@ -181,18 +181,6 @@
             this.lstLangs.Name = "lstLangs";
             this.lstLangs.Size = new System.Drawing.Size(98, 108);
             this.lstLangs.TabIndex = 16;
-            // 
-            // chkUseEnglish
-            // 
-            this.chkUseEnglish.AutoSize = true;
-            this.chkUseEnglish.Checked = true;
-            this.chkUseEnglish.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkUseEnglish.Location = new System.Drawing.Point(180, 265);
-            this.chkUseEnglish.Name = "chkUseEnglish";
-            this.chkUseEnglish.Size = new System.Drawing.Size(105, 17);
-            this.chkUseEnglish.TabIndex = 19;
-            this.chkUseEnglish.Text = "English if missing";
-            this.chkUseEnglish.UseVisualStyleBackColor = true;
             // 
             // tabControl1
             // 
@@ -264,6 +252,18 @@
             this.webBrowse.Name = "webBrowse";
             this.webBrowse.Size = new System.Drawing.Size(441, 296);
             this.webBrowse.TabIndex = 6;
+            // 
+            // chkUseEnglish
+            // 
+            this.chkUseEnglish.AutoSize = true;
+            this.chkUseEnglish.Checked = true;
+            this.chkUseEnglish.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkUseEnglish.Location = new System.Drawing.Point(180, 232);
+            this.chkUseEnglish.Name = "chkUseEnglish";
+            this.chkUseEnglish.Size = new System.Drawing.Size(105, 17);
+            this.chkUseEnglish.TabIndex = 19;
+            this.chkUseEnglish.Text = "English if missing";
+            this.chkUseEnglish.UseVisualStyleBackColor = true;
             // 
             // frmSubtables
             // 

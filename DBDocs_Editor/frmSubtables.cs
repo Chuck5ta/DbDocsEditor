@@ -34,31 +34,38 @@ namespace DBDocs_Editor
             }
             else
             {   // If Non-English, join to localised table and grab field
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocssubtables`.`subtableid`, `dbdocssubtables_localised`.`subtabletemplate`, `dbdocssubtables_localised`.`subtablecontent` FROM `dbdocssubtables` INNER JOIN `dbdocssubtables_localised` ON `dbdocssubtables`.`subtableid` = `dbdocssubtables_localised`.`subtableid` WHERE `subtablename` = '" + selectedSubtable + "' AND (`dbdocssubtables_localised`.`languageId`=" + lstLangs.SelectedIndex + "  OR `dbdocssubtables`.`languageId`=0);");
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocssubtables`.`subtableid`, `dbdocssubtables_localised`.`subtabletemplate`, `dbdocssubtables_localised`.`subtablecontent`, `dbdocssubtables`.`subtabletemplate` as subtableTemplateEnglish, `dbdocssubtables`.`subtablecontent` as subTableContentEnglish FROM `dbdocssubtables` INNER JOIN `dbdocssubtables_localised` ON `dbdocssubtables`.`subtableid` = `dbdocssubtables_localised`.`subtableid` WHERE `subtablename` = '" + selectedSubtable + "' AND (`dbdocssubtables_localised`.`languageId`=" + lstLangs.SelectedIndex + "  OR `dbdocssubtables`.`languageId`=0);");
             }
 
             if (dbViewList != null)
             {
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
-                    for (int thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
-                    {
-                          subTableId = dbViewList.Tables[0].Rows[thisRow]["subtableid"].ToString();
-                        txtSubtableContent.Text = dbViewList.Tables[0].Rows[thisRow]["subtablecontent"].ToString();
-                        txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[thisRow]["subtabletemplate"].ToString();
-
-                        // Render the HTML
-                        webBrowse.DocumentText = txtSubtableContent.Text;
-
-                        chkDBDocsEntry.Checked = true;
-
+                    subTableId = dbViewList.Tables[0].Rows[0]["subtableid"].ToString();
+                    txtSubtableContent.Text = dbViewList.Tables[0].Rows[0]["subtablecontent"].ToString();
+                    txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[0]["subtabletemplate"].ToString();
+                        
+                    // If the 'Use English' if blank checkbox is ticked
+                    if (chkUseEnglish.Checked == true)
+                    {   // If Localised SubTable Template is blank, go grab the English
                         if (string.IsNullOrEmpty(txtSubtableTemplate.Text))
-                        {   //If the template is missing, attempt to build it from the content, only for historic entries !!
-                            txtSubtableTemplate.Text = ProgSettings.ConvertHtmlToTemplate(txtSubtableContent.Text);
-
-                            //Save the updated Template
-                            btnSave_Click(sender, e);
+                        {
+                            txtSubtableContent.Text = dbViewList.Tables[0].Rows[0]["subtablecontentEnglish"].ToString();
+                            txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[0]["subtabletemplateEnglish"].ToString();
                         }
+                    }
+
+                    // Render the HTML
+                    webBrowse.DocumentText = txtSubtableContent.Text;
+
+                    chkDBDocsEntry.Checked = true;
+
+                    if (string.IsNullOrEmpty(txtSubtableTemplate.Text))
+                    {   //If the template is missing, attempt to build it from the content, only for historic entries !!
+                        txtSubtableTemplate.Text = ProgSettings.ConvertHtmlToTemplate(txtSubtableContent.Text);
+
+                        //Save the updated Template
+                        btnSave_Click(sender, e);
                     }
                 }
                 else  // No dbdocs match

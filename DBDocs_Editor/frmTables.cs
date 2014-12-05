@@ -40,8 +40,10 @@ namespace DBDocs_Editor
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
                     txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotes"].ToString();
+                        
+                    // If the 'Use English' if blank checkbox is ticked
                     if (chkUseEnglish.Checked == true)
-                    {
+                    {   // If Localised SubTable Template is blank, go grab the English
                         if (string.IsNullOrEmpty(txtTableNotes.Text))
                         {
                             txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotesEnglish"].ToString();
@@ -151,6 +153,7 @@ namespace DBDocs_Editor
 
             MessageBox.Show("Save Complete");
         }
+
 
         private void btnShowSubtables_Click(object sender, EventArgs e)
         {
