@@ -451,7 +451,6 @@ namespace DBDocs_Editor
         /// <param name="lstLangs"></param>
         public static void LoadLangs(ListBox lstLangs)
         {
-            lstLangs.Items.Clear();
             lstLangs.Items.Add("ENGLISH  - EN");
             lstLangs.Items.Add("FRANCAIS - FR");
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
