@@ -138,19 +138,24 @@ namespace DBDocs_Editor
             return myDataset;
         }
 
+        #region "dbdocsTable Functions"
         /// <summary>
         /// Inserts a record into the dbdocstable table
         /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="tableNotes">The table notes.</param>
-        public static void TableInsert(string tableName, string tableNotes)
+        /// <param name="tableName"></param>
+        /// <param name="languageId"></param>
+        /// <param name="tableNotes"></param>
+        public static void TableInsert(string tableName, int languageId, string tableNotes)
         {
+            
             var conn = new MySqlConnection(sqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
-            cmd.CommandText = "insert  into `dbdocstable`(`tableName`,`tableNotes`) "
-                              + "VALUES (@tablename, @tablenotes)";
 
+            cmd.CommandText = "insert  into `dbdocstable`(`languageId`,`tableName`,`tableNotes`) "
+                              + "VALUES (@languageId, @tablename, @tablenotes)";
+
+            cmd.Parameters.AddWithValue("@languageId", languageId);
             cmd.Parameters.AddWithValue("@tablename", tableName);
             cmd.Parameters.AddWithValue("@tablenotes", tableNotes);
 
@@ -159,23 +164,98 @@ namespace DBDocs_Editor
         }
 
         /// <summary>
-        /// Update a record in the dbdocstable table
+        /// Update a record in the dbdocstable or dbdocstable_localised table
         /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="tableNotes">The table notes.</param>
-        public static void TableUpdate(string tableName, string tableNotes)
+        /// <param name="tableId"></param>
+        /// <param name="languageId"></param>
+        /// <param name="tableNotes"></param>
+        public static void TableUpdate(int tableId, int languageId, string tableNotes)
         {
             var conn = new MySqlConnection(sqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
-            cmd.CommandText = "update `dbdocstable` set `tablenotes`=@tableNotes where `tablename`=@tablename";
 
-            cmd.Parameters.AddWithValue("@tablename", tableName);
+            // Does this entry exist as a main table entry ?
+            if (LookupTableEntry(languageId, tableId) == true)
+            {
+                // Update dbdocs
+                cmd.CommandText = "update `dbdocstable` set `tablenotes`=@tableNotes where tableId=@tableId and languageId=@languageId";
+            }
+            else
+            {   // Does this entry exist as a localised entry ?
+                if (LookupTableEntryLocalised(languageId, tableId) == true)
+                {
+                    // update dbdocs_localised
+                    cmd.CommandText = "update `dbdocstable_localised` set `tablenotes`=@tableNotes where tableId=@tableId and languageId=@languageId";
+                }
+                else
+                { 
+                    // insert into dbdocs_localised
+                    cmd.CommandText = "insert  into `dbdocstable_localised`(`tableId`,`languageId`,`tableNotes`) "
+                                    + "VALUES (@tableId, @languageId, @tablenotes)";
+                }
+            }
+
+            cmd.Parameters.AddWithValue("@tableId", tableId);
+            cmd.Parameters.AddWithValue("@languageId", languageId);
             cmd.Parameters.AddWithValue("@tablenotes", tableNotes);
 
             cmd.ExecuteNonQuery();
             cmd.Connection.Close();
         }
+
+        /// <summary>
+        /// Check whether the data exists in the localised or main table
+        /// </summary>
+        /// <param name="languageId"></param>
+        /// <param name="tableId"></param>
+        /// <returns></returns>
+        public static bool LookupTableEntryLocalised(int languageId, int tableId)
+        {
+            System.Data.DataSet dbView = new System.Data.DataSet();
+            dbView = ProgSettings.SelectRows("SELECT tableNotes FROM dbdocstable_localised where tableId=" + tableId + " and languageId=" + languageId + ";");
+            if (dbView != null)
+            {
+                if (dbView.Tables[0].Rows.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Check whether the data exists in the main table
+        /// </summary>
+        /// <param name="languageId"></param>
+        /// <param name="tableId"></param>
+        /// <returns></returns>
+        public static bool LookupTableEntry(int languageId, int tableId)
+        {
+            System.Data.DataSet dbView = new System.Data.DataSet();
+            dbView = ProgSettings.SelectRows("SELECT tableNotes FROM dbdocstable where tableId=" + tableId + " and languageId=" + languageId + ";");
+            if (dbView != null)
+            {
+                if (dbView.Tables[0].Rows.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+        #endregion "dbdocsTable Functions"
+
+        #region "dbdocsfields Functions"
 
         /// <summary>
         /// Inserts a record into the dbdocsfields table
@@ -183,14 +263,15 @@ namespace DBDocs_Editor
         /// <param name="tableName">Name of the table.</param>
         /// <param name="fieldName">Name of the field.</param>
         /// <param name="fieldNotes">The field notes.</param>
-        public static void FieldInsert(string tableName, string fieldName, string fieldNotes)
+        public static void FieldInsert(int languageId, string tableName, string fieldName, string fieldNotes)
         {
             var conn = new MySqlConnection(sqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
-            cmd.CommandText = "insert  into `dbdocsfields`(`tableName`,`fieldName`,`fieldNotes`) "
-                              + "VALUES (@tablename, @fieldname, @tablenotes)";
+            cmd.CommandText = "insert  into `dbdocsfields`(`languageId`,`tableName`,`fieldName`,`fieldNotes`) "
+                              + "VALUES (@languageId,@tablename, @fieldname, @tablenotes)";
 
+            cmd.Parameters.AddWithValue("@languageId", languageId);
             cmd.Parameters.AddWithValue("@tablename", tableName);
             cmd.Parameters.AddWithValue("@fieldName", fieldName);
             cmd.Parameters.AddWithValue("@fieldNotes", fieldNotes);
@@ -205,20 +286,98 @@ namespace DBDocs_Editor
         /// <param name="tableName">Name of the table.</param>
         /// <param name="fieldName">Name of the field.</param>
         /// <param name="fieldNotes">The field notes.</param>
-        public static void FieldUpdate(string tableName, string fieldName, string fieldNotes)
+        public static void FieldUpdate(int fieldId, int languageId, string fieldNotes)
         {
             var conn = new MySqlConnection(sqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
-            cmd.CommandText = "update `dbdocsfields` set `fieldnotes`=@fieldNotes where `tablename`=@tablename and `fieldname`=@fieldname";
 
-            cmd.Parameters.AddWithValue("@tablename", tableName);
-            cmd.Parameters.AddWithValue("@fieldName", fieldName);
+            // Does this entry exist as a main table entry ?
+            if (LookupFieldEntry(languageId, fieldId) == true)
+            {
+                // Update dbdocs
+                cmd.CommandText = "update `dbdocsfields` set `fieldnotes`=@fieldNotes where `fieldId`=@fieldId and `languageId`=@languageId;";
+            }
+            else
+            {   // Does this entry exist as a localised entry ?
+                if (LookupFieldEntryLocalised(languageId, fieldId) == true)
+                {
+                    // update dbdocs_localised
+                    cmd.CommandText = "update `dbdocsfields_localised` set `fieldnotes`=@fieldNotes where `fieldId`=@fieldId and `languageId`=@languageId;";
+                }
+                else
+                {
+                    // insert into dbdocs_localised
+                    cmd.CommandText = "insert into `dbdocsfields_localised` (`fieldId`,`languageId`,`fieldNotes`) "
+                                    + "VALUES (@fieldId, @languageId, @fieldNotes)";
+                }
+            }
+
+            
+
+            cmd.Parameters.AddWithValue("@fieldId", fieldId);
+            cmd.Parameters.AddWithValue("@languageId", languageId);
             cmd.Parameters.AddWithValue("@fieldNotes", fieldNotes);
 
             cmd.ExecuteNonQuery();
             cmd.Connection.Close();
         }
+
+        /// <summary>
+        /// Check whether the data exists in the localised or main table
+        /// </summary>
+        /// <param name="languageId"></param>
+        /// <param name="tableId"></param>
+        /// <returns></returns>
+        public static bool LookupFieldEntryLocalised(int languageId, int fieldId)
+        {
+            System.Data.DataSet dbView = new System.Data.DataSet();
+            dbView = ProgSettings.SelectRows("SELECT fieldNotes FROM dbdocsfields_localised where fieldId=" + fieldId + " and languageId=" + languageId + ";");
+            if (dbView != null)
+            {
+                if (dbView.Tables[0].Rows.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Check whether the data exists in the main table
+        /// </summary>
+        /// <param name="languageId"></param>
+        /// <param name="tableId"></param>
+        /// <returns></returns>
+        public static bool LookupFieldEntry(int languageId, int fieldId)
+        {
+            System.Data.DataSet dbView = new System.Data.DataSet();
+            dbView = ProgSettings.SelectRows("SELECT fieldNotes FROM dbdocsfields where fieldId=" + fieldId + " and languageId=" + languageId + ";");
+            if (dbView != null)
+            {
+                if (dbView.Tables[0].Rows.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+        #endregion "dbdocsfields Functions"
+
+
+
+
+
 
         /// <summary>
         /// Inserts a record into the dbdocsfields table
@@ -422,29 +581,6 @@ namespace DBDocs_Editor
             }
         }
 
-        ///// <summary>
-        ///// Based on the language listbox entries, use the last 2 characters as language identifier. English (EN) has no prefix so it's removed 
-        ///// </summary>
-        ///// <param name="langsetting"></param>
-        ///// <returns></returns>
-        //public static string SetLocalisationModifier(string langsetting)
-        //{
-        //    if (langsetting.Length > 2)
-        //    {
-        //        langsetting = langsetting.Substring(langsetting.Length - 2);
-        //    }
-        //    if (langsetting == "EN")
-        //    {
-        //        langsetting = "";
-        //    }
-
-        //    if (!string.IsNullOrEmpty(langsetting))
-        //    {
-        //        langsetting = "_" + langsetting;
-        //    }
-        //    return langsetting;
-        //}
-
         /// <summary>
         /// Populate the Language Listboxes
         /// </summary>
@@ -491,7 +627,11 @@ namespace DBDocs_Editor
             return "0";
         }
 
-
+        /// <summary>
+        /// Returns the subTableId for a given subTableName
+        /// </summary>
+        /// <param name="subTableName"></param>
+        /// <returns></returns>
         public static string LookupSubTableId(string subTableName)
         {
             System.Data.DataSet dbViewSubtable = new System.Data.DataSet();

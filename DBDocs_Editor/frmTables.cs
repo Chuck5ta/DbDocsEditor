@@ -8,6 +8,8 @@ namespace DBDocs_Editor
 {
     public partial class frmTables : Form
     {
+        int tableId = 0;
+
         public frmTables()
         {
             InitializeComponent();
@@ -28,11 +30,11 @@ namespace DBDocs_Editor
             DataSet dbViewList = null;
             if (lstLangs.SelectedIndex == 0)
             {   // If English, connect to main table
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable`.`tableNotes` FROM `dbdocstable` WHERE `tablename` = '" + selectedTable + "'"); 
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable`.`tableId`,`dbdocstable`.`tableNotes` FROM `dbdocstable` WHERE `tablename` = '" + selectedTable + "'"); 
             }
             else
             {   // If Non-English, join to localised table and grab field
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable_localised`.`tableNotes`, `dbdocstable`.`tableNotes` as TableNotesEnglish FROM `dbdocstable` LEFT JOIN `dbdocstable_localised` ON `dbdocstable`.`tableId` = `dbdocstable_localised`.`tableId` WHERE `tablename` = '" + selectedTable + "' AND (`dbdocstable_localised`.`languageId`=" + lstLangs.SelectedIndex + " OR `dbdocstable`.`languageId`=0)"); 
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable_localised`.`tableNotes`, `dbdocstable`.`tableId`, `dbdocstable`.`tableNotes` as TableNotesEnglish FROM `dbdocstable` LEFT JOIN `dbdocstable_localised` ON `dbdocstable`.`tableId` = `dbdocstable_localised`.`tableId` WHERE `tablename` = '" + selectedTable + "' AND (`dbdocstable_localised`.`languageId`=" + lstLangs.SelectedIndex + " OR `dbdocstable`.`languageId`=0)"); 
             }
 
             if (dbViewList != null)
@@ -40,6 +42,7 @@ namespace DBDocs_Editor
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
                     txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotes"].ToString();
+                    tableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["TableId"]);
                         
                     // If the 'Use English' if blank checkbox is ticked
                     if (chkUseEnglish.Checked == true)
@@ -112,44 +115,78 @@ namespace DBDocs_Editor
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            //var dbDocsTableOutput = new StringBuilder();
-            //string outputFolder = Application.ExecutablePath;
+            var dbDocsTableOutput = new StringBuilder();
+            string outputFolder = Application.ExecutablePath;
 
-            //// Strip the Executable name from the path
-            //outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
+            // Strip the Executable name from the path
+            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
 
-            //string selectedTable = lstTables.Text;
-            //txtTableName.Text = selectedTable;
+            string selectedTable = lstTables.Text;
+            txtTableName.Text = selectedTable;
 
-            //if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
-            //string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Items[lstLangs.SelectedIndex].ToString());
+            // If the output folder doesnt exist, create it
+            if (!Directory.Exists(outputFolder + @"\"))
+            {
+                Directory.CreateDirectory(outputFolder + @"\");
+            }
 
-            ////delete from `dbdocstable` where `tableName`= 'creature';
-            ////insert  into `dbdocstable`(`tableName`,`tableNotes`) values ('script_texts','xxxx');
-            //dbDocsTableOutput.AppendLine("delete from `dbdocstable" + selectedLang + "` where `tableName`= '" + selectedTable + "';");
-            //dbDocsTableOutput.AppendLine("insert  into `dbdocstable" + selectedLang + "`(`tableName`,`tableNotes`) values ('" + selectedTable + "','" + txtTableNotes.Text + "');");
+            if (tableId == 0)   // New Record
+            {
+                if (lstLangs.SelectedIndex != 0)
+                {   // If English, connect to main table
+                    dbDocsTableOutput.AppendLine("-- WARNING: The default entry should really be in english --");
+                }
 
-            //// If the output folder doesnt exist, create it
-            //if (!Directory.Exists(outputFolder + @"\"))
-            //{
-            //    Directory.CreateDirectory(outputFolder + @"\");
-            //}
+                //insert  into `dbdocstable`(`languageId`,`tableName`,`tableNotes`) values (2,'script_texts','xxxx');
+                dbDocsTableOutput.AppendLine("insert  into `dbdocstable`(`languageId`,`tableName`,`tableNotes`) values (" + lstLangs.SelectedIndex + ", '" + selectedTable + "','" + txtTableNotes.Text + "');");
 
-            //// Open the file for append and write the entries to it
-            //using (var outfile = new StreamWriter(outputFolder + @"\dbdocsTable" + selectedLang + ".SQL", true))
-            //{
-            //    outfile.Write(dbDocsTableOutput.ToString());
-            //}
+                // Open the file for append and write the entries to it
+                using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
+                {
+                    outfile.Write(dbDocsTableOutput.ToString());
+                }
 
-            ////Now the next part, updating the db directly
-            //if (chkDBDocsEntry.Checked == false)
-            //{       //INSERT
-            //    ProgSettings.TableInsert(selectedTable, txtTableNotes.Text);
-            //}
-            //else
-            //{       //UPDATE
-            //    ProgSettings.TableUpdate(selectedTable, txtTableNotes.Text);
-            //}
+                // Write the entry out to the Database directly
+
+                // For an insert, the record is always saved to the primary table, regardless of the language
+                // Since the system is English based, it should really have an English base record.
+
+                //                       Selected Table        Language ID              Notes
+                ProgSettings.TableInsert(selectedTable, lstLangs.SelectedIndex, txtTableNotes.Text);
+        
+            }
+            else                // Updated Record
+            {
+                if (lstLangs.SelectedIndex == 0)
+                {   // If English, connect to main table
+                    //update `dbdocstable` set `languageId`=xx,`tableName`=yy,`tableNotes`=zz where tableId=aa;
+                    dbDocsTableOutput.AppendLine("update `dbdocstable` set `languageId`=" + lstLangs.SelectedIndex + ", `tableName`='" + selectedTable + "', `tableNotes`='" + txtTableNotes.Text + "' where tableId=" + tableId + ";");
+
+                    // Open the file for append and write the entries to it
+                    using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
+                    {
+                        outfile.Write(dbDocsTableOutput.ToString());
+                    }
+                }
+                else
+                {
+                    dbDocsTableOutput.AppendLine("delete from `dbdocstable_localisation` where `languageId`=" + lstLangs.SelectedIndex + " and `tableId`= " + tableId + ";");
+                    dbDocsTableOutput.AppendLine("insert  into `dbdocstable_localisation`(`tableId`,`languageId`,`tableNotes`) values ("+ tableId + ", " + lstLangs.SelectedIndex + ", '" + txtTableNotes.Text + "');");
+
+                    // Open the file for append and write the entries to it
+                    using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable_localised.SQL", true))
+                    {
+                        outfile.Write(dbDocsTableOutput.ToString());
+                    }
+                }
+
+                // Write the entry out to the Database directly
+                // For an update the logic to decide which table to update is in the Update function itself
+                
+                //                       Table ID         Language ID          Notes
+                ProgSettings.TableUpdate(tableId, lstLangs.SelectedIndex, txtTableNotes.Text);
+
+            }
 
             MessageBox.Show("Save Complete");
         }
