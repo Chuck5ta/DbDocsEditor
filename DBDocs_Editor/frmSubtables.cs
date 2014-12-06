@@ -8,7 +8,7 @@ namespace DBDocs_Editor
 {
     public partial class frmSubtables : Form
     {
-        public string subTableId = "";
+        public int subTableId = 0;
 
         public frmSubtables()
         {
@@ -41,7 +41,7 @@ namespace DBDocs_Editor
             {
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
-                    subTableId = dbViewList.Tables[0].Rows[0]["subtableid"].ToString();
+                    subTableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["subtableid"]);
                     txtSubtableContent.Text = dbViewList.Tables[0].Rows[0]["subtablecontent"].ToString();
                     txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[0]["subtabletemplate"].ToString();
                         
@@ -91,7 +91,7 @@ namespace DBDocs_Editor
         private void frmsubtables_Load(object sender, EventArgs e)
         {
             System.Data.DataSet dbViewList;
-            if (string.IsNullOrEmpty(subTableId))
+            if (subTableId==0)
             {
                 // The following command reads all the columns for all the subtables
                 dbViewList = ProgSettings.SelectRows("SELECT subtablename from dbdocssubtables");
@@ -117,9 +117,7 @@ namespace DBDocs_Editor
                 lstsubtables.Items.Add(fieldName);
             }
 
-            ProgSettings.LoadLangs(lstLangs);
-
-            if (!string.IsNullOrEmpty(subTableId))
+            if (subTableId !=0)
             {   //Select the first entry if we passed in an Id
                 if (lstsubtables.SelectedIndex < 0) lstsubtables.SelectedIndex = 0;
                 Text = "SubTable: " + lstsubtables.Text;
@@ -128,54 +126,84 @@ namespace DBDocs_Editor
             { 
                 Text = "SubTables"; 
             }
+
+            ProgSettings.LoadLangs(lstLangs);
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            //StringBuilder dbDocsTableOutput = new StringBuilder();
-            //string outputFolder = Application.ExecutablePath;
+            var dbDocsTableOutput = new StringBuilder();
+            string outputFolder = Application.ExecutablePath;
 
-            //// Strip the Executable name from the path
-            //outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
+            // Strip the Executable name from the path
+            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
 
-            //string selectedField = lstsubtables.Text;
-            //txtSubtableName.Text = selectedField;
+            string selectedTable = lstsubtables.Text;
+            txtSubtableName.Text = selectedTable;
 
-            //if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
-            //string selectedLang = ProgSettings.SetLocalisationModifier(lstLangs.Items[lstLangs.SelectedIndex].ToString());
+            // If the output folder doesnt exist, create it
+            if (!Directory.Exists(outputFolder + @"\"))
+            {
+                Directory.CreateDirectory(outputFolder + @"\");
+            }
 
-            //// If the output folder doesnt exist, create it
-            //if (!Directory.Exists(outputFolder + @"\"))
-            //{
-            //    Directory.CreateDirectory(outputFolder + @"\");
-            //}
+            if (subTableId == 0)   // New Record
+            {
+                if (lstLangs.SelectedIndex != 0)
+                {   // If English, connect to main table
+                    dbDocsTableOutput.AppendLine("-- WARNING: The default entry should really be in english --");
+                }
 
-            //// This table save works a little different to the others, since this is a table with an id we can use that to perform the insert/update logic
+                int newSubtableId = Convert.ToInt32(ProgSettings.GetNewSubTableId());
+                dbDocsTableOutput.AppendLine("insert  into `dbdocssubtables`(`subtableId`,`languageId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" + newSubtableId.ToString() + "," + lstLangs.SelectedIndex + ",'" + selectedTable + "','" + ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" + ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
 
-            //if (!string.IsNullOrEmpty(subTableId))
-            //{ // This is an update to an existing subtable
+                // Open the file for append and write the entries to it
+                using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables.SQL", true))
+                {
+                    outfile.Write(dbDocsTableOutput.ToString());
+                }
 
-            //    //delete from `dbdocssubtables` where `subtableid`= xx;
-            //    //insert  into `dbdocstable`(`tableName`,`tableNotes`) values ('script_texts','xxxx');
-            //    dbDocsTableOutput.AppendLine("delete from `dbdocssubtables" + selectedLang + "` where `subtableId`= " + subTableId + ";");
-            //    dbDocsTableOutput.AppendLine("insert  into `dbdocssubtables" + selectedLang + "`(`subtableId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" + subTableId + ",'" + selectedField + "','" + ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" + ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
+                // Write the entry out to the Database directly
 
-            //    ProgSettings.SubTableUpdate(subTableId, selectedField, txtSubtableContent.Text, txtSubtableTemplate.Text);
+                // For an insert, the record is always saved to the primary table, regardless of the language
+                // Since the system is English based, it should really have an English base record.
 
-            //}
-            //else
-            //{ // This is to insert a new subtable
-            //    string newSubtableId = ProgSettings.GetNewSubTableId();
-            //    dbDocsTableOutput.AppendLine("insert  into `dbdocssubtables" + selectedLang + "`(`subtableId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" + newSubtableId.ToString() + ",'" + selectedField + "','" + ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" + ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
-            //    ProgSettings.SubTableInsert(newSubtableId, selectedField, txtSubtableContent.Text, txtSubtableTemplate.Text);
-            //    subTableId = newSubtableId.ToString();
-            //}
+                ProgSettings.SubTableInsert(newSubtableId, lstLangs.SelectedIndex, selectedTable, txtSubtableContent.Text, txtSubtableTemplate.Text);
+                subTableId = newSubtableId;
+        
+            }
+            else                // Updated Record
+            {
+                if (lstLangs.SelectedIndex == 0)
+                {   // If English, connect to main table
+                    dbDocsTableOutput.AppendLine("delete from `dbdocssubtables` where `subtableId`= " + subTableId + " and languageId=" + lstLangs.SelectedIndex + ";");
+                    dbDocsTableOutput.AppendLine("insert  into `dbdocssubtables`(`subtableId`,`languageId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" + subTableId.ToString() + "," + lstLangs.SelectedIndex + ",'" + selectedTable + "','" + ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" + ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
 
-            //// Open the file for append and write the entries to it
-            //using (StreamWriter outfile = new StreamWriter(outputFolder + @"\dbdocssubtables" + selectedLang + ".SQL", true))
-            //{
-            //    outfile.Write(dbDocsTableOutput.ToString());
-            //}
+                    // Open the file for append and write the entries to it
+                    using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables.SQL", true))
+                    {
+                        outfile.Write(dbDocsTableOutput.ToString());
+                    }
+                }
+                else
+                {
+                    dbDocsTableOutput.AppendLine("delete from `dbdocssubtables_localised` where `subtableId`= " + subTableId + " and languageId=" + lstLangs.SelectedIndex + ";");
+                    dbDocsTableOutput.AppendLine("insert  into `dbdocssubtable_localised`(`subtableId`,`languageId`,`subtablecontent`,`subtableTemplate`) values (" + subTableId.ToString() + "," + lstLangs.SelectedIndex + ",'" + ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" + ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
+
+                    // Open the file for append and write the entries to it
+                    using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables_localised.SQL", true))
+                    {
+                        outfile.Write(dbDocsTableOutput.ToString());
+                    }
+                }
+
+                // Write the entry out to the Database directly
+                // For an update the logic to decide which table to update is in the Update function itself
+
+                ProgSettings.SubTableUpdate(subTableId, lstLangs.SelectedIndex, selectedTable, txtSubtableContent.Text, txtSubtableTemplate.Text);
+            }
+
+            MessageBox.Show("Save Complete");
         }
 
 

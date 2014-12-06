@@ -373,27 +373,24 @@ namespace DBDocs_Editor
             return false;
         }
         #endregion "dbdocsfields Functions"
-
-
-
-
-
-
+        
+        #region "dbdocssubTable Functions"
         /// <summary>
         /// Inserts a record into the dbdocsfields table
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="fieldName">Name of the field.</param>
         /// <param name="fieldNotes">The field notes.</param>
-        public static void SubTableInsert(string subTableId, string subTableName, string subTableContent, string subTableTemplate)
+        public static void SubTableInsert(int subTableId, int languageId, string subTableName, string subTableContent, string subTableTemplate)
         {
             var conn = new MySqlConnection(sqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
-            cmd.CommandText = "insert  into `dbdocssubtables`(subtableid,`subtableName`,`subtablecontent`,`subtabletemplate`) "
-                              + "VALUES (@subtableid, @subtableName, @subtablecontent, @subtabletemplate)";
+            cmd.CommandText = "insert  into `dbdocssubtables`(`subtableid`,`languageId`,`subtableName`,`subtablecontent`,`subtabletemplate`) "
+                              + "VALUES (@subtableid, @languageId, @subtableName, @subtablecontent, @subtabletemplate)";
 
             cmd.Parameters.AddWithValue("@subtableid", subTableId);
+            cmd.Parameters.AddWithValue("@languageId", languageId);
             cmd.Parameters.AddWithValue("@subtableName", subTableName);
             cmd.Parameters.AddWithValue("@subtablecontent", subTableContent);
             cmd.Parameters.AddWithValue("@subtabletemplate", subTableTemplate);
@@ -408,14 +405,35 @@ namespace DBDocs_Editor
         /// <param name="tableName">Name of the table.</param>
         /// <param name="fieldName">Name of the field.</param>
         /// <param name="fieldNotes">The field notes.</param>
-        public static void SubTableUpdate(string subTableId, string subTableName, string subTableContent, string subTableTemplate)
+        public static void SubTableUpdate(int subTableId, int languageId, string subTableName, string subTableContent, string subTableTemplate)
         {
             var conn = new MySqlConnection(sqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
-            cmd.CommandText = "update `dbdocssubtables` set `subTableName`=@subTableName,`subTableContent`=@subTableContent,`subTableTemplate`=@subTableTemplate where subTableId=@subTableId;";
 
+            // Does this entry exist as a main table entry ?
+            if (LookupSubTableEntry(languageId, subTableId) == true)
+            {
+                // Update dbdocs
+                cmd.CommandText = "update `dbdocssubtables` set `subTableName`=@subTableName,`subTableContent`=@subTableContent,`subTableTemplate`=@subTableTemplate where subTableId=@subTableId and languageId=@languageId;";
+            }
+            else
+            {   // Does this entry exist as a localised entry ?
+                if (LookupSubTableEntryLocalised(languageId, subTableId) == true)
+                {
+                    // update dbdocs_localised
+                    cmd.CommandText = "update `dbdocssubtables_localised` set `subTableContent`=@subTableContent,`subTableTemplate`=@subTableTemplate where subTableId=@subTableId and languageId=@languageId;";
+                }
+                else
+                {
+                    // insert into dbdocs_localised
+                    cmd.CommandText = "insert  into `dbdocssubtables_localised`(`subtableid`,`languageId`,`subtablecontent`,`subtabletemplate`) "
+                                      + "VALUES (@subtableid, @languageId, @subtablecontent, @subtabletemplate)";
+                }
+            }
+            
             cmd.Parameters.AddWithValue("@subtableid", subTableId);
+            cmd.Parameters.AddWithValue("@languageId", languageId);
             cmd.Parameters.AddWithValue("@subtableName", subTableName);
             cmd.Parameters.AddWithValue("@subTableContent", subTableContent);
             cmd.Parameters.AddWithValue("@subTableTemplate", subTableTemplate);
@@ -424,11 +442,62 @@ namespace DBDocs_Editor
             cmd.Connection.Close();
         }
 
+
+        /// <summary>
+        /// Check whether the data exists in the localised or main table
+        /// </summary>
+        /// <param name="languageId"></param>
+        /// <param name="tableId"></param>
+        /// <returns></returns>
+        public static bool LookupSubTableEntryLocalised(int languageId, int subtableId)
+        {
+            System.Data.DataSet dbView = new System.Data.DataSet();
+            dbView = ProgSettings.SelectRows("SELECT subtabletemplate FROM dbdocssubtables_localised where subtableId=" + subtableId + " and languageId=" + languageId + ";");
+            if (dbView != null)
+            {
+                if (dbView.Tables[0].Rows.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Check whether the data exists in the main table
+        /// </summary>
+        /// <param name="languageId"></param>
+        /// <param name="tableId"></param>
+        /// <returns></returns>
+        public static bool LookupSubTableEntry(int languageId, int subtableId)
+        {
+            System.Data.DataSet dbView = new System.Data.DataSet();
+            dbView = ProgSettings.SelectRows("SELECT subtablename FROM dbdocssubtables where subtableId=" + subtableId + " and languageId=" + languageId + ";");
+            if (dbView != null)
+            {
+                if (dbView.Tables[0].Rows.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+                #endregion "dbdocsTable Functions"
+
         /// <summary>
         /// Redisplays the form 'formName' passed
         /// </summary>
         /// <param name="formName"></param>
-
         public static void ShowThisForm(Form formName)
         {
             foreach (Form frm in Application.OpenForms)

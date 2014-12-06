@@ -194,18 +194,18 @@ namespace DBDocs_Editor
 
         private void btnShowSubtables_Click(object sender, EventArgs e)
         {
-            var subTableScreen = new frmSubtables { subTableId = "" };
+            var subTableScreen = new frmSubtables { subTableId = 0 };
             subTableScreen.Show();
         }
 
         private void lstSubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
             // The subtable entry in the listbox starts xx:, to need to trim everything after the :
-            string subTableId = lstSubtables.Text;
-            if (subTableId.Contains(":"))
+            int thissubTableId = 0;
+            if (lstSubtables.Text.Contains(":"))
             {
-                subTableId = subTableId.Substring(0, subTableId.IndexOf(":"));
-                var subTableScreen = new frmSubtables { subTableId = subTableId };
+                thissubTableId = Convert.ToInt32(lstSubtables.Text.Substring(0, lstSubtables.Text.IndexOf(":")));
+                var subTableScreen = new frmSubtables { subTableId = thissubTableId };
                 subTableScreen.Show();
             }
         }
