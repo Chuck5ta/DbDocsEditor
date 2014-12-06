@@ -52,7 +52,10 @@ namespace DBDocs_Editor
                             txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotesEnglish"].ToString();
                         }
                     }
-
+                    else
+                    {
+                        txtTableNotes.Text = "";
+                    }
                     chkDBDocsEntry.Checked = true;
 
                     //Check for Subtables
@@ -207,6 +210,42 @@ namespace DBDocs_Editor
                 thissubTableId = Convert.ToInt32(lstSubtables.Text.Substring(0, lstSubtables.Text.IndexOf(":")));
                 var subTableScreen = new frmSubtables { subTableId = thissubTableId };
                 subTableScreen.Show();
+            }
+        }
+
+        private void lstLangs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Are we looking for a localised version ?
+            
+            
+            if (lstLangs.SelectedIndex == 0)
+            {
+                if (ProgSettings.LookupTableEntry(lstLangs.SelectedIndex, tableId) == true)
+                {
+                    chkDBDocsEntry.Checked = true;
+                }
+                else
+                {
+                    chkDBDocsEntry.Checked = false;
+                }
+            }
+            else
+            {
+                // Check whether a localised version exists
+                if (ProgSettings.LookupTableEntryLocalised(lstLangs.SelectedIndex, tableId) == true)
+                {
+                    chkDBDocsEntry.Checked = true;
+                }
+                else
+                {
+                    chkDBDocsEntry.Checked = false;
+                    
+                    // If 'Use English' is not selected, clear the text
+                    if (chkUseEnglish.Checked == false)
+                    {
+                        txtTableNotes.Text = "";
+                    }
+                }
             }
         }
     }

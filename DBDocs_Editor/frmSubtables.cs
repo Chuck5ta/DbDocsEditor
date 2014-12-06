@@ -54,6 +54,11 @@ namespace DBDocs_Editor
                             txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[0]["subtabletemplateEnglish"].ToString();
                         }
                     }
+                    else
+                    {
+                        txtSubtableContent.Text = "";
+						txtSubtableTemplate.Text = "";
+                    }
 
                     // Render the HTML
                     webBrowse.DocumentText = txtSubtableContent.Text;
@@ -132,6 +137,23 @@ namespace DBDocs_Editor
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            // First thing we need to do it sync the other tabs data based on the Template
+            if (txtSubtableTemplate.Text.Contains("\r\n"))
+            {
+                // Uses the first line of the template as the headings
+                string header = txtSubtableTemplate.Text;
+                header = header.Substring(0, header.IndexOf("\r\n"));
+
+                // Renders everything beyond the first line as the table body
+                string body = txtSubtableTemplate.Text;
+                body = body.Substring(body.IndexOf("\r\n") + 2, body.Length - (body.IndexOf("\r\n") + 2));
+
+                // Sync the Content tab with the current template
+                txtSubtableContent.Text = ProgSettings.ConvertTemplateToHtml(header, body);
+
+                // Not technically needed, but render the HTML panel
+                webBrowse.DocumentText = txtSubtableContent.Text;
+            }            
             var dbDocsTableOutput = new StringBuilder();
             string outputFolder = Application.ExecutablePath;
 
@@ -226,5 +248,41 @@ namespace DBDocs_Editor
             webBrowse.DocumentText = txtSubtableContent.Text;
         }
 
+        private void lstLangs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Are we looking for a localised version ?
+            
+            
+            if (lstLangs.SelectedIndex == 0)
+            {
+                if (ProgSettings.LookupTableEntry(lstLangs.SelectedIndex, subTableId) == true)
+                {
+                    chkDBDocsEntry.Checked = true;
+                }
+                else
+                {
+                    chkDBDocsEntry.Checked = false;
+                }
+            }
+            else
+            {
+                // Check whether a localised version exists
+                if (ProgSettings.LookupTableEntryLocalised(lstLangs.SelectedIndex, subTableId) == true)
+                {
+                    chkDBDocsEntry.Checked = true;
+                }
+                else
+                {
+                    chkDBDocsEntry.Checked = false;
+                    
+                    // If 'Use English' is not selected, clear the text
+                    if (chkUseEnglish.Checked == false)
+                    {
+                        txtSubtableContent.Text = "";
+                        txtSubtableTemplate.Text = "";
+                    }
+                }
+            }
+        }
     }
 }

@@ -160,6 +160,7 @@
             this.lstLangs.Name = "lstLangs";
             this.lstLangs.Size = new System.Drawing.Size(101, 147);
             this.lstLangs.TabIndex = 19;
+            this.lstLangs.SelectedIndexChanged += new System.EventHandler(this.lstLangs_SelectedIndexChanged);
             // 
             // chkUseEnglish
             // 

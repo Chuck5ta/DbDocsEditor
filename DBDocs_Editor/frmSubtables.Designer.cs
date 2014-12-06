@@ -181,6 +181,7 @@
             this.lstLangs.Name = "lstLangs";
             this.lstLangs.Size = new System.Drawing.Size(98, 108);
             this.lstLangs.TabIndex = 16;
+            this.lstLangs.SelectedIndexChanged += new System.EventHandler(this.lstLangs_SelectedIndexChanged);
             // 
             // tabControl1
             // 
