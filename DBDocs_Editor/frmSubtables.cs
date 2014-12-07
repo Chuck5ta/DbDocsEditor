@@ -24,6 +24,7 @@ namespace DBDocs_Editor
         {
             string selectedSubtable = lstsubtables.Text;
             txtSubtableName.Text = selectedSubtable;
+            subTableId = 0;  // Force to new entry before the lookup updates it should it exist
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
 
@@ -95,6 +96,8 @@ namespace DBDocs_Editor
 
         private void frmsubtables_Load(object sender, EventArgs e)
         {
+            ProgSettings.LoadLangs(lstLangs);
+
             System.Data.DataSet dbViewList;
             if (subTableId==0)
             {
@@ -113,8 +116,6 @@ namespace DBDocs_Editor
             // Do we have rows
             if (dbViewList.Tables[0].Rows.Count <= 0) return;
 
-            lstsubtables.Items.Clear();
-
             // for each Field returned, populate the listbox with the table name
             for (var thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
             {
@@ -132,7 +133,6 @@ namespace DBDocs_Editor
                 Text = "SubTables"; 
             }
 
-            ProgSettings.LoadLangs(lstLangs);
         }
 
         private void btnSave_Click(object sender, EventArgs e)

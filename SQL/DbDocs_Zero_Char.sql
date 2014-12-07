@@ -275,7 +275,7 @@ insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fiel
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (245,0,'creature_respawn','guid','zzzz','zzzz');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (246,0,'creature_respawn','instance','zzzz','zzzz');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (247,0,'creature_respawn','respawntime','zzzz','zzzz');
-insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (248,0,'dbdocsfields','fieldComment','zzzz','zzzz');
+insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (248,0,'dbdocsfields','fieldComment','A short Description of the Field.','A short Description of the Field.');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (249,0,'dbdocsfields','fieldName','The fieldname in the table to link the note to.','The fieldname in the table to link the note to.');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (250,0,'dbdocsfields','fieldNotes','The Field Note text','The Field Note text');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (251,0,'dbdocsfields','tableName','The table name to link the note to.','The table name to link the note to.');

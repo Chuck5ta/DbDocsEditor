@@ -51,11 +51,11 @@ insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fiel
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (21,0,'account_banned','banreason','The reason for the ban.','The reason for the ban.');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (22,0,'account_banned','id','The account ID (See account.id).','The account ID (See account.id).');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (23,0,'account_banned','unbandate','The date when the account will be automatically unbanned.','The date when the account will be automatically unbanned, in Unix time. A value less than the current date means, in effect, a permanent ban.');
-insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (24,0,'dbdocsfields','fieldComment','Main field Note','Main field Note');
+insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (24,0,'dbdocsfields','fieldComment','A short Description of the Field.','A short Description of the Field.');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (25,0,'dbdocsfields','fieldName','The fieldname in the table to link the note to.','The fieldname in the table to link the note to.');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (26,0,'dbdocsfields','fieldNotes','The Field Note text','The Field Note text');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (27,0,'dbdocsfields','tableName','The table name to link the note to.','The table name to link the note to.');
-insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (28,0,'dbdocssubtables','subTableContent','The Sub Table Content','The Sub Table Content');
+insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (28,0,'dbdocssubtables','subTableContent','The Content of the subTable','The Content of the subTable.');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (29,0,'dbdocssubtables','subTableId','The Lookup Id of the subTable','This is the Lookup Id of the subTable');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (30,0,'dbdocssubtables','subTableName','The Name of the SubTable','The Name of the SubTable');
 insert  into `dbdocsfields`(`fieldId`,`languageId`,`tableName`,`fieldName`,`fieldComment`,`fieldNotes`) values (31,0,'dbdocssubtables','subTableTemplate','The SubTable Template','The SubTable Template, Used to create the SubTableContent field content');
@@ -248,7 +248,7 @@ CREATE TABLE `dbdocstable` (
   `languageId` int(11) NOT NULL DEFAULT '0' COMMENT 'The Language Id for the Notes (Normally 0 for English)',
   `tableName` varchar(80) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of the table to add additional notes to',
   `tableNotes` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'The additional note to be added to the table',
-  PRIMARY KEY (`tableId`,`languageId`,`tableName`),
+  PRIMARY KEY (`tableId`,`languageId`),
   KEY `tableId` (`tableId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -257,11 +257,8 @@ CREATE TABLE `dbdocstable` (
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (1,0,'account','This table holds information on all available accounts.');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (2,0,'account_banned','This table lists all of the accounts that have been banned along with the date when (or if) the ban will expire.');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (3,0,'dbdocsfields','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\r\n\r\nAn entry in this table provides a link to the table and field to allow additional notes to describe the field in the Wiki.');
-insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (4,0,'dbdocsfields_fr','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\r\n\r\nAn entry in this table provides a link to the table and field to allow additional notes to describe the field in the Wiki. (French)');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (5,0,'dbdocssubtables','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\r\n\r\nAn entry in this table provides a table which dirctly replaces the link in the fieldnotes.');
-insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (6,0,'dbdocssubtables_fr','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\r\n\r\nAn entry in this table provides a table which dirctly replaces the link in the fieldnotes. (French)');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (7,0,'dbdocstable','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\r\n\r\nAn entry in this table provides a additional notes field to describe the database in the Wiki.');
-insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (8,0,'dbdocstable_fr','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\r\n\r\nAn entry in this table provides a additional notes field to describe the database in the Wiki. (French)');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (9,0,'ip_banned','This table contains all of the banned IPs and the date when (or if) the ban will expire.');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (10,0,'realmcharacters','This table holds information on the number of characters each account has for each realm.');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (11,0,'realmd_db_version','This table contains the latest version of the database.');
@@ -274,7 +271,7 @@ DROP TABLE IF EXISTS `dbdocstable_localised`;
 
 CREATE TABLE `dbdocstable_localised` (
   `tableId` int(11) NOT NULL COMMENT 'The dbdocsTableId to link to',
-  `languageId` int(11) NOT NULL DEFAULT '2' COMMENT 'The dbdocsLanguageId to link to',
+  `languageId` int(11) NOT NULL COMMENT 'The dbdocsLanguageId to link to',
   `tableNotes` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'The additional note to be added to the table',
   PRIMARY KEY (`tableId`,`languageId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

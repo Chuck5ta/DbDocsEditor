@@ -26,6 +26,7 @@ namespace DBDocs_Editor
         {
             string selectedField = lstFields.Text;
             txtFieldName.Text = selectedField;
+            fieldId = 0;    // Force to new entry before the lookup updates it should it exist
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
 

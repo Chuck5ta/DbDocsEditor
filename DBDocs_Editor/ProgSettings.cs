@@ -675,7 +675,16 @@ namespace DBDocs_Editor
                     }
                 }
             }
-            if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
+            
+            // Should something horrible go wrong, this will attempt to at least provide an option for english
+            if (lstLangs.Items.Count > 0)
+            { 
+                if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0; 
+            }
+            else
+            {
+                lstLangs.Items.Add("English");
+            }
         }
 
         /// <summary>
