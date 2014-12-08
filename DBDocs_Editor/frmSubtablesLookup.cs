@@ -126,7 +126,7 @@ namespace DBDocs_Editor
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            subTableId = lstsubtables.SelectedIndex;
+            subTableId = Convert.ToInt32(ProgSettings.LookupSubTableId(lstsubtables.Text));
             Close();
 //            MessageBox.Show("Save Complete");
         }
