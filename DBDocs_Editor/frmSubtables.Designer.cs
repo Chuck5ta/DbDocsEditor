@@ -38,7 +38,6 @@
             this.btnSave = new System.Windows.Forms.Button();
             this.chkHasContent = new System.Windows.Forms.CheckBox();
             this.chkHasTemplate = new System.Windows.Forms.CheckBox();
-            this.btnRenderContent = new System.Windows.Forms.Button();
             this.btnRebuildContent = new System.Windows.Forms.Button();
             this.lstLangs = new System.Windows.Forms.ListBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -49,6 +48,7 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.webBrowse = new System.Windows.Forms.WebBrowser();
             this.chkUseEnglish = new System.Windows.Forms.CheckBox();
+            this.btnNewEntry = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -154,16 +154,6 @@
             this.chkHasTemplate.Text = "Has Template";
             this.chkHasTemplate.UseVisualStyleBackColor = true;
             // 
-            // btnRenderContent
-            // 
-            this.btnRenderContent.Location = new System.Drawing.Point(177, 284);
-            this.btnRenderContent.Name = "btnRenderContent";
-            this.btnRenderContent.Size = new System.Drawing.Size(101, 23);
-            this.btnRenderContent.TabIndex = 13;
-            this.btnRenderContent.Text = "Render Content";
-            this.btnRenderContent.UseVisualStyleBackColor = true;
-            this.btnRenderContent.Click += new System.EventHandler(this.btnRenderContent_Click);
-            // 
             // btnRebuildContent
             // 
             this.btnRebuildContent.Location = new System.Drawing.Point(177, 255);
@@ -266,14 +256,24 @@
             this.chkUseEnglish.Text = "English if missing";
             this.chkUseEnglish.UseVisualStyleBackColor = true;
             // 
+            // btnNewEntry
+            // 
+            this.btnNewEntry.Location = new System.Drawing.Point(177, 284);
+            this.btnNewEntry.Name = "btnNewEntry";
+            this.btnNewEntry.Size = new System.Drawing.Size(101, 23);
+            this.btnNewEntry.TabIndex = 20;
+            this.btnNewEntry.Text = "New Entry";
+            this.btnNewEntry.UseVisualStyleBackColor = true;
+            this.btnNewEntry.Click += new System.EventHandler(this.btnNewEntry_Click);
+            // 
             // frmSubtables
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(737, 430);
+            this.Controls.Add(this.btnNewEntry);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.lstLangs);
-            this.Controls.Add(this.btnRenderContent);
             this.Controls.Add(this.btnRebuildContent);
             this.Controls.Add(this.chkHasTemplate);
             this.Controls.Add(this.chkHasContent);
@@ -315,7 +315,6 @@
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.CheckBox chkHasContent;
         private System.Windows.Forms.CheckBox chkHasTemplate;
-        private System.Windows.Forms.Button btnRenderContent;
         private System.Windows.Forms.Button btnRebuildContent;
         private System.Windows.Forms.ListBox lstLangs;
         private System.Windows.Forms.CheckBox chkUseEnglish;
@@ -326,5 +325,6 @@
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.TextBox txtSubtableTemplate;
         internal System.Windows.Forms.WebBrowser webBrowse;
+        private System.Windows.Forms.Button btnNewEntry;
     }
 }

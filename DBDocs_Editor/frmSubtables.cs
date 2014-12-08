@@ -241,11 +241,12 @@ namespace DBDocs_Editor
 
                 txtSubtableContent.Text = ProgSettings.ConvertTemplateToHtml(header,body);
             }
+
+            webBrowse.DocumentText = txtSubtableContent.Text;
         }
 
         private void btnRenderContent_Click(object sender, EventArgs e)
         {
-            webBrowse.DocumentText = txtSubtableContent.Text;
         }
 
         private void lstLangs_SelectedIndexChanged(object sender, EventArgs e)
@@ -282,6 +283,28 @@ namespace DBDocs_Editor
                         txtSubtableTemplate.Text = "";
                     }
                 }
+            }
+        }
+
+        private void btnNewEntry_Click(object sender, EventArgs e)
+        {
+            // Get the Next Subtable EntryID
+            int thissubTableId = Convert.ToInt32(ProgSettings.GetNewSubTableId());
+
+            string thisSubtableName = "";
+            DialogResult returnVal = 0;
+            returnVal = ProgSettings.ShowInputDialog(ref thisSubtableName, "subTable Name");
+
+            // If the user clicked ok, add the new table
+            if (returnVal == DialogResult.OK) ;
+            {
+                // Add to the table
+                ProgSettings.SubTableInsert(thissubTableId, lstLangs.SelectedIndex, thisSubtableName, "To be populated", "To be populated");
+                subTableId = thissubTableId;
+                
+                // Add it to the listbox and select it
+                lstsubtables.Items.Add(thisSubtableName);
+                lstsubtables.SelectedIndex=lstsubtables.Items.Count - 1;
             }
         }
     }
