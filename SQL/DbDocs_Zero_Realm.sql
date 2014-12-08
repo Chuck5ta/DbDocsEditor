@@ -221,7 +221,7 @@ DROP TABLE IF EXISTS `dbdocssubtables_localised`;
 
 CREATE TABLE `dbdocssubtables_localised` (
   `subTableId` int(11) NOT NULL COMMENT 'dbdocsSubtableId to link to',
-  `languageId` int(11) NOT NULL DEFAULT '2' COMMENT 'dbdocsLanguageId to link to.',
+  `languageId` int(11) NOT NULL COMMENT 'dbdocsLanguageId to link to.',
   `subTableContent` text NOT NULL COMMENT 'The Sub Table Content',
   `subTableTemplate` text NOT NULL COMMENT 'The Sub Table Template',
   PRIMARY KEY (`subTableId`,`languageId`)
@@ -250,7 +250,7 @@ CREATE TABLE `dbdocstable` (
   `tableNotes` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'The additional note to be added to the table',
   PRIMARY KEY (`tableId`,`languageId`),
   KEY `tableId` (`tableId`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `dbdocstable` */
 
@@ -264,6 +264,10 @@ insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) valu
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (11,0,'realmd_db_version','This table contains the latest version of the database.');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (12,0,'realmlist','This table holds information for the realms.');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (13,0,'uptime','This table holds the uptime of all realms. Each realm will automatically update it\'s latest entry\'s value until it crashes and a new record is added. Doing so also some statistical/historical information is collected - about the availability of your machine.');
+insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (14,0,'dbdocsfields_localised','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\nAn entry in this table provides a link to the table and field to allow additional notes to describe the field in the Wiki for localised entries.');
+insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (15,0,'dbdocslanguage','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\nThis table provides a list of supported languages, based on the entries provided in the core.');
+insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (16,0,'dbdocssubtables_localised','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\nAn entry in this table provides a table which dirctly replaces the link in the fieldnotes for localised entries.');
+insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (17,0,'dbdocstable_localised','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\nAn entry in this table provides a additional localised notes field to describe the database in the Wiki in that language.');
 
 /*Table structure for table `dbdocstable_localised` */
 

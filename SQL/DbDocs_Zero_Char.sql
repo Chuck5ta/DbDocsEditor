@@ -483,7 +483,7 @@ DROP TABLE IF EXISTS `dbdocssubtables_localised`;
 
 CREATE TABLE `dbdocssubtables_localised` (
   `subTableId` int(11) NOT NULL COMMENT 'dbdocsSubtableId to link to',
-  `languageId` int(11) NOT NULL DEFAULT '2' COMMENT 'dbdocsLanguageId to link to.',
+  `languageId` int(11) NOT NULL COMMENT 'dbdocsLanguageId to link to.',
   `subTableContent` text NOT NULL COMMENT 'The Sub Table Content',
   `subTableTemplate` text NOT NULL COMMENT 'The Sub Table Template',
   PRIMARY KEY (`subTableId`,`languageId`)
@@ -500,9 +500,9 @@ CREATE TABLE `dbdocstable` (
   `languageId` int(11) NOT NULL DEFAULT '0' COMMENT 'The Language Id for the Notes (Normally 0 for English)',
   `tableName` varchar(80) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of the table to add additional notes to',
   `tableNotes` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'The additional note to be added to the table',
-  PRIMARY KEY (`tableId`,`languageId`,`tableName`),
+  PRIMARY KEY (`tableId`,`languageId`),
   KEY `tableId` (`tableId`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `dbdocstable` */
 
@@ -557,6 +557,10 @@ insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) valu
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (49,0,'petition_sign','This table holds information on all the signatures of a petition for either a guild or an arena team.');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (50,0,'saved_variables','Stores server required values.<br />\r\ni.e. Character Database cleanup flags and Honor Point / Rank reset date\r\n');
 insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (51,0,'world','Stores World Status information');
+insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (52,0,'dbdocsfields_localised','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\nAn entry in this table provides a link to the table and field to allow additional notes to describe the field in the Wiki for localised entries.');
+insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (53,0,'dbdocslanguage','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\nThis table provides a list of supported languages, based on the entries provided in the core.');
+insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (54,0,'dbdocssubtables_localised','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\nAn entry in this table provides a table which dirctly replaces the link in the fieldnotes for localised entries.');
+insert  into `dbdocstable`(`tableId`,`languageId`,`tableName`,`tableNotes`) values (55,0,'dbdocstable_localised','This table is part of the implementation of the \'Mangos Database Documentation\' (MDD) Project.\nAn entry in this table provides a additional localised notes field to describe the database in the Wiki in that language.');
 
 /*Table structure for table `dbdocstable_localised` */
 
@@ -564,7 +568,7 @@ DROP TABLE IF EXISTS `dbdocstable_localised`;
 
 CREATE TABLE `dbdocstable_localised` (
   `tableId` int(11) NOT NULL COMMENT 'The dbdocsTableId to link to',
-  `languageId` int(11) NOT NULL DEFAULT '2' COMMENT 'The dbdocsLanguageId to link to',
+  `languageId` int(11) NOT NULL COMMENT 'The dbdocsLanguageId to link to',
   `tableNotes` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'The additional note to be added to the table',
   PRIMARY KEY (`tableId`,`languageId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
