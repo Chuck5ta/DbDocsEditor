@@ -41,6 +41,7 @@
             this.btnShowSubtables = new System.Windows.Forms.Button();
             this.lstLangs = new System.Windows.Forms.ListBox();
             this.chkUseEnglish = new System.Windows.Forms.CheckBox();
+            this.btnInsertSubtable = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -121,7 +122,7 @@
             // btnSave
             // 
             this.btnSave.Enabled = false;
-            this.btnSave.Location = new System.Drawing.Point(180, 332);
+            this.btnSave.Location = new System.Drawing.Point(177, 332);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(101, 23);
             this.btnSave.TabIndex = 10;
@@ -174,11 +175,22 @@
             this.chkUseEnglish.Text = "English if missing";
             this.chkUseEnglish.UseVisualStyleBackColor = true;
             // 
+            // btnInsertSubtable
+            // 
+            this.btnInsertSubtable.Location = new System.Drawing.Point(175, 288);
+            this.btnInsertSubtable.Name = "btnInsertSubtable";
+            this.btnInsertSubtable.Size = new System.Drawing.Size(101, 23);
+            this.btnInsertSubtable.TabIndex = 20;
+            this.btnInsertSubtable.Text = "Insert Subtable";
+            this.btnInsertSubtable.UseVisualStyleBackColor = true;
+            this.btnInsertSubtable.Click += new System.EventHandler(this.btnInsertSubtable_Click);
+            // 
             // frmFields
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(737, 430);
+            this.Controls.Add(this.btnInsertSubtable);
             this.Controls.Add(this.lstLangs);
             this.Controls.Add(this.lstSubtables);
             this.Controls.Add(this.btnShowSubtables);
@@ -218,5 +230,6 @@
         private System.Windows.Forms.Button btnShowSubtables;
         private System.Windows.Forms.ListBox lstLangs;
         private System.Windows.Forms.CheckBox chkUseEnglish;
+        private System.Windows.Forms.Button btnInsertSubtable;
     }
 }

@@ -118,6 +118,7 @@ namespace DBDocs_Editor
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public static DataSet SelectRows(string query)
         {
             var conn = new MySqlConnection(sqldBconn);

@@ -243,5 +243,21 @@ namespace DBDocs_Editor
                 }
             }
         }
+
+        private void btnInsertSubtable_Click(object sender, EventArgs e)
+        {
+            frmSubtablesLookup lookup = new frmSubtablesLookup();
+            lookup.languageId = lstLangs.SelectedIndex;
+            lookup.ShowDialog();
+
+            // Once the Dialog has closed, has the user selected an entry
+            if (lookup.subTableId != 0)
+            {
+                var insertText = "¬subtable:" + lookup.subTableId.ToString().Trim() + "¬";
+                var selectionIndex = txtFieldNotes.SelectionStart;
+                txtFieldNotes.Text = txtFieldNotes.Text.Insert(selectionIndex, insertText);
+                txtFieldNotes.SelectionStart = selectionIndex + insertText.Length;
+            }
+        }
     }
 }

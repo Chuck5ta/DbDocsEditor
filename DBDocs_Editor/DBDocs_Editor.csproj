@@ -59,6 +59,12 @@
     <Compile Include="frmServerSelect.Designer.cs">
       <DependentUpon>frmServerSelect.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmSubtablesLookup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSubtablesLookup.Designer.cs">
+      <DependentUpon>frmSubtablesLookup.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmSubtables.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,6 +91,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmServerSelect.resx">
       <DependentUpon>frmServerSelect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSubtablesLookup.resx">
+      <DependentUpon>frmSubtablesLookup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSubtables.resx">
       <DependentUpon>frmSubtables.cs</DependentUpon>
