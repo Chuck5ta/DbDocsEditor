@@ -26,14 +26,14 @@ namespace DBDocs_Editor
         {
             string selectedField = lstFields.Text;
             txtFieldName.Text = selectedField;
-            fieldId = 0;    // Force to new entry before the lookup updates it should it exist
+            fieldId = ProgSettings.LookupFieldId(TableName, selectedField);    // Force to new entry before the lookup updates it should it exist
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
 
             DataSet dbViewList = null;
             if (lstLangs.SelectedIndex == 0)
             {   // If English, connect to main table
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocsfields`.`FieldId`, `dbdocsfields`.`FieldNotes` FROM `dbdocsfields` WHERE `FieldName` = '" + selectedField + "'");
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocsfields`.`FieldId`, `dbdocsfields`.`FieldNotes` FROM `dbdocsfields` WHERE `tablename` = '" + TableName + "' and `FieldName` = '" + selectedField + "'");
             }
             else
             {   // If Non-English, join to localised table and grab field

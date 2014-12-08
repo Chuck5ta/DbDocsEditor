@@ -24,7 +24,7 @@ namespace DBDocs_Editor
         {
             string selectedTable = lstTables.Text;
             txtTableName.Text = selectedTable;
-            tableId = 0;    // Force to new entry before the lookup updates it should it exist
+            tableId = ProgSettings.LookupTableId(selectedTable);
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
 

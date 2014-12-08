@@ -231,6 +231,25 @@ namespace DBDocs_Editor
         }
 
         /// <summary>
+        /// Returns the TableId for a given TableName
+        /// </summary>
+        /// <param name="subTableName"></param>
+        /// <returns></returns>
+        public static int LookupTableId(string tableName)
+        {
+            System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
+            dbViewSubtable = ProgSettings.SelectRows("SELECT tableid FROM dbdocstable where tableName='" + tableName + "';");
+            if (dbViewSubtable != null)
+            {
+                if (dbViewSubtable.Tables[0].Rows.Count > 0)
+                {
+                    return Convert.ToInt32(dbViewSubtable.Tables[0].Rows[0]["tableid"]);
+                }
+            }
+            return 0;
+        }
+
+        /// <summary>
         /// Check whether the data exists in the main table
         /// </summary>
         /// <param name="languageId"></param>
@@ -373,6 +392,28 @@ namespace DBDocs_Editor
 
             return false;
         }
+
+        /// <summary>
+        /// Returns the FieldId for a given FieldName
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        public static int LookupFieldId(string tableName, string fieldName)
+        {
+            System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
+            dbViewSubtable = ProgSettings.SelectRows("SELECT fieldid FROM dbdocsfields where tableName='" + tableName + "' and fieldname='" + fieldName + "';");
+            if (dbViewSubtable != null)
+            {
+                if (dbViewSubtable.Tables[0].Rows.Count > 0)
+                {
+                    return Convert.ToInt32(dbViewSubtable.Tables[0].Rows[0]["fieldId"]);
+                }
+            }
+            return 0;
+        }
+
+
         #endregion "dbdocsfields Functions"
         
         #region "dbdocssubTable Functions"
