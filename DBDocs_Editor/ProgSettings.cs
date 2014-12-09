@@ -283,17 +283,18 @@ namespace DBDocs_Editor
         /// <param name="tableName">Name of the table.</param>
         /// <param name="fieldName">Name of the field.</param>
         /// <param name="fieldNotes">The field notes.</param>
-        public static void FieldInsert(int languageId, string tableName, string fieldName, string fieldNotes)
+        public static void FieldInsert(int languageId, string tableName, string fieldName, string FieldComment, string fieldNotes)
         {
             var conn = new MySqlConnection(sqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
-            cmd.CommandText = "insert  into `dbdocsfields`(`languageId`,`tableName`,`fieldName`,`fieldNotes`) "
-                              + "VALUES (@languageId,@tablename, @fieldname, @tablenotes)";
+            cmd.CommandText = "insert  into `dbdocsfields`(`languageId`,`tableName`,`fieldName`,`FieldComment`,`fieldNotes`) "
+                              + "VALUES (@languageId,@tablename, @fieldname, @FieldComment, @fieldnotes)";
 
             cmd.Parameters.AddWithValue("@languageId", languageId);
             cmd.Parameters.AddWithValue("@tablename", tableName);
             cmd.Parameters.AddWithValue("@fieldName", fieldName);
+            cmd.Parameters.AddWithValue("@FieldComment", FieldComment);
             cmd.Parameters.AddWithValue("@fieldNotes", fieldNotes);
 
             cmd.ExecuteNonQuery();
@@ -306,7 +307,7 @@ namespace DBDocs_Editor
         /// <param name="tableName">Name of the table.</param>
         /// <param name="fieldName">Name of the field.</param>
         /// <param name="fieldNotes">The field notes.</param>
-        public static void FieldUpdate(int fieldId, int languageId, string fieldNotes)
+        public static void FieldUpdate(int fieldId, int languageId, string FieldComment, string fieldNotes)
         {
             var conn = new MySqlConnection(sqldBconn);
             var cmd = new MySqlCommand("", conn);
@@ -316,20 +317,20 @@ namespace DBDocs_Editor
             if (LookupFieldEntry(languageId, fieldId) == true)
             {
                 // Update dbdocs
-                cmd.CommandText = "update `dbdocsfields` set `fieldnotes`=@fieldNotes where `fieldId`=@fieldId and `languageId`=@languageId;";
+                cmd.CommandText = "update `dbdocsfields` set `FieldComment`=@FieldComment, `fieldnotes`=@fieldNotes where `fieldId`=@fieldId and `languageId`=@languageId;";
             }
             else
             {   // Does this entry exist as a localised entry ?
                 if (LookupFieldEntryLocalised(languageId, fieldId) == true)
                 {
                     // update dbdocs_localised
-                    cmd.CommandText = "update `dbdocsfields_localised` set `fieldnotes`=@fieldNotes where `fieldId`=@fieldId and `languageId`=@languageId;";
+                    cmd.CommandText = "update `dbdocsfields_localised` set `FieldComment`=@FieldComment, `fieldnotes`=@fieldNotes where `fieldId`=@fieldId and `languageId`=@languageId;";
                 }
                 else
                 {
                     // insert into dbdocs_localised
-                    cmd.CommandText = "insert into `dbdocsfields_localised` (`fieldId`,`languageId`,`fieldNotes`) "
-                                    + "VALUES (@fieldId, @languageId, @fieldNotes)";
+                    cmd.CommandText = "insert into `dbdocsfields_localised` (`fieldId`,`languageId`,`FieldComment`,`fieldNotes`) "
+                                    + "VALUES (@fieldId, @languageId, @FieldComment, @fieldNotes)";
                 }
             }
 
@@ -337,6 +338,7 @@ namespace DBDocs_Editor
 
             cmd.Parameters.AddWithValue("@fieldId", fieldId);
             cmd.Parameters.AddWithValue("@languageId", languageId);
+            cmd.Parameters.AddWithValue("@FieldComment", FieldComment);
             cmd.Parameters.AddWithValue("@fieldNotes", fieldNotes);
 
             cmd.ExecuteNonQuery();

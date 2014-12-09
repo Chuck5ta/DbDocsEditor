@@ -225,7 +225,8 @@ namespace DBDocs_Editor
                 ProgSettings.SubTableUpdate(subTableId, lstLangs.SelectedIndex, selectedTable, txtSubtableContent.Text, txtSubtableTemplate.Text);
             }
 
-            MessageBox.Show("Save Complete");
+            //MessageBox.Show("Save Complete");
+            lblStatus.Text = DateTime.Now.ToString() + " Save Complete for " + selectedTable;
         }
 
 

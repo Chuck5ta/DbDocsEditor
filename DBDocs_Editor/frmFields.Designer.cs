@@ -42,6 +42,11 @@
             this.lstLangs = new System.Windows.Forms.ListBox();
             this.chkUseEnglish = new System.Windows.Forms.CheckBox();
             this.btnInsertSubtable = new System.Windows.Forms.Button();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.txtFieldComment = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -93,7 +98,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(210, 27);
+            this.label4.Location = new System.Drawing.Point(215, 57);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(63, 13);
             this.label4.TabIndex = 7;
@@ -101,18 +106,18 @@
             // 
             // txtFieldNotes
             // 
-            this.txtFieldNotes.Location = new System.Drawing.Point(284, 27);
+            this.txtFieldNotes.Location = new System.Drawing.Point(284, 57);
             this.txtFieldNotes.Multiline = true;
             this.txtFieldNotes.Name = "txtFieldNotes";
             this.txtFieldNotes.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtFieldNotes.Size = new System.Drawing.Size(441, 328);
+            this.txtFieldNotes.Size = new System.Drawing.Size(441, 298);
             this.txtFieldNotes.TabIndex = 8;
             // 
             // chkDBDocsEntry
             // 
             this.chkDBDocsEntry.AutoSize = true;
             this.chkDBDocsEntry.Enabled = false;
-            this.chkDBDocsEntry.Location = new System.Drawing.Point(180, 43);
+            this.chkDBDocsEntry.Location = new System.Drawing.Point(180, 89);
             this.chkDBDocsEntry.Name = "chkDBDocsEntry";
             this.chkDBDocsEntry.Size = new System.Drawing.Size(96, 17);
             this.chkDBDocsEntry.TabIndex = 9;
@@ -185,12 +190,46 @@
             this.btnInsertSubtable.UseVisualStyleBackColor = true;
             this.btnInsertSubtable.Click += new System.EventHandler(this.btnInsertSubtable_Click);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblStatus});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 422);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(737, 22);
+            this.statusStrip1.TabIndex = 20;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(0, 17);
+            // 
+            // txtFieldComment
+            // 
+            this.txtFieldComment.Location = new System.Drawing.Point(284, 27);
+            this.txtFieldComment.Name = "txtFieldComment";
+            this.txtFieldComment.Size = new System.Drawing.Size(441, 20);
+            this.txtFieldComment.TabIndex = 21;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(197, 30);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(79, 13);
+            this.label2.TabIndex = 22;
+            this.label2.Text = "Field Comment:";
+            // 
             // frmFields
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(737, 430);
+            this.ClientSize = new System.Drawing.Size(737, 444);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.txtFieldComment);
             this.Controls.Add(this.btnInsertSubtable);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.lstLangs);
             this.Controls.Add(this.lstSubtables);
             this.Controls.Add(this.btnShowSubtables);
@@ -208,8 +247,11 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "frmFields";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Fields Form";
             this.Load += new System.EventHandler(this.frmFields_Load);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -230,6 +272,10 @@
         private System.Windows.Forms.Button btnShowSubtables;
         private System.Windows.Forms.ListBox lstLangs;
         private System.Windows.Forms.CheckBox chkUseEnglish;
+        private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Button btnInsertSubtable;
+        private System.Windows.Forms.ToolStripStatusLabel lblStatus;
+        private System.Windows.Forms.TextBox txtFieldComment;
+        private System.Windows.Forms.Label label2;
     }
 }

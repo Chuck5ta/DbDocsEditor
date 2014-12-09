@@ -49,10 +49,13 @@
             this.webBrowse = new System.Windows.Forms.WebBrowser();
             this.chkUseEnglish = new System.Windows.Forms.CheckBox();
             this.btnNewEntry = new System.Windows.Forms.Button();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -167,9 +170,9 @@
             // lstLangs
             // 
             this.lstLangs.FormattingEnabled = true;
-            this.lstLangs.Location = new System.Drawing.Point(180, 112);
+            this.lstLangs.Location = new System.Drawing.Point(177, 112);
             this.lstLangs.Name = "lstLangs";
-            this.lstLangs.Size = new System.Drawing.Size(98, 108);
+            this.lstLangs.Size = new System.Drawing.Size(101, 147);
             this.lstLangs.TabIndex = 16;
             this.lstLangs.SelectedIndexChanged += new System.EventHandler(this.lstLangs_SelectedIndexChanged);
             // 
@@ -266,12 +269,28 @@
             this.btnNewEntry.UseVisualStyleBackColor = true;
             this.btnNewEntry.Click += new System.EventHandler(this.btnNewEntry_Click);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblStatus});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 422);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(737, 22);
+            this.statusStrip1.TabIndex = 20;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(0, 17);
+            // 
             // frmSubtables
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(737, 430);
+            this.ClientSize = new System.Drawing.Size(737, 444);
             this.Controls.Add(this.btnNewEntry);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.lstLangs);
             this.Controls.Add(this.btnRebuildContent);
@@ -290,6 +309,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "frmSubtables";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "subtables Form";
             this.Load += new System.EventHandler(this.frmsubtables_Load);
             this.tabControl1.ResumeLayout(false);
@@ -298,6 +318,8 @@
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             this.tabPage3.ResumeLayout(false);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -326,5 +348,8 @@
         private System.Windows.Forms.TextBox txtSubtableTemplate;
         internal System.Windows.Forms.WebBrowser webBrowse;
         private System.Windows.Forms.Button btnNewEntry;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.Button btnInsertSubtable;
+        private System.Windows.Forms.ToolStripStatusLabel lblStatus;
     }
 }

@@ -33,11 +33,11 @@ namespace DBDocs_Editor
             DataSet dbViewList = null;
             if (lstLangs.SelectedIndex == 0)
             {   // If English, connect to main table
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocsfields`.`FieldId`, `dbdocsfields`.`FieldNotes` FROM `dbdocsfields` WHERE `tablename` = '" + TableName + "' and `FieldName` = '" + selectedField + "'");
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocsfields`.`FieldId`, `dbdocsfields`.`FieldNotes`,`dbdocsfields`.`FieldComment` FROM `dbdocsfields` WHERE `tablename` = '" + TableName + "' and `FieldName` = '" + selectedField + "'");
             }
             else
             {   // If Non-English, join to localised table and grab field
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocsfields`.`FieldId`, `dbdocsfields_localised`.`FieldNotes`, `dbdocsfields`.`FieldNotes` as FieldNotesEnglish FROM `dbdocsfields` INNER JOIN `dbdocsfields_localised` ON `dbdocsfields`.`fieldId` = `dbdocsfields_localised`.`fieldId` where TableName='" + TableName + "'" + " AND FieldName='" + selectedField + "' AND (`dbdocsfields_localised`.`languageId`=" + lstLangs.SelectedIndex + "  OR `dbdocsfields`.`languageId`=0);");
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocsfields`.`FieldId`, `dbdocsfields_localised`.`FieldNotes`, `dbdocsfields_localised`.`FieldComment`,`dbdocsfields`.`FieldNotes` as FieldNotesEnglish, `dbdocsfields`.`FieldComment` as FieldCommentEnglish FROM `dbdocsfields` INNER JOIN `dbdocsfields_localised` ON `dbdocsfields`.`fieldId` = `dbdocsfields_localised`.`fieldId` where TableName='" + TableName + "'" + " AND FieldName='" + selectedField + "' AND (`dbdocsfields_localised`.`languageId`=" + lstLangs.SelectedIndex + "  OR `dbdocsfields`.`languageId`=0);");
             }
 
             if (dbViewList != null)
@@ -45,6 +45,12 @@ namespace DBDocs_Editor
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
                     txtFieldNotes.Text = dbViewList.Tables[0].Rows[0]["FieldNotes"].ToString();
+                    txtFieldComment.Text = dbViewList.Tables[0].Rows[0]["FieldComment"].ToString();
+                    if (string.IsNullOrEmpty(txtFieldComment.Text)) 
+                    {
+                        txtFieldComment.Text=txtFieldNotes.Text.Substring(0,80);
+                    }
+
                     fieldId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["fieldId"]);
                         
                     // If the 'Use English' if blank checkbox is ticked
@@ -54,10 +60,19 @@ namespace DBDocs_Editor
                         {
                             txtFieldNotes.Text = dbViewList.Tables[0].Rows[0]["FieldNotesEnglish"].ToString();
                         }
+                        if (string.IsNullOrEmpty(txtFieldComment.Text))
+                        {
+                            txtFieldComment.Text = dbViewList.Tables[0].Rows[0]["FieldCommentEnglish"].ToString();
+                        }
+                        if (string.IsNullOrEmpty(txtFieldComment.Text)) 
+                        { 
+                            txtFieldComment.Text = txtFieldNotes.Text.Substring(0, 80); 
+                        }
                     }
                     else
                     {
                         txtFieldNotes.Text = "";
+                        txtFieldComment.Text="";
                     }
                     chkDBDocsEntry.Checked = true;
 
@@ -67,12 +82,14 @@ namespace DBDocs_Editor
                 else  // No dbdocs match
                 {
                     txtFieldNotes.Text = "";
+                    txtFieldComment.Text="";
                     chkDBDocsEntry.Checked = false;
                 }
             }
             else  // No dbdocs match
             {
                 txtFieldNotes.Text = "";
+                txtFieldComment.Text="";
                 chkDBDocsEntry.Checked = false;
             }
 
@@ -136,7 +153,7 @@ namespace DBDocs_Editor
                 }
 
                 //insert  into `dbdocsfields`(`languageId`, `tableName`,`fieldName`,`tableNotes`) values (0,'creature','entry','xxxx');
-                dbDocsTableOutput.AppendLine("insert  into `dbdocsfields` (`languageId`,`tableName`,`fieldName`,`tableNotes`) values (" + lstLangs.SelectedIndex + ",'" + TableName + "','" + selectedField + "','" + txtFieldNotes.Text + "');");
+                dbDocsTableOutput.AppendLine("insert  into `dbdocsfields` (`languageId`,`tableName`,`fieldName`,`tableComments`,`tableNotes`) values (" + lstLangs.SelectedIndex + ",'" + TableName + "','" + selectedField + "','" + txtFieldComment.Text + "','" + txtFieldNotes.Text + "');");
 
                 // Open the file for append and write the entries to it
                 using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
@@ -150,7 +167,7 @@ namespace DBDocs_Editor
                 // Since the system is English based, it should really have an English base record.
 
                 //                          Language Id        Selected Table   Field              Notes
-                ProgSettings.FieldInsert(lstLangs.SelectedIndex, TableName, selectedField, txtFieldNotes.Text);
+                ProgSettings.FieldInsert(lstLangs.SelectedIndex, TableName, selectedField, txtFieldComment.Text, txtFieldNotes.Text);
         
             }
             else                // Updated Record
@@ -158,7 +175,7 @@ namespace DBDocs_Editor
                 if (lstLangs.SelectedIndex == 0)
                 {   // If English, connect to main table
                     //update `dbdocsfields` set `fieldnotes`= xxx where `fieldId`= xxx and languageId=yyy;
-                    dbDocsTableOutput.AppendLine("update `dbdocsfields` set `fieldNotes` = " + txtFieldNotes.Text + " where `fieldId`= '" + fieldId + " and `languageId`= " + lstLangs.SelectedIndex + ";");
+                    dbDocsTableOutput.AppendLine("update `dbdocsfields` set `FieldComment` = " + txtFieldComment.Text + ", `fieldNotes` = " + txtFieldNotes.Text + " where `fieldId`= '" + fieldId + " and `languageId`= " + lstLangs.SelectedIndex + ";");
 
                     // Open the file for append and write the entries to it
                     using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
@@ -169,7 +186,7 @@ namespace DBDocs_Editor
                 else
                 {
                     dbDocsTableOutput.AppendLine("delete from `dbdocsfields_localised` where `fieldId`= '" + fieldId + " and `languageId`= " + lstLangs.SelectedIndex + ";");
-                    dbDocsTableOutput.AppendLine("insert into `dbdocsfields_localised` (`fieldId`,`languageId`,`fieldNotes`) values (" + fieldId + ", " + lstLangs.SelectedIndex + ", " + txtFieldNotes.Text + ");");
+                    dbDocsTableOutput.AppendLine("insert into `dbdocsfields_localised` (`fieldId`,`languageId`,`FieldComment`,`fieldNotes`) values (" + fieldId + ", " + lstLangs.SelectedIndex + ", " + txtFieldComment.Text + ", " + txtFieldNotes.Text + ");");
 
                     // Open the file for append and write the entries to it
                     using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable_localised.SQL", true))
@@ -182,11 +199,12 @@ namespace DBDocs_Editor
                 // For an update the logic to decide which table to update is in the Update function itself
                 
                 //                       Field ID         Language ID          Notes
-                ProgSettings.FieldUpdate(fieldId, lstLangs.SelectedIndex, txtFieldNotes.Text);
+                ProgSettings.FieldUpdate(fieldId, lstLangs.SelectedIndex, txtFieldComment.Text, txtFieldNotes.Text);
 
             }
 
-            MessageBox.Show("Save Complete");
+            //MessageBox.Show("Save Complete");
+            lblStatus.Text = DateTime.Now.ToString() + " Save Complete for " + selectedField;
         }
 
 

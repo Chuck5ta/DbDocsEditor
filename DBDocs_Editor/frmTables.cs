@@ -191,8 +191,8 @@ namespace DBDocs_Editor
                 ProgSettings.TableUpdate(tableId, lstLangs.SelectedIndex, txtTableNotes.Text);
 
             }
-
-            MessageBox.Show("Save Complete");
+            lblStatus.Text = DateTime.Now.ToString() + " Save Complete for " + selectedTable; 
+            //MessageBox.Show("Save Complete");
         }
 
 
