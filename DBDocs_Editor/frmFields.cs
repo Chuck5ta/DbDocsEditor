@@ -13,6 +13,7 @@ namespace DBDocs_Editor
 		int fieldId = 0;
         bool blnTextChanged = false;
 
+
         public frmFields()
         {
             InitializeComponent();
@@ -111,6 +112,15 @@ namespace DBDocs_Editor
 
         private void btnQuit_Click(object sender, EventArgs e)
         {
+            if (blnTextChanged == true)
+            {
+              
+                var response = MessageBox.Show(this,"You have unsaved changes, continue ?","Exit Check",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+                if (response == System.Windows.Forms.DialogResult.No)
+                { 
+                    return; 
+                }
+            }
             Close();
         }
 
@@ -215,8 +225,6 @@ namespace DBDocs_Editor
                 ProgSettings.FieldUpdate(fieldId, lstLangs.SelectedIndex, txtFieldComment.Text, ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text));
 
             }
-
-            //MessageBox.Show("Save Complete");
             lblStatus.Text = DateTime.Now.ToString() + " Save Complete for " + selectedField;
         }
 

@@ -88,6 +88,15 @@ namespace DBDocs_Editor
 
         private void btnQuit_Click(object sender, EventArgs e)
         {
+            if (blnTextChanged == true)
+            {
+              
+                var response = MessageBox.Show(this,"You have unsaved changes, continue ?","Exit Check",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+                if (response == System.Windows.Forms.DialogResult.No)
+                { 
+                    return; 
+                }
+            }
             ProgSettings.ShowThisForm(ProgSettings.mainForm);
             Close();
         }
@@ -200,7 +209,6 @@ namespace DBDocs_Editor
 
             }
             lblStatus.Text = DateTime.Now.ToString() + " Save Complete for " + selectedTable; 
-            //MessageBox.Show("Save Complete");
         }
 
 

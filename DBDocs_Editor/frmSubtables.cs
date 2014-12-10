@@ -11,6 +11,7 @@ namespace DBDocs_Editor
         public int subTableId = 0;
         bool blnTextChanged = false;
 
+
         public frmSubtables()
         {
             InitializeComponent();
@@ -92,6 +93,15 @@ namespace DBDocs_Editor
 
         private void btnQuit_Click(object sender, EventArgs e)
         {
+            if (blnTextChanged == true)
+            {
+              
+                var response = MessageBox.Show(this,"You have unsaved changes, continue ?","Exit Check",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+                if (response == System.Windows.Forms.DialogResult.No)
+                { 
+                    return; 
+                }
+            }
             Close();
         }
 
