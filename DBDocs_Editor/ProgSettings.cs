@@ -341,7 +341,14 @@ namespace DBDocs_Editor
             cmd.Parameters.AddWithValue("@FieldComment", FieldComment);
             cmd.Parameters.AddWithValue("@fieldNotes", fieldNotes);
 
-            cmd.ExecuteNonQuery();
+            try
+            { 
+                cmd.ExecuteNonQuery(); 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error Saving: " + ex.Message);
+            }
             cmd.Connection.Close();
         }
 
@@ -909,43 +916,60 @@ namespace DBDocs_Editor
             string[] stringSeparators2 = new string[] { "\r\n" };
             strLines = templateText.Split(stringSeparators2, StringSplitOptions.RemoveEmptyEntries);
 
+            bool resyncError = false;
             for (int intLines = 0; intLines <= strLines.GetUpperBound(0); intLines++)
             {
                 if (blnBuild == true)
                 {
-                    strBody = strLines[intLines].Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+                    try
+                    {
+                        strBody = strLines[intLines].Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
             
-                    if (intLines % 2 == 0)
-                    {
-                        //               sbHtml.Append("<tr bgcolor='#FAF8FA'>")
-                        sbHtml.Append("<tr bgcolor='#FFFFEE'>");
+                        if (intLines % 2 == 0)
+                        {
+                            //               sbHtml.Append("<tr bgcolor='#FAF8FA'>")
+                            sbHtml.Append("<tr bgcolor='#FFFFEE'>");
+                        }
+                        else
+                        {
+                            //                sbHtml.Append("<tr bgcolor='#F8FAFA'>")
+                            sbHtml.Append("<tr bgcolor='#FEFEFF'>");
+                        }
+
+                        for (int intFields = 0; intFields <= strBody.GetUpperBound(0); intFields++)
+                        {
+                            try
+                            {
+                                strBody[intFields] = strBody[intFields].Trim();
+                                if (strBody[intFields].Length > 0)
+                                {
+                                    if (strHeaderCols[intFields] == "1")
+                                    {
+                                        sbHtml.Append("<td align='left' valign='middle'>" + strBody[intFields] + "</td>");
+                                    }
+                                    else if (strHeaderCols[intFields] == "2")
+                                    {
+                                        sbHtml.Append("<td align='right' valign='middle'>" + strBody[intFields] + "</td>");
+                                    }
+                                    else
+                                    {
+                                        sbHtml.Append("<td align='center' valign='middle'>" + strBody[intFields] + "</td>");
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                resyncError = true;
+                            }    
+                        }
+                        sbHtml.AppendLine("</tr>");
+                
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        //                sbHtml.Append("<tr bgcolor='#F8FAFA'>")
-                        sbHtml.Append("<tr bgcolor='#FEFEFF'>");
+                        resyncError = true;
                     }
 
-                    for (int intFields = 0; intFields <= strBody.GetUpperBound(0); intFields++)
-                    {
-                        strBody[intFields] = strBody[intFields].Trim();
-                        if (strBody[intFields].Length > 0)
-                        {
-                            if (strHeaderCols[intFields] == "1")
-                            {
-                                sbHtml.Append("<td align='left' valign='middle'>" + strBody[intFields] + "</td>");
-                            }
-                            else if (strHeaderCols[intFields] == "2")
-                            {
-                                sbHtml.Append("<td align='right' valign='middle'>" + strBody[intFields] + "</td>");
-                            }
-                            else
-                            {
-                                sbHtml.Append("<td align='center' valign='middle'>" + strBody[intFields] + "</td>");
-                            }
-                        }
-                    }
-                    sbHtml.AppendLine("</tr>");
                 }
                 else
                 {
@@ -955,8 +979,11 @@ namespace DBDocs_Editor
             if (blnBuild == true)
                 sbHtml.AppendLine("</table>");
 
-            
-//            //.Replace("<", "&lt;").Replace(">", "&gt;")
+            if (resyncError == true) 
+            { 
+                MessageBox.Show("Failures during Resync"); 
+            }
+
             return sbHtml.ToString();
         }
 
@@ -1018,7 +1045,33 @@ namespace DBDocs_Editor
             input = textBox.Text;
             return result;
         }
-        
+
+       
+        /// <summary>
+        /// Replace <br /> with standard \r\n so that text displays correctly in textboxes
+        /// </summary>
+        /// <param name="inText"></param>
+        /// <returns></returns>
+        public static string ConvertBrToCrlf(string inText)
+        {
+            inText = inText.Replace("<br />", "\r\n");
+            inText = inText.Replace("<br/>", "\r\n");
+            inText = inText.Replace("<br>", "\r\n");
+            return inText;
+        }
+
+        /// <summary>
+        /// Replace \r\n with <br /> so that text is stored correctly in db
+        /// </summary>
+        /// <param name="inText"></param>
+        /// <returns></returns>
+        public static string ConvertCrlfToBr(string inText)
+        {
+            inText = inText.Replace("\r\n","<br />");
+            return inText;
+        }
+
+
         
         /// <summary>
         /// Basic Connectin Information Structure

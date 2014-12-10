@@ -54,6 +54,7 @@
             this.lstsubtables.Location = new System.Drawing.Point(12, 27);
             this.lstsubtables.Name = "lstsubtables";
             this.lstsubtables.Size = new System.Drawing.Size(162, 394);
+            this.lstsubtables.Sorted = true;
             this.lstsubtables.TabIndex = 2;
             this.lstsubtables.SelectedIndexChanged += new System.EventHandler(this.lstsubtables_SelectedIndexChanged);
             // 

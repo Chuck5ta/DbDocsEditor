@@ -110,6 +110,7 @@
             this.txtTableNotes.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtTableNotes.Size = new System.Drawing.Size(441, 328);
             this.txtTableNotes.TabIndex = 8;
+            this.txtTableNotes.TextChanged += new System.EventHandler(this.txtTableNotes_TextChanged);
             // 
             // chkDBDocsEntry
             // 

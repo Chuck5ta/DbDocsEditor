@@ -9,6 +9,8 @@ namespace DBDocs_Editor
     public partial class frmTables : Form
     {
         int tableId = 0;
+        bool blnTextChanged = false;
+
 
         public frmTables()
         {
@@ -31,18 +33,28 @@ namespace DBDocs_Editor
             DataSet dbViewList = null;
             if (lstLangs.SelectedIndex == 0)
             {   // If English, connect to main table
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable`.`tableId`,`dbdocstable`.`tableNotes` FROM `dbdocstable` WHERE `tablename` = '" + selectedTable + "'"); 
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable`.`languageId`,`dbdocstable`.`tableId`,`dbdocstable`.`tableNotes` FROM `dbdocstable` WHERE `tablename` = '" + selectedTable + "'"); 
             }
             else
             {   // If Non-English, join to localised table and grab field
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable_localised`.`tableNotes`, `dbdocstable`.`tableId`, `dbdocstable`.`tableNotes` as TableNotesEnglish FROM `dbdocstable` LEFT JOIN `dbdocstable_localised` ON `dbdocstable`.`tableId` = `dbdocstable_localised`.`tableId` WHERE `tablename` = '" + selectedTable + "' AND (`dbdocstable_localised`.`languageId`=" + lstLangs.SelectedIndex + " OR `dbdocstable`.`languageId`=0)"); 
+                dbViewList = ProgSettings.SelectRows("SELECT COALESCE(`dbdocstable_localised`.`languageid`,-1) AS languageId,`dbdocstable_localised`.`tableNotes`, `dbdocstable`.`tableId`, `dbdocstable`.`tableNotes` as TableNotesEnglish FROM `dbdocstable` LEFT JOIN `dbdocstable_localised` ON `dbdocstable`.`tableId` = `dbdocstable_localised`.`tableId` WHERE `tablename` = '" + selectedTable + "' AND (`dbdocstable_localised`.`languageId`=" + lstLangs.SelectedIndex + " OR `dbdocstable`.`languageId`=0)"); 
             }
 
             if (dbViewList != null)
             {
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
-                    txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotes"].ToString();
+                    if (Convert.ToInt32(dbViewList.Tables[0].Rows[0]["languageId"]) == lstLangs.SelectedIndex)
+                    { 
+                        txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotes"].ToString(); 
+                        chkDBDocsEntry.Checked = true;
+                    }
+                    else 
+                    {
+                        txtTableNotes.Text = "";
+                       chkDBDocsEntry.Checked= false;
+                    }
+
                     tableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["TableId"]);
                         
                     // If the 'Use English' if blank checkbox is ticked
@@ -50,14 +62,11 @@ namespace DBDocs_Editor
                     {   // If Localised SubTable Template is blank, go grab the English
                         if (string.IsNullOrEmpty(txtTableNotes.Text))
                         {
-                            txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotesEnglish"].ToString();
+                                txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotesEnglish"].ToString();
                         }
                     }
-                    else
-                    {
-                        txtTableNotes.Text = "";
-                    }
-                    chkDBDocsEntry.Checked = true;
+
+                    txtTableNotes.Text = ProgSettings.ConvertBrToCrlf(txtTableNotes.Text);
 
                     //Check for Subtables
                     ProgSettings.ExtractSubTables(txtTableNotes.Text, lstSubtables);
@@ -73,7 +82,6 @@ namespace DBDocs_Editor
                 txtTableNotes.Text = "";
                 chkDBDocsEntry.Checked = false;
             }
-
             btnShowFields.Enabled = true;
             btnSave.Enabled = true;
         }
@@ -142,7 +150,7 @@ namespace DBDocs_Editor
                 }
 
                 //insert  into `dbdocstable`(`languageId`,`tableName`,`tableNotes`) values (2,'script_texts','xxxx');
-                dbDocsTableOutput.AppendLine("insert  into `dbdocstable`(`languageId`,`tableName`,`tableNotes`) values (" + lstLangs.SelectedIndex + ", '" + selectedTable + "','" + txtTableNotes.Text + "');");
+                dbDocsTableOutput.AppendLine("insert  into `dbdocstable`(`languageId`,`tableName`,`tableNotes`) values (" + lstLangs.SelectedIndex + ", '" + selectedTable + "','" + ProgSettings.ConvertCrlfToBr(txtTableNotes.Text) + "');");
 
                 // Open the file for append and write the entries to it
                 using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
@@ -164,7 +172,7 @@ namespace DBDocs_Editor
                 if (lstLangs.SelectedIndex == 0)
                 {   // If English, connect to main table
                     //update `dbdocstable` set `languageId`=xx,`tableName`=yy,`tableNotes`=zz where tableId=aa;
-                    dbDocsTableOutput.AppendLine("update `dbdocstable` set `languageId`=" + lstLangs.SelectedIndex + ", `tableName`='" + selectedTable + "', `tableNotes`='" + txtTableNotes.Text + "' where tableId=" + tableId + ";");
+                    dbDocsTableOutput.AppendLine("update `dbdocstable` set `languageId`=" + lstLangs.SelectedIndex + ", `tableName`='" + selectedTable + "', `tableNotes`='" + ProgSettings.ConvertCrlfToBr(txtTableNotes.Text) + "' where tableId=" + tableId + ";");
 
                     // Open the file for append and write the entries to it
                     using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
@@ -175,7 +183,7 @@ namespace DBDocs_Editor
                 else
                 {
                     dbDocsTableOutput.AppendLine("delete from `dbdocstable_localisation` where `languageId`=" + lstLangs.SelectedIndex + " and `tableId`= " + tableId + ";");
-                    dbDocsTableOutput.AppendLine("insert  into `dbdocstable_localisation`(`tableId`,`languageId`,`tableNotes`) values ("+ tableId + ", " + lstLangs.SelectedIndex + ", '" + txtTableNotes.Text + "');");
+                    dbDocsTableOutput.AppendLine("insert  into `dbdocstable_localisation`(`tableId`,`languageId`,`tableNotes`) values (" + tableId + ", " + lstLangs.SelectedIndex + ", '" + ProgSettings.ConvertCrlfToBr(txtTableNotes.Text) + "');");
 
                     // Open the file for append and write the entries to it
                     using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable_localised.SQL", true))
@@ -188,7 +196,7 @@ namespace DBDocs_Editor
                 // For an update the logic to decide which table to update is in the Update function itself
                 
                 //                       Table ID         Language ID          Notes
-                ProgSettings.TableUpdate(tableId, lstLangs.SelectedIndex, txtTableNotes.Text);
+                ProgSettings.TableUpdate(tableId, lstLangs.SelectedIndex, ProgSettings.ConvertCrlfToBr(txtTableNotes.Text));
 
             }
             lblStatus.Text = DateTime.Now.ToString() + " Save Complete for " + selectedTable; 
@@ -248,6 +256,11 @@ namespace DBDocs_Editor
                     }
                 }
             }
+        }
+
+        private void txtTableNotes_TextChanged(object sender, EventArgs e)
+        {
+            blnTextChanged = true;
         }
     }
 }

@@ -9,6 +9,7 @@ namespace DBDocs_Editor
     public partial class frmSubtables : Form
     {
         public int subTableId = 0;
+        bool blnTextChanged = false;
 
         public frmSubtables()
         {
@@ -35,7 +36,7 @@ namespace DBDocs_Editor
             }
             else
             {   // If Non-English, join to localised table and grab field
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocssubtables`.`subtableid`, `dbdocssubtables_localised`.`subtabletemplate`, `dbdocssubtables_localised`.`subtablecontent`, `dbdocssubtables`.`subtabletemplate` as subtableTemplateEnglish, `dbdocssubtables`.`subtablecontent` as subTableContentEnglish FROM `dbdocssubtables` INNER JOIN `dbdocssubtables_localised` ON `dbdocssubtables`.`subtableid` = `dbdocssubtables_localised`.`subtableid` WHERE `subtablename` = '" + selectedSubtable + "' AND (`dbdocssubtables_localised`.`languageId`=" + lstLangs.SelectedIndex + "  OR `dbdocssubtables`.`languageId`=0);");
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocssubtables`.`subtableid`, `dbdocssubtables_localised`.`subtabletemplate`, `dbdocssubtables_localised`.`subtablecontent`, `dbdocssubtables`.`subtabletemplate` as subtableTemplateEnglish, `dbdocssubtables`.`subtablecontent` as subTableContentEnglish FROM `dbdocssubtables` LEFT JOIN `dbdocssubtables_localised` ON `dbdocssubtables`.`subtableid` = `dbdocssubtables_localised`.`subtableid` WHERE `subtablename` = '" + selectedSubtable + "' AND (`dbdocssubtables_localised`.`languageId`=" + lstLangs.SelectedIndex + "  OR `dbdocssubtables`.`languageId`=0);");
             }
 
             if (dbViewList != null)
@@ -305,8 +306,21 @@ namespace DBDocs_Editor
                 
                 // Add it to the listbox and select it
                 lstsubtables.Items.Add(thisSubtableName);
-                lstsubtables.SelectedIndex=lstsubtables.Items.Count - 1;
+
+                int intSubTableListIndex = lstsubtables.Items.IndexOf(thisSubtableName);
+
+                lstsubtables.SelectedIndex = intSubTableListIndex; // lstsubtables.Items.Count - 1;
             }
+        }
+
+        private void btnStripTemplate_Click(object sender, EventArgs e)
+        {
+            txtSubtableTemplate.Text = ProgSettings.ConvertHtmlToTemplate(txtSubtableTemplate.Text);
+        }
+
+        private void txtSubtableTemplate_TextChanged(object sender, EventArgs e)
+        {
+            blnTextChanged = true;
         }
     }
 }

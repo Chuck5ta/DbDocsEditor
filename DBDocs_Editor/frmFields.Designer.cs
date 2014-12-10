@@ -112,6 +112,7 @@
             this.txtFieldNotes.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtFieldNotes.Size = new System.Drawing.Size(441, 298);
             this.txtFieldNotes.TabIndex = 8;
+            this.txtFieldNotes.TextChanged += new System.EventHandler(this.txtFieldNotes_TextChanged);
             // 
             // chkDBDocsEntry
             // 
@@ -211,6 +212,7 @@
             this.txtFieldComment.Name = "txtFieldComment";
             this.txtFieldComment.Size = new System.Drawing.Size(441, 20);
             this.txtFieldComment.TabIndex = 21;
+            this.txtFieldComment.TextChanged += new System.EventHandler(this.txtFieldComment_TextChanged);
             // 
             // label2
             // 

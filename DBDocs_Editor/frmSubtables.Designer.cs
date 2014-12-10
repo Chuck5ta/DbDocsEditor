@@ -51,6 +51,7 @@
             this.btnNewEntry = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.btnStripTemplate = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -73,6 +74,7 @@
             this.lstsubtables.Location = new System.Drawing.Point(12, 27);
             this.lstsubtables.Name = "lstsubtables";
             this.lstsubtables.Size = new System.Drawing.Size(162, 394);
+            this.lstsubtables.Sorted = true;
             this.lstsubtables.TabIndex = 2;
             this.lstsubtables.SelectedIndexChanged += new System.EventHandler(this.lstsubtables_SelectedIndexChanged);
             // 
@@ -159,7 +161,7 @@
             // 
             // btnRebuildContent
             // 
-            this.btnRebuildContent.Location = new System.Drawing.Point(177, 255);
+            this.btnRebuildContent.Location = new System.Drawing.Point(177, 265);
             this.btnRebuildContent.Name = "btnRebuildContent";
             this.btnRebuildContent.Size = new System.Drawing.Size(101, 23);
             this.btnRebuildContent.TabIndex = 14;
@@ -206,6 +208,7 @@
             this.txtSubtableTemplate.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtSubtableTemplate.Size = new System.Drawing.Size(441, 309);
             this.txtSubtableTemplate.TabIndex = 10;
+            this.txtSubtableTemplate.TextChanged += new System.EventHandler(this.txtSubtableTemplate_TextChanged);
             // 
             // tabPage2
             // 
@@ -261,9 +264,9 @@
             // 
             // btnNewEntry
             // 
-            this.btnNewEntry.Location = new System.Drawing.Point(177, 284);
+            this.btnNewEntry.Location = new System.Drawing.Point(564, 4);
             this.btnNewEntry.Name = "btnNewEntry";
-            this.btnNewEntry.Size = new System.Drawing.Size(101, 23);
+            this.btnNewEntry.Size = new System.Drawing.Size(80, 23);
             this.btnNewEntry.TabIndex = 20;
             this.btnNewEntry.Text = "New Entry";
             this.btnNewEntry.UseVisualStyleBackColor = true;
@@ -284,11 +287,22 @@
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(0, 17);
             // 
+            // btnStripTemplate
+            // 
+            this.btnStripTemplate.Location = new System.Drawing.Point(177, 294);
+            this.btnStripTemplate.Name = "btnStripTemplate";
+            this.btnStripTemplate.Size = new System.Drawing.Size(101, 23);
+            this.btnStripTemplate.TabIndex = 21;
+            this.btnStripTemplate.Text = "Strip Template";
+            this.btnStripTemplate.UseVisualStyleBackColor = true;
+            this.btnStripTemplate.Click += new System.EventHandler(this.btnStripTemplate_Click);
+            // 
             // frmSubtables
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(737, 444);
+            this.Controls.Add(this.btnStripTemplate);
             this.Controls.Add(this.btnNewEntry);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.tabControl1);
@@ -351,5 +365,6 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Button btnInsertSubtable;
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
+        private System.Windows.Forms.Button btnStripTemplate;
     }
 }
