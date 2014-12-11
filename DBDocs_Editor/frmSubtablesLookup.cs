@@ -9,7 +9,6 @@ namespace DBDocs_Editor
     public partial class frmSubtablesLookup : Form
     {
         public int subTableId = 0;
-        public int languageId = 0;
 
         public frmSubtablesLookup()
         {
@@ -27,32 +26,18 @@ namespace DBDocs_Editor
             txtSubtableName.Text = selectedSubtable;
             subTableId = 0;  // Force to new entry before the lookup updates it should it exist
 
-            if (languageId < 0) languageId = 0;
-
             DataSet dbViewList = null;
-            if (languageId == 0)
-            {   // If English, connect to main table
-                dbViewList = ProgSettings.SelectRows("SELECT subtableid,subtablecontent,subtabletemplate FROM `dbdocssubtables` WHERE `subtablename` = '" + selectedSubtable + "'");
-            }
-            else
-            {   // If Non-English, join to localised table and grab field
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocssubtables`.`subtableid`, `dbdocssubtables_localised`.`subtabletemplate`, `dbdocssubtables_localised`.`subtablecontent`, `dbdocssubtables`.`subtabletemplate` as subtableTemplateEnglish, `dbdocssubtables`.`subtablecontent` as subTableContentEnglish FROM `dbdocssubtables` INNER JOIN `dbdocssubtables_localised` ON `dbdocssubtables`.`subtableid` = `dbdocssubtables_localised`.`subtableid` WHERE `subtablename` = '" + selectedSubtable + "' AND (`dbdocssubtables_localised`.`languageId`=" + languageId + "  OR `dbdocssubtables`.`languageId`=0);");
-            }
+            dbViewList = ProgSettings.SelectRows("SELECT subtableid,languageid, subtablecontent,subtabletemplate FROM `dbdocssubtables` WHERE `subtablename` = '" + selectedSubtable + "'");
 
             if (dbViewList != null)
             {
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
-                    subTableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["subtableid"]);
                     txtSubtableContent.Text = dbViewList.Tables[0].Rows[0]["subtablecontent"].ToString();
                     txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[0]["subtabletemplate"].ToString();
-                        
-                    if (string.IsNullOrEmpty(txtSubtableTemplate.Text))
-                    {
-                        txtSubtableContent.Text = dbViewList.Tables[0].Rows[0]["subtablecontentEnglish"].ToString();
-                        txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[0]["subtabletemplateEnglish"].ToString();
-                    }
 
+                    subTableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["subtableid"]);
+                        
                     // Render the HTML
                     webBrowse.DocumentText = txtSubtableContent.Text;
 
@@ -77,17 +62,11 @@ namespace DBDocs_Editor
             btnSave.Enabled = true;
         }
 
-        private void btnQuit_Click(object sender, EventArgs e)
-        {
-            subTableId = 0;
-            Close();
-        }
-
         private void frmsubtables_Load(object sender, EventArgs e)
         {
             //ProgSettings.LoadLangs(lstLangs);
 
-            System.Data.DataSet dbViewList;
+            DataSet dbViewList;
             if (subTableId==0)
             {
                 // The following command reads all the columns for all the subtables
@@ -114,7 +93,6 @@ namespace DBDocs_Editor
 
             if (subTableId !=0)
             {   //Select the first entry if we passed in an Id
-                if (languageId < 0) languageId = 0;
                 Text = "SubTable: " + lstsubtables.Text;
             }
             else
@@ -129,6 +107,12 @@ namespace DBDocs_Editor
             subTableId = Convert.ToInt32(ProgSettings.LookupSubTableId(lstsubtables.Text));
             Close();
 //            MessageBox.Show("Save Complete");
+        }
+
+        private void frmsubtables_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            subTableId = 0;
+            Close();
         }
     }
 }

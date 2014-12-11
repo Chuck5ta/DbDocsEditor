@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following set of attributes. Change these attribute values to modify the information associated with an assembly.
 [assembly: AssemblyTitle("DBDocs_Editor")]
-[assembly: AssemblyDescription("An Editor for the DbDocs System")]
+[assembly: AssemblyDescription("An Editor for the MaNGOS DbDocs System")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("getMaNGOS.eu")]
 [assembly: AssemblyProduct("DBDocs_Editor")]
@@ -23,5 +23,5 @@ using System.Runtime.InteropServices;
 // Major Version Minor Version Build Number Revision
 //
 // You can specify all the values or you can default the Build and Revision Numbers by using the '*' as shown below: [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.3.0.0")]
+[assembly: AssemblyFileVersion("0.3.0.0")]

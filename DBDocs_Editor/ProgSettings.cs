@@ -739,6 +739,43 @@ namespace DBDocs_Editor
         }
 
         /// <summary>
+        /// Populate the Language Listboxes
+        /// </summary>
+        /// <param name="lstLangs"></param>
+        public static void LoadLangs(ToolStripComboBox lstLangs)
+        {
+            // The following command reads all the columns for the selected table
+            var dbViewList = ProgSettings.SelectRows("SELECT * FROM dbdocslanguage");
+
+            // Did we return anything
+            if (dbViewList != null)
+            {
+                // Do we have rows
+                if (dbViewList.Tables[0].Rows.Count > 0)
+                {
+                    lstLangs.Items.Clear();
+
+                    // for each Field returned, populate the listbox with the table name
+                    for (var thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
+                    {
+                        var tableName = dbViewList.Tables[0].Rows[thisRow]["LanguageName"].ToString();
+                        lstLangs.Items.Add(tableName);
+                    }
+                }
+            }
+
+            // Should something horrible go wrong, this will attempt to at least provide an option for english
+            if (lstLangs.Items.Count > 0)
+            {
+                if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
+            }
+            else
+            {
+                lstLangs.Items.Add("English");
+            }
+        }
+
+        /// <summary>
         /// Looks up the next available subtableId
         /// </summary>
         /// <returns></returns>
@@ -957,7 +994,7 @@ namespace DBDocs_Editor
                                     }
                                 }
                             }
-                            catch (Exception ex)
+                            catch 
                             {
                                 resyncError = true;
                             }    
@@ -965,7 +1002,7 @@ namespace DBDocs_Editor
                         sbHtml.AppendLine("</tr>");
                 
                     }
-                    catch (Exception ex)
+                    catch 
                     {
                         resyncError = true;
                     }

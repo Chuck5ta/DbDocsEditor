@@ -30,7 +30,6 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.lstsubtables = new System.Windows.Forms.ListBox();
-            this.btnQuit = new System.Windows.Forms.Button();
             this.txtSubtableName = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.btnSave = new System.Windows.Forms.Button();
@@ -50,6 +49,7 @@
             // 
             // lstsubtables
             // 
+            this.lstsubtables.BackColor = System.Drawing.SystemColors.ControlLight;
             this.lstsubtables.FormattingEnabled = true;
             this.lstsubtables.Location = new System.Drawing.Point(12, 27);
             this.lstsubtables.Name = "lstsubtables";
@@ -57,16 +57,6 @@
             this.lstsubtables.Sorted = true;
             this.lstsubtables.TabIndex = 2;
             this.lstsubtables.SelectedIndexChanged += new System.EventHandler(this.lstsubtables_SelectedIndexChanged);
-            // 
-            // btnQuit
-            // 
-            this.btnQuit.Location = new System.Drawing.Point(650, 4);
-            this.btnQuit.Name = "btnQuit";
-            this.btnQuit.Size = new System.Drawing.Size(75, 23);
-            this.btnQuit.TabIndex = 4;
-            this.btnQuit.Text = "Close";
-            this.btnQuit.UseVisualStyleBackColor = true;
-            this.btnQuit.Click += new System.EventHandler(this.btnQuit_Click);
             // 
             // txtSubtableName
             // 
@@ -89,7 +79,7 @@
             // btnSave
             // 
             this.btnSave.Enabled = false;
-            this.btnSave.Location = new System.Drawing.Point(569, 4);
+            this.btnSave.Location = new System.Drawing.Point(659, 4);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
             this.btnSave.TabIndex = 10;
@@ -136,7 +126,6 @@
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtSubtableName);
-            this.Controls.Add(this.btnQuit);
             this.Controls.Add(this.lstsubtables);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.webBrowse);
@@ -144,7 +133,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "frmSubtablesLookup";
-            this.Text = "subtables Form";
+            this.Text = "===";
             this.Load += new System.EventHandler(this.frmsubtables_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -155,7 +144,6 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ListBox lstsubtables;
-        private System.Windows.Forms.Button btnQuit;
         private System.Windows.Forms.Label txtSubtableName;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnSave;

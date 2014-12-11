@@ -11,7 +11,6 @@ namespace DBDocs_Editor
         int tableId = 0;
         bool blnTextChanged = false;
 
-
         public frmTables()
         {
             InitializeComponent();
@@ -25,7 +24,6 @@ namespace DBDocs_Editor
         private void lstTables_SelectedIndexChanged(object sender, EventArgs e)
         {
             string selectedTable = lstTables.Text;
-            txtTableName.Text = selectedTable;
             tableId = ProgSettings.LookupTableId(selectedTable);
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
@@ -52,7 +50,7 @@ namespace DBDocs_Editor
                     else 
                     {
                         txtTableNotes.Text = "";
-                       chkDBDocsEntry.Checked= false;
+                        chkDBDocsEntry.Checked= false;
                     }
 
                     tableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["TableId"]);
@@ -83,34 +81,16 @@ namespace DBDocs_Editor
                 chkDBDocsEntry.Checked = false;
             }
             btnShowFields.Enabled = true;
-            btnSave.Enabled = true;
-        }
-
-        private void btnQuit_Click(object sender, EventArgs e)
-        {
-            if (blnTextChanged == true)
-            {
-              
-                var response = MessageBox.Show(this,"You have unsaved changes, continue ?","Exit Check",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
-                if (response == System.Windows.Forms.DialogResult.No)
-                { 
-                    return; 
-                }
-            }
-            ProgSettings.ShowThisForm(ProgSettings.mainForm);
-            Close();
-        }
-
-        private void btnShowFields_Click(object sender, EventArgs e)
-        {
-            string selectedTable = lstTables.Text;
-
-            var fieldScreen = new frmFields { TableName = selectedTable };
-            fieldScreen.Show();
+            blnTextChanged = false;
+            btnSave.Enabled = false;
+            mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void frmTables_Load(object sender, EventArgs e)
         {
+            // Populate the Language Pulldown
+			ProgSettings.LoadLangs(lstLangs);
+
             // The following command reads all the columns for the selected table
             DataSet dbViewList = ProgSettings.SelectRows("SELECT T.TABLE_NAME AS TableName, T.ENGINE AS TableEngine, T.TABLE_COMMENT AS TableComment FROM INFORMATION_SCHEMA.Tables T WHERE T.TABLE_NAME <> 'dtproperties' AND T.TABLE_SCHEMA <> 'INFORMATION_SCHEMA' AND t.Table_schema='" + ProgSettings.DbName + "' ORDER BY T.TABLE_NAME");
 
@@ -131,7 +111,7 @@ namespace DBDocs_Editor
                 }
             }
 
-            ProgSettings.LoadLangs(lstLangs);
+            blnTextChanged = false;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -143,7 +123,6 @@ namespace DBDocs_Editor
             outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
 
             string selectedTable = lstTables.Text;
-            txtTableName.Text = selectedTable;
 
             // If the output folder doesnt exist, create it
             if (!Directory.Exists(outputFolder + @"\"))
@@ -174,7 +153,10 @@ namespace DBDocs_Editor
 
                 //                       Selected Table        Language ID              Notes
                 ProgSettings.TableInsert(selectedTable, lstLangs.SelectedIndex, txtTableNotes.Text);
-        
+
+                blnTextChanged = false;
+                btnSave.Enabled = false;
+                mnuSave.Enabled = btnSave.Enabled;
             }
             else                // Updated Record
             {
@@ -207,8 +189,12 @@ namespace DBDocs_Editor
                 //                       Table ID         Language ID          Notes
                 ProgSettings.TableUpdate(tableId, lstLangs.SelectedIndex, ProgSettings.ConvertCrlfToBr(txtTableNotes.Text));
 
+                blnTextChanged = false;
+                btnSave.Enabled = false;
+                mnuSave.Enabled = btnSave.Enabled;
+
             }
-            lblStatus.Text = DateTime.Now.ToString() + " Save Complete for " + selectedTable; 
+            lblStatus.Text = DateTime.Now.ToString() + " Save Complete for " + selectedTable;
         }
 
 
@@ -228,6 +214,9 @@ namespace DBDocs_Editor
                 var subTableScreen = new frmSubtables { subTableId = thissubTableId };
                 subTableScreen.Show();
             }
+            blnTextChanged = false;
+            btnSave.Enabled = false;
+            mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void lstLangs_SelectedIndexChanged(object sender, EventArgs e)
@@ -264,11 +253,101 @@ namespace DBDocs_Editor
                     }
                 }
             }
+            blnTextChanged = false;
+            btnSave.Enabled = false;
+            mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void txtTableNotes_TextChanged(object sender, EventArgs e)
         {
             blnTextChanged = true;
+            btnSave.Enabled = true;
+            mnuSave.Enabled = btnSave.Enabled;
         }
+
+        private void frmTables_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Has any text changed on the form
+            if (blnTextChanged == true)
+            {
+                // Ask the user if they which to close without saving
+                var response = MessageBox.Show(this, "You have unsaved changes, continue ?", "Exit Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == System.Windows.Forms.DialogResult.No)
+                {
+                    // Bail out of the form closing
+                    e.Cancel = true;
+                }
+                else
+                {
+                    // User said yes to closing anyway
+                    ProgSettings.ShowThisForm(ProgSettings.mainForm);
+                }
+            }
+            else
+            {   // Nothing changed, close normally
+                ProgSettings.ShowThisForm(ProgSettings.mainForm);
+            }
+        }
+
+        private void chkUseEnglish_Click(object sender, EventArgs e)
+        {
+            if (chkUseEnglish.Checked == false)
+            {
+                chkUseEnglish.Checked = true;
+            }
+            else
+            {
+                chkUseEnglish.Checked = false;
+            }
+        }
+
+        private void btnCloseWindow_Click(object sender, EventArgs e)
+        {
+            if (blnTextChanged == true)
+            {
+
+                var response = MessageBox.Show(this, "You have unsaved changes, continue ?", "Exit Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == System.Windows.Forms.DialogResult.No)
+                {
+                    return;
+                }
+            }
+            ProgSettings.ShowThisForm(ProgSettings.mainForm);
+            Close();
+        }
+
+        private void btnQuit_Click(object sender, EventArgs e)
+        {
+            if (blnTextChanged == true)
+            {
+
+                var response = MessageBox.Show(this, "You have unsaved changes, continue ?", "Exit Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == System.Windows.Forms.DialogResult.No)
+                {
+                    return;
+                }
+            }
+            Application.Exit();
+        }
+
+        private void btnShowFields_Click(object sender, EventArgs e)
+        {
+            string selectedTable = lstTables.Text;
+
+            var fieldScreen = new frmFields { TableName = selectedTable };
+            fieldScreen.Show();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var aboutScreen = new About();
+            aboutScreen.ShowDialog();
+        }
+
+        private void mnuSave_Click(object sender, EventArgs e)
+        {
+            btnSave_Click(sender, e);
+        }
+
     }
 }

@@ -11,7 +11,6 @@ namespace DBDocs_Editor
         public int subTableId = 0;
         bool blnTextChanged = false;
 
-
         public frmSubtables()
         {
             InitializeComponent();
@@ -25,7 +24,6 @@ namespace DBDocs_Editor
         private void lstsubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
             string selectedSubtable = lstsubtables.Text;
-            txtSubtableName.Text = selectedSubtable;
             subTableId = 0;  // Force to new entry before the lookup updates it should it exist
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
@@ -33,20 +31,29 @@ namespace DBDocs_Editor
             DataSet dbViewList = null;
             if (lstLangs.SelectedIndex == 0)
             {   // If English, connect to main table
-                dbViewList = ProgSettings.SelectRows("SELECT subtableid,subtablecontent,subtabletemplate FROM `dbdocssubtables` WHERE `subtablename` = '" + selectedSubtable + "'");
+                dbViewList = ProgSettings.SelectRows("SELECT subtableid,languageid, subtablecontent,subtabletemplate FROM `dbdocssubtables` WHERE `subtablename` = '" + selectedSubtable + "'");
             }
             else
             {   // If Non-English, join to localised table and grab field
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocssubtables`.`subtableid`, `dbdocssubtables_localised`.`subtabletemplate`, `dbdocssubtables_localised`.`subtablecontent`, `dbdocssubtables`.`subtabletemplate` as subtableTemplateEnglish, `dbdocssubtables`.`subtablecontent` as subTableContentEnglish FROM `dbdocssubtables` LEFT JOIN `dbdocssubtables_localised` ON `dbdocssubtables`.`subtableid` = `dbdocssubtables_localised`.`subtableid` WHERE `subtablename` = '" + selectedSubtable + "' AND (`dbdocssubtables_localised`.`languageId`=" + lstLangs.SelectedIndex + "  OR `dbdocssubtables`.`languageId`=0);");
+                dbViewList = ProgSettings.SelectRows("SELECT COALESCE(`dbdocstable_localised`.`languageid`,-1) AS languageId,`dbdocssubtables`.`subtableid`, `dbdocssubtables_localised`.`subtabletemplate`, `dbdocssubtables_localised`.`subtablecontent`, `dbdocssubtables`.`subtabletemplate` as subtableTemplateEnglish, `dbdocssubtables`.`subtablecontent` as subTableContentEnglish FROM `dbdocssubtables` LEFT JOIN `dbdocssubtables_localised` ON `dbdocssubtables`.`subtableid` = `dbdocssubtables_localised`.`subtableid` WHERE `subtablename` = '" + selectedSubtable + "' AND (`dbdocssubtables_localised`.`languageId`=" + lstLangs.SelectedIndex + "  OR `dbdocssubtables`.`languageId`=0);");
             }
 
             if (dbViewList != null)
             {
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
+                    if (Convert.ToInt32(dbViewList.Tables[0].Rows[0]["languageId"]) == lstLangs.SelectedIndex)
+                    { 
+                        txtSubtableContent.Text = dbViewList.Tables[0].Rows[0]["subtablecontent"].ToString();
+                        txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[0]["subtabletemplate"].ToString();
+                    }
+                    else 
+                    {
+                        txtSubtableContent.Text = "";
+                        txtSubtableTemplate.Text = ""; 
+                    }
+
                     subTableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["subtableid"]);
-                    txtSubtableContent.Text = dbViewList.Tables[0].Rows[0]["subtablecontent"].ToString();
-                    txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[0]["subtabletemplate"].ToString();
                         
                     // If the 'Use English' if blank checkbox is ticked
                     if (chkUseEnglish.Checked == true)
@@ -57,16 +64,9 @@ namespace DBDocs_Editor
                             txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[0]["subtabletemplateEnglish"].ToString();
                         }
                     }
-                    else
-                    {
-                        txtSubtableContent.Text = "";
-						txtSubtableTemplate.Text = "";
-                    }
 
                     // Render the HTML
                     webBrowse.DocumentText = txtSubtableContent.Text;
-
-                    chkDBDocsEntry.Checked = true;
 
                     if (string.IsNullOrEmpty(txtSubtableTemplate.Text))
                     {   //If the template is missing, attempt to build it from the content, only for historic entries !!
@@ -78,38 +78,26 @@ namespace DBDocs_Editor
                 }
                 else  // No dbdocs match
                 {
-                    txtSubtableName.Text = "";
-                    chkDBDocsEntry.Checked = false;
+                    txtSubtableContent.Text = "";
+					txtSubtableTemplate.Text = "";
                 }
             }
             else  // No dbdocs match
             {
-                txtSubtableName.Text = "";
-                chkDBDocsEntry.Checked = false;
+                txtSubtableContent.Text = "";
+				txtSubtableTemplate.Text = "";
             }
-
-            btnSave.Enabled = true;
-        }
-
-        private void btnQuit_Click(object sender, EventArgs e)
-        {
-            if (blnTextChanged == true)
-            {
-              
-                var response = MessageBox.Show(this,"You have unsaved changes, continue ?","Exit Check",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
-                if (response == System.Windows.Forms.DialogResult.No)
-                { 
-                    return; 
-                }
-            }
-            Close();
+            blnTextChanged = false;
+            btnSave.Enabled = false;
+            mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void frmsubtables_Load(object sender, EventArgs e)
         {
-            ProgSettings.LoadLangs(lstLangs);
+            // Populate the Language Pulldown
+			ProgSettings.LoadLangs(lstLangs);
 
-            System.Data.DataSet dbViewList;
+            DataSet dbViewList;
             if (subTableId==0)
             {
                 // The following command reads all the columns for all the subtables
@@ -144,6 +132,7 @@ namespace DBDocs_Editor
                 Text = "SubTables"; 
             }
 
+            blnTextChanged = false;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -172,7 +161,6 @@ namespace DBDocs_Editor
             outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
 
             string selectedTable = lstsubtables.Text;
-            txtSubtableName.Text = selectedTable;
 
             // If the output folder doesnt exist, create it
             if (!Directory.Exists(outputFolder + @"\"))
@@ -203,7 +191,9 @@ namespace DBDocs_Editor
 
                 ProgSettings.SubTableInsert(newSubtableId, lstLangs.SelectedIndex, selectedTable, txtSubtableContent.Text, txtSubtableTemplate.Text);
                 subTableId = newSubtableId;
-        
+                blnTextChanged = false;
+                btnSave.Enabled = false;
+                mnuSave.Enabled = btnSave.Enabled;
             }
             else                // Updated Record
             {
@@ -232,11 +222,14 @@ namespace DBDocs_Editor
 
                 // Write the entry out to the Database directly
                 // For an update the logic to decide which table to update is in the Update function itself
-
+                
                 ProgSettings.SubTableUpdate(subTableId, lstLangs.SelectedIndex, selectedTable, txtSubtableContent.Text, txtSubtableTemplate.Text);
-            }
 
-            //MessageBox.Show("Save Complete");
+                blnTextChanged = false;
+                btnSave.Enabled = false;
+                mnuSave.Enabled = btnSave.Enabled;
+
+            }
             lblStatus.Text = DateTime.Now.ToString() + " Save Complete for " + selectedTable;
         }
 
@@ -266,28 +259,11 @@ namespace DBDocs_Editor
             // Are we looking for a localised version ?
             
             
-            if (lstLangs.SelectedIndex == 0)
-            {
-                if (ProgSettings.LookupTableEntry(lstLangs.SelectedIndex, subTableId) == true)
-                {
-                    chkDBDocsEntry.Checked = true;
-                }
-                else
-                {
-                    chkDBDocsEntry.Checked = false;
-                }
-            }
-            else
+            if (lstLangs.SelectedIndex > 0)
             {
                 // Check whether a localised version exists
-                if (ProgSettings.LookupTableEntryLocalised(lstLangs.SelectedIndex, subTableId) == true)
+                if (ProgSettings.LookupTableEntryLocalised(lstLangs.SelectedIndex, subTableId) == false)
                 {
-                    chkDBDocsEntry.Checked = true;
-                }
-                else
-                {
-                    chkDBDocsEntry.Checked = false;
-                    
                     // If 'Use English' is not selected, clear the text
                     if (chkUseEnglish.Checked == false)
                     {
@@ -296,6 +272,81 @@ namespace DBDocs_Editor
                     }
                 }
             }
+            blnTextChanged = false;
+            btnSave.Enabled = false;
+            mnuSave.Enabled = btnSave.Enabled;
+        }
+
+        private void txtSubTableName_TextChanged(object sender, EventArgs e)
+        {
+            blnTextChanged = true;
+            btnSave.Enabled = true;
+            mnuSave.Enabled = btnSave.Enabled;
+        }
+
+        private void frmsubtables_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Has any text changed on the form
+            if (blnTextChanged == true)
+            {
+                // Ask the user if they which to close without saving
+                var response = MessageBox.Show(this, "You have unsaved changes, continue ?", "Exit Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == System.Windows.Forms.DialogResult.No)
+                {
+                    // Bail out of the form closing
+                    e.Cancel = true;
+                }
+                else
+                {
+                    // User said yes to closing anyway
+                    ProgSettings.ShowThisForm(ProgSettings.mainForm);
+                }
+            }
+            else
+            {   // Nothing changed, close normally
+                ProgSettings.ShowThisForm(ProgSettings.mainForm);
+            }
+        }
+
+        private void chkUseEnglish_Click(object sender, EventArgs e)
+        {
+            if (chkUseEnglish.Checked == false)
+            {
+                chkUseEnglish.Checked = true;
+            }
+            else
+            {
+                chkUseEnglish.Checked = false;
+            }
+        }
+
+        private void btnCloseWindow_Click(object sender, EventArgs e)
+        {
+            if (blnTextChanged == true)
+            {
+
+                var response = MessageBox.Show(this, "You have unsaved changes, continue ?", "Exit Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == System.Windows.Forms.DialogResult.No)
+                {
+                    return;
+                }
+            }
+            ProgSettings.ShowThisForm(ProgSettings.mainForm);
+            Close();
+        }
+
+        private void btnQuit_Click(object sender, EventArgs e)
+        {
+            if (blnTextChanged == true)
+            {
+
+                var response = MessageBox.Show(this, "You have unsaved changes, continue ?", "Exit Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == System.Windows.Forms.DialogResult.No)
+                {
+                    return;
+                }
+            }
+            Application.Exit();
         }
 
         private void btnNewEntry_Click(object sender, EventArgs e)
@@ -308,7 +359,7 @@ namespace DBDocs_Editor
             returnVal = ProgSettings.ShowInputDialog(ref thisSubtableName, "subTable Name");
 
             // If the user clicked ok, add the new table
-            if (returnVal == DialogResult.OK) ;
+            if (returnVal == DialogResult.OK) 
             {
                 // Add to the table
                 ProgSettings.SubTableInsert(thissubTableId, lstLangs.SelectedIndex, thisSubtableName, "To be populated", "To be populated");
@@ -320,6 +371,10 @@ namespace DBDocs_Editor
                 int intSubTableListIndex = lstsubtables.Items.IndexOf(thisSubtableName);
 
                 lstsubtables.SelectedIndex = intSubTableListIndex; // lstsubtables.Items.Count - 1;
+
+				blnTextChanged = true;
+	            btnSave.Enabled = true;
+	            mnuSave.Enabled = btnSave.Enabled;
             }
         }
 
@@ -332,5 +387,22 @@ namespace DBDocs_Editor
         {
             blnTextChanged = true;
         }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var aboutScreen = new About();
+            aboutScreen.ShowDialog();
+        }
+
+        private void mnuSave_Click(object sender, EventArgs e)
+        {
+            btnSave_Click(sender, e);
+        }
+
+        private void mnuNew_Click(object sender, EventArgs e)
+        {
+            btnNewEntry_Click(sender, e);
+        }
+
     }
 }

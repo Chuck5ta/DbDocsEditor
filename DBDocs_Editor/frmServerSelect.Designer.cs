@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmServerSelect));
             this.btnSave = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
             this.btnEdit = new System.Windows.Forms.Button();
@@ -236,9 +237,10 @@
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.btnSave);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "frmServerSelect";
-            this.Text = "Select Connection";
+            this.Text = "MaNGOS DBDocs Editor";
             this.Load += new System.EventHandler(this.frmServerSelect_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

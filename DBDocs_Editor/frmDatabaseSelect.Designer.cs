@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDatabaseSelect));
             this.btnConnect = new System.Windows.Forms.Button();
             this.btnQuit = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
@@ -105,6 +106,7 @@
             this.Controls.Add(this.btnQuit);
             this.Controls.Add(this.btnConnect);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "frmDatabaseSelect";
             this.Text = "Select Database";
