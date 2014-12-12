@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Windows.Forms;
+using DBDocs_Editor.Properties;
 
 namespace DBDocs_Editor
 {
-    public partial class frmDatabaseSelect : Form
+    public partial class FrmDatabaseSelect : Form
     {
-        public frmDatabaseSelect()
+        public FrmDatabaseSelect()
         {
             InitializeComponent();
         }
 
         private void btnQuit_Click(object sender, EventArgs e)
         {
-            ProgSettings.ShowThisForm(ProgSettings.mainForm);
+            ProgSettings.ShowThisForm(ProgSettings.MainForm);
             Close();
         }
-        
+
         private void frmDatabaseSelect_Load(object sender, EventArgs e)
         {
             var dbViewList = ProgSettings.SelectRows("SHOW DATABASES");
@@ -31,17 +32,17 @@ namespace DBDocs_Editor
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            if (txtDefaultDB.Text != "*")
+            if (txtDefaultDB.Text != @"*")
             {
                 ProgSettings.DbName = txtDefaultDB.Text;
 
-                var tablesScreen = new frmTables { Text = "DBDocs: Using database " + txtDefaultDB.Text };
+                var tablesScreen = new FrmTables { Text = Resources.DBDocs__Using_database_ + txtDefaultDB.Text };
                 tablesScreen.Show();
                 Hide();
             }
             else
             {
-                MessageBox.Show("Please select a database from the list");
+                MessageBox.Show(Resources.Please_select_a_database_from_the_list);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace DBDocs_Editor
 {
-    partial class frmSubtables
+    partial class FrmSubtables
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSubtables));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmSubtables));
             this.label1 = new System.Windows.Forms.Label();
             this.lstsubtables = new System.Windows.Forms.ListBox();
             this.btnSave = new System.Windows.Forms.Button();
@@ -44,7 +44,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.btnStripTemplate = new System.Windows.Forms.Button();
-            this.txtSubTableComment = new System.Windows.Forms.TextBox();
+            this.txtSubTableName = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -229,13 +229,14 @@
             this.btnStripTemplate.UseVisualStyleBackColor = true;
             this.btnStripTemplate.Click += new System.EventHandler(this.btnStripTemplate_Click);
             // 
-            // txtSubTableComment
+            // txtSubTableName
             // 
-            this.txtSubTableComment.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.txtSubTableComment.Location = new System.Drawing.Point(292, 30);
-            this.txtSubTableComment.Name = "txtSubTableComment";
-            this.txtSubTableComment.Size = new System.Drawing.Size(441, 20);
-            this.txtSubTableComment.TabIndex = 22;
+            this.txtSubTableName.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.txtSubTableName.Location = new System.Drawing.Point(292, 30);
+            this.txtSubTableName.Name = "txtSubTableName";
+            this.txtSubTableName.Size = new System.Drawing.Size(441, 20);
+            this.txtSubTableName.TabIndex = 22;
+            this.txtSubTableName.TextChanged += new System.EventHandler(this.txtSubTableName_TextChanged);
             // 
             // label5
             // 
@@ -279,7 +280,7 @@
             this.mnuNew.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.mnuNew.Name = "mnuNew";
             this.mnuNew.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.mnuNew.Size = new System.Drawing.Size(152, 22);
+            this.mnuNew.Size = new System.Drawing.Size(150, 22);
             this.mnuNew.Text = "&New";
             this.mnuNew.Click += new System.EventHandler(this.mnuNew_Click);
             // 
@@ -289,13 +290,13 @@
             this.openToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.openToolStripMenuItem.Text = "&Open";
             // 
             // toolStripSeparator
             // 
             this.toolStripSeparator.Name = "toolStripSeparator";
-            this.toolStripSeparator.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator.Size = new System.Drawing.Size(147, 6);
             // 
             // mnuSave
             // 
@@ -303,26 +304,26 @@
             this.mnuSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.mnuSave.Name = "mnuSave";
             this.mnuSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.mnuSave.Size = new System.Drawing.Size(152, 22);
+            this.mnuSave.Size = new System.Drawing.Size(150, 22);
             this.mnuSave.Text = "&Save";
             this.mnuSave.Click += new System.EventHandler(this.mnuSave_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(147, 6);
             // 
             // btnCloseWindow
             // 
             this.btnCloseWindow.Name = "btnCloseWindow";
-            this.btnCloseWindow.Size = new System.Drawing.Size(152, 22);
+            this.btnCloseWindow.Size = new System.Drawing.Size(150, 22);
             this.btnCloseWindow.Text = "Close Window";
             this.btnCloseWindow.Click += new System.EventHandler(this.btnCloseWindow_Click);
             // 
             // btnQuit
             // 
             this.btnQuit.Name = "btnQuit";
-            this.btnQuit.Size = new System.Drawing.Size(152, 22);
+            this.btnQuit.Size = new System.Drawing.Size(150, 22);
             this.btnQuit.Text = "E&xit";
             this.btnQuit.Click += new System.EventHandler(this.btnQuit_Click);
             // 
@@ -399,6 +400,7 @@
             this.lstLangs.Margin = new System.Windows.Forms.Padding(0);
             this.lstLangs.Name = "lstLangs";
             this.lstLangs.Size = new System.Drawing.Size(130, 23);
+            this.lstLangs.SelectedIndexChanged += new System.EventHandler(this.lstLangs_SelectedIndexChanged);
             // 
             // helpToolStripMenuItem
             // 
@@ -430,7 +432,7 @@
             this.label2.TabIndex = 22;
             this.label2.Text = "Field Comment:";
             // 
-            // frmSubtables
+            // FrmSubtables
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -442,7 +444,7 @@
             this.Controls.Add(this.label5);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
-            this.Controls.Add(this.txtSubTableComment);
+            this.Controls.Add(this.txtSubTableName);
             this.Controls.Add(this.lstsubtables);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.label1);
@@ -451,7 +453,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
-            this.Name = "frmSubtables";
+            this.Name = "FrmSubtables";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "subtables Form";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmsubtables_FormClosing);
@@ -488,7 +490,7 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
         private System.Windows.Forms.Button btnStripTemplate;
-        private System.Windows.Forms.TextBox txtSubTableComment;
+        private System.Windows.Forms.TextBox txtSubTableName;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripComboBox lstLangs;

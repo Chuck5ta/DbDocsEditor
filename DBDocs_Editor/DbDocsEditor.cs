@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using DBDocs_Editor.Properties;
 
 namespace DBDocs_Editor
 {
@@ -13,9 +14,9 @@ namespace DBDocs_Editor
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var mainform = new frmServerSelect();
-            ProgSettings.mainForm = mainform;
-            mainform.Text = "DBDocs Editor v0.0.2";
+            var mainform = new FrmServerSelect();
+            ProgSettings.MainForm = mainform;
+            mainform.Text = Resources.DBDocs_Editor_v + Application.ProductVersion;
             Application.Run(mainform);
         }
     }

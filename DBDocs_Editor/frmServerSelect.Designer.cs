@@ -1,6 +1,6 @@
 ﻿namespace DBDocs_Editor
 {
-    partial class frmServerSelect
+    partial class FrmServerSelect
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmServerSelect));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmServerSelect));
             this.btnSave = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
             this.btnEdit = new System.Windows.Forms.Button();
@@ -239,7 +239,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "frmServerSelect";
+            this.Name = "FrmServerSelect";
             this.Text = "MaNGOS DBDocs Editor";
             this.Load += new System.EventHandler(this.frmServerSelect_Load);
             this.ResumeLayout(false);

@@ -1,6 +1,6 @@
 ﻿namespace DBDocs_Editor
 {
-    partial class frmSubtablesLookup
+    partial class FrmSubtablesLookup
     {
         /// <summary>
         /// Required designer variable.
@@ -116,7 +116,7 @@
             this.txtSubtableContent.TabIndex = 20;
             this.txtSubtableContent.Visible = false;
             // 
-            // frmSubtablesLookup
+            // FrmSubtablesLookup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -132,8 +132,9 @@
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
-            this.Name = "frmSubtablesLookup";
+            this.Name = "FrmSubtablesLookup";
             this.Text = "===";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmSubtablesLookup_FormClosing);
             this.Load += new System.EventHandler(this.frmsubtables_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using DBDocs_Editor.Properties;
 
 namespace DBDocs_Editor
 {
-    public partial class frmServerSelect : Form
+    public partial class FrmServerSelect : Form
     {
-        private bool blnEditmode = false;
-        private List<ProgSettings.ConnectionInfo> serverList = new List<ProgSettings.ConnectionInfo>();
+        private bool _blnEditmode;
+        private List<ProgSettings.ConnectionInfo> _serverList = new List<ProgSettings.ConnectionInfo>();
 
-        public frmServerSelect()
+        public FrmServerSelect()
         {
             InitializeComponent();
         }
@@ -21,7 +22,7 @@ namespace DBDocs_Editor
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (blnEditmode == false)
+            if (_blnEditmode == false)
             {   // When saving a new item, we only need to add it to the listbox and update the registry
                 lstServers.Items.Add(txtServerName.Text + "-" + txtDefaultDB.Text);
             }
@@ -31,9 +32,9 @@ namespace DBDocs_Editor
 
                 if (selectedServer > 0)
                 {
-                    if (serverList.Count > 0)
+                    if (_serverList.Count > 0)
                     {
-                        var thisServer = serverList[selectedServer - 1];
+                        var thisServer = _serverList[selectedServer - 1];
                         var dummyServerName = thisServer.ServerNameorIp;
                         var dummyDefaultDb = thisServer.DatabaseName;
 
@@ -62,7 +63,7 @@ namespace DBDocs_Editor
         {
             // Set the screen to 'Edit' Mode
             ToggleControls(true);
-            blnEditmode = true;
+            _blnEditmode = true;
         }
 
         private void ToggleControls(bool editmode)
@@ -133,11 +134,11 @@ namespace DBDocs_Editor
         {
             int selectedServer = lstServers.SelectedIndex;
 
-            if(serverList.Count>0)
+            if (_serverList.Count > 0)
             {
                 if (selectedServer >= 0)
                 {
-                    ProgSettings.ConnectionInfo thisServer = serverList[selectedServer];
+                    ProgSettings.ConnectionInfo thisServer = _serverList[selectedServer];
 
                     txtServerName.Text = thisServer.ServerNameorIp;
                     txtUsername.Text = thisServer.DatabaseUserName;
@@ -170,11 +171,11 @@ namespace DBDocs_Editor
             //// Add default entry
             //lstServers.Items.Add("localhost-*");
 
-            serverList = ProgSettings.PopulateConnections();
-            if (serverList == null) return;
-            if (serverList.Count <= 0) return;
+            _serverList = ProgSettings.PopulateConnections();
+            if (_serverList == null) return;
+            if (_serverList.Count <= 0) return;
 
-            foreach (var thisConnection in serverList)
+            foreach (var thisConnection in _serverList)
             {
                 lstServers.Items.Add(thisConnection.ServerNameorIp + "-" + thisConnection.DatabaseName);
             }
@@ -190,14 +191,14 @@ namespace DBDocs_Editor
             if (!txtDefaultDB.Text.Contains("*"))
             {
                 // Display Table List screen
-                var tablesScreen = new frmTables { Text = "DBDocs: Using database " + txtDefaultDB.Text };
+                var tablesScreen = new FrmTables { Text = Resources.DBDocs__Using_database_ + txtDefaultDB.Text };
                 tablesScreen.Show();
                 Hide();
             }
             else
             {
                 // Display Database List screen
-                var dbScreen = new frmDatabaseSelect { Text = "DBDocs: Using Server " + txtServerName.Text };
+                var dbScreen = new FrmDatabaseSelect { Text = Resources.DBDocs__Using_Server + txtServerName.Text };
                 dbScreen.Show();
                 Hide();
             }

@@ -1,6 +1,6 @@
 ﻿namespace DBDocs_Editor
 {
-    partial class frmTables
+    partial class FrmTables
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmTables));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmTables));
             this.label1 = new System.Windows.Forms.Label();
             this.lstTables = new System.Windows.Forms.ListBox();
             this.txtTableNotes = new System.Windows.Forms.TextBox();
@@ -192,7 +192,7 @@
             this.newToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.newToolStripMenuItem.Text = "&New";
             // 
             // openToolStripMenuItem
@@ -202,13 +202,13 @@
             this.openToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.openToolStripMenuItem.Text = "&Open";
             // 
             // toolStripSeparator
             // 
             this.toolStripSeparator.Name = "toolStripSeparator";
-            this.toolStripSeparator.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator.Size = new System.Drawing.Size(147, 6);
             // 
             // mnuSave
             // 
@@ -217,26 +217,26 @@
             this.mnuSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.mnuSave.Name = "mnuSave";
             this.mnuSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.mnuSave.Size = new System.Drawing.Size(152, 22);
+            this.mnuSave.Size = new System.Drawing.Size(150, 22);
             this.mnuSave.Text = "&Save";
             this.mnuSave.Click += new System.EventHandler(this.mnuSave_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(147, 6);
             // 
             // btnCloseWindow
             // 
             this.btnCloseWindow.Name = "btnCloseWindow";
-            this.btnCloseWindow.Size = new System.Drawing.Size(152, 22);
+            this.btnCloseWindow.Size = new System.Drawing.Size(150, 22);
             this.btnCloseWindow.Text = "Close Window";
             this.btnCloseWindow.Click += new System.EventHandler(this.btnCloseWindow_Click);
             // 
             // btnQuit
             // 
             this.btnQuit.Name = "btnQuit";
-            this.btnQuit.Size = new System.Drawing.Size(152, 22);
+            this.btnQuit.Size = new System.Drawing.Size(150, 22);
             this.btnQuit.Text = "E&xit";
             this.btnQuit.Click += new System.EventHandler(this.btnQuit_Click);
             // 
@@ -316,6 +316,7 @@
             this.lstLangs.Margin = new System.Windows.Forms.Padding(0);
             this.lstLangs.Name = "lstLangs";
             this.lstLangs.Size = new System.Drawing.Size(130, 23);
+            this.lstLangs.SelectedIndexChanged += new System.EventHandler(this.lstLangs_SelectedIndexChanged);
             // 
             // helpToolStripMenuItem
             // 
@@ -358,7 +359,7 @@
             this.btnShowFields.UseVisualStyleBackColor = true;
             this.btnShowFields.Click += new System.EventHandler(this.btnShowFields_Click);
             // 
-            // frmTables
+            // FrmTables
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -379,7 +380,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
-            this.Name = "frmTables";
+            this.Name = "FrmTables";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Selected Database: ";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmTables_FormClosing);

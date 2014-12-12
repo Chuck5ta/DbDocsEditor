@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Text;
 using System.Windows.Forms;
+using DBDocs_Editor.Properties;
 using Microsoft.Win32;
 using MySql.Data.MySqlClient;
-using System.Text;
 
 namespace DBDocs_Editor
 {
     public class ProgSettings
     {   // Common Functions will be added in here
-        private static string dbName = "";
-        private static string serverName = "";
-        private static string userName = "";
-        private static string password = "";
-        public static string sqldBconn = "";
-        public static Form mainForm;
+        private static string _dbName = "";
+        private static string _serverName = "";
+        private static string _userName = "";
+        private static string _password = "";
+        public static string SqldBconn = "";
+        public static Form MainForm;
 
         /// <summary>
         /// Gets or sets the password.
@@ -25,18 +26,18 @@ namespace DBDocs_Editor
         {
             get
             {
-                return password;
+                return _password;
             }
             set
             {
-                password = value;
-                if (dbName != "*")
+                _password = value;
+                if (_dbName != "*")
                 {
-                    sqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + _serverName + ";DATABASE=" + _dbName + ";UID=" + _userName + ";PWD=" + _password + ";";
                 }
                 else
                 {
-                    sqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + _serverName + ";UID=" + _userName + ";PWD=" + _password + ";";
                 }
             }
         }
@@ -49,18 +50,18 @@ namespace DBDocs_Editor
         {
             get
             {
-                return userName;
+                return _userName;
             }
             set
             {
-                userName = value;
-                if (dbName != "*")
+                _userName = value;
+                if (_dbName != "*")
                 {
-                    sqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + _serverName + ";DATABASE=" + _dbName + ";UID=" + _userName + ";PWD=" + _password + ";";
                 }
                 else
                 {
-                    sqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + _serverName + ";UID=" + _userName + ";PWD=" + _password + ";";
                 }
             }
         }
@@ -73,18 +74,18 @@ namespace DBDocs_Editor
         {
             get
             {
-                return serverName;
+                return _serverName;
             }
             set
             {
-                serverName = value;
-                if (dbName != "*")
+                _serverName = value;
+                if (_dbName != "*")
                 {
-                    sqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + _serverName + ";DATABASE=" + _dbName + ";UID=" + _userName + ";PWD=" + _password + ";";
                 }
                 else
                 {
-                    sqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + _serverName + ";UID=" + _userName + ";PWD=" + _password + ";";
                 }
             }
         }
@@ -97,18 +98,18 @@ namespace DBDocs_Editor
         {
             get
             {
-                return dbName;
+                return _dbName;
             }
             set
             {
-                dbName = value;
-                if (dbName != "*")
+                _dbName = value;
+                if (_dbName != "*")
                 {
-                    sqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + _serverName + ";DATABASE=" + _dbName + ";UID=" + _userName + ";PWD=" + _password + ";";
                 }
                 else
                 {
-                    sqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + _serverName + ";UID=" + _userName + ";PWD=" + _password + ";";
                 }
             }
         }
@@ -121,7 +122,7 @@ namespace DBDocs_Editor
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public static DataSet SelectRows(string query)
         {
-            var conn = new MySqlConnection(sqldBconn);
+            var conn = new MySqlConnection(SqldBconn);
             var adapter = new MySqlDataAdapter();
             var myDataset = new DataSet();
             adapter.SelectCommand = new MySqlCommand(query, conn);
@@ -132,7 +133,7 @@ namespace DBDocs_Editor
             catch (Exception ex)
             {
                 myDataset = null;
-                MessageBox.Show("There was an error connecting to the database: \n" + ex.Message);
+                MessageBox.Show(Resources.Error_Connecting_to_DB + ex.Message);
             }
             adapter.Dispose();
             conn.Close();
@@ -140,6 +141,7 @@ namespace DBDocs_Editor
         }
 
         #region "dbdocsTable Functions"
+
         /// <summary>
         /// Inserts a record into the dbdocstable table
         /// </summary>
@@ -148,8 +150,7 @@ namespace DBDocs_Editor
         /// <param name="tableNotes"></param>
         public static void TableInsert(string tableName, int languageId, string tableNotes)
         {
-            
-            var conn = new MySqlConnection(sqldBconn);
+            var conn = new MySqlConnection(SqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
 
@@ -172,25 +173,25 @@ namespace DBDocs_Editor
         /// <param name="tableNotes"></param>
         public static void TableUpdate(int tableId, int languageId, string tableNotes)
         {
-            var conn = new MySqlConnection(sqldBconn);
+            var conn = new MySqlConnection(SqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
 
             // Does this entry exist as a main table entry ?
-            if (LookupTableEntry(languageId, tableId) == true)
+            if (LookupTableEntry(languageId, tableId))
             {
                 // Update dbdocs
                 cmd.CommandText = "update `dbdocstable` set `tablenotes`=@tableNotes where tableId=@tableId and languageId=@languageId";
             }
             else
             {   // Does this entry exist as a localised entry ?
-                if (LookupTableEntryLocalised(languageId, tableId) == true)
+                if (LookupTableEntryLocalised(languageId, tableId))
                 {
                     // update dbdocs_localised
                     cmd.CommandText = "update `dbdocstable_localised` set `tablenotes`=@tableNotes where tableId=@tableId and languageId=@languageId";
                 }
                 else
-                { 
+                {
                     // insert into dbdocs_localised
                     cmd.CommandText = "insert  into `dbdocstable_localised`(`tableId`,`languageId`,`tableNotes`) "
                                     + "VALUES (@tableId, @languageId, @tablenotes)";
@@ -213,32 +214,27 @@ namespace DBDocs_Editor
         /// <returns></returns>
         public static bool LookupTableEntryLocalised(int languageId, int tableId)
         {
-            System.Data.DataSet dbView = new System.Data.DataSet();
-            dbView = ProgSettings.SelectRows("SELECT tableNotes FROM dbdocstable_localised where tableId=" + tableId + " and languageId=" + languageId + ";");
+            var dbView = SelectRows("SELECT tableNotes FROM dbdocstable_localised where tableId=" + tableId + " and languageId=" + languageId + ";");
             if (dbView != null)
             {
                 if (dbView.Tables[0].Rows.Count > 0)
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
-            
+
             return false;
         }
 
         /// <summary>
         /// Returns the TableId for a given TableName
         /// </summary>
-        /// <param name="subTableName"></param>
+        /// <param name="tableName"></param>
         /// <returns></returns>
         public static int LookupTableId(string tableName)
         {
-            System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
-            dbViewSubtable = ProgSettings.SelectRows("SELECT tableid FROM dbdocstable where tableName='" + tableName + "';");
+            var dbViewSubtable = SelectRows("SELECT tableid FROM dbdocstable where tableName='" + tableName + "';");
             if (dbViewSubtable != null)
             {
                 if (dbViewSubtable.Tables[0].Rows.Count > 0)
@@ -257,22 +253,19 @@ namespace DBDocs_Editor
         /// <returns></returns>
         public static bool LookupTableEntry(int languageId, int tableId)
         {
-            System.Data.DataSet dbView = new System.Data.DataSet();
-            dbView = ProgSettings.SelectRows("SELECT tableNotes FROM dbdocstable where tableId=" + tableId + " and languageId=" + languageId + ";");
+            var dbView = SelectRows("SELECT tableNotes FROM dbdocstable where tableId=" + tableId + " and languageId=" + languageId + ";");
             if (dbView != null)
             {
                 if (dbView.Tables[0].Rows.Count > 0)
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
 
             return false;
         }
+
         #endregion "dbdocsTable Functions"
 
         #region "dbdocsfields Functions"
@@ -280,12 +273,14 @@ namespace DBDocs_Editor
         /// <summary>
         /// Inserts a record into the dbdocsfields table
         /// </summary>
+        /// <param name="languageId"></param>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="fieldName">Name of the field.</param>
+        /// <param name="fieldComment"></param>
         /// <param name="fieldNotes">The field notes.</param>
-        public static void FieldInsert(int languageId, string tableName, string fieldName, string FieldComment, string fieldNotes)
+        public static void FieldInsert(int languageId, string tableName, string fieldName, string fieldComment, string fieldNotes)
         {
-            var conn = new MySqlConnection(sqldBconn);
+            var conn = new MySqlConnection(SqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
             cmd.CommandText = "insert  into `dbdocsfields`(`languageId`,`tableName`,`fieldName`,`FieldComment`,`fieldNotes`) "
@@ -294,7 +289,7 @@ namespace DBDocs_Editor
             cmd.Parameters.AddWithValue("@languageId", languageId);
             cmd.Parameters.AddWithValue("@tablename", tableName);
             cmd.Parameters.AddWithValue("@fieldName", fieldName);
-            cmd.Parameters.AddWithValue("@FieldComment", FieldComment);
+            cmd.Parameters.AddWithValue("@FieldComment", fieldComment);
             cmd.Parameters.AddWithValue("@fieldNotes", fieldNotes);
 
             cmd.ExecuteNonQuery();
@@ -304,24 +299,25 @@ namespace DBDocs_Editor
         /// <summary>
         /// Updates a record in the dbdocsfields table
         /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="fieldName">Name of the field.</param>
+        /// <param name="fieldId"></param>
+        /// <param name="languageId"></param>
+        /// <param name="fieldComment">Name of the field.</param>
         /// <param name="fieldNotes">The field notes.</param>
-        public static void FieldUpdate(int fieldId, int languageId, string FieldComment, string fieldNotes)
+        public static void FieldUpdate(int fieldId, int languageId, string fieldComment, string fieldNotes)
         {
-            var conn = new MySqlConnection(sqldBconn);
+            var conn = new MySqlConnection(SqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
 
             // Does this entry exist as a main table entry ?
-            if (LookupFieldEntry(languageId, fieldId) == true)
+            if (LookupFieldEntry(languageId, fieldId))
             {
                 // Update dbdocs
                 cmd.CommandText = "update `dbdocsfields` set `FieldComment`=@FieldComment, `fieldnotes`=@fieldNotes where `fieldId`=@fieldId and `languageId`=@languageId;";
             }
             else
             {   // Does this entry exist as a localised entry ?
-                if (LookupFieldEntryLocalised(languageId, fieldId) == true)
+                if (LookupFieldEntryLocalised(languageId, fieldId))
                 {
                     // update dbdocs_localised
                     cmd.CommandText = "update `dbdocsfields_localised` set `FieldComment`=@FieldComment, `fieldnotes`=@fieldNotes where `fieldId`=@fieldId and `languageId`=@languageId;";
@@ -334,20 +330,18 @@ namespace DBDocs_Editor
                 }
             }
 
-            
-
             cmd.Parameters.AddWithValue("@fieldId", fieldId);
             cmd.Parameters.AddWithValue("@languageId", languageId);
-            cmd.Parameters.AddWithValue("@FieldComment", FieldComment);
+            cmd.Parameters.AddWithValue("@FieldComment", fieldComment);
             cmd.Parameters.AddWithValue("@fieldNotes", fieldNotes);
 
             try
-            { 
-                cmd.ExecuteNonQuery(); 
+            {
+                cmd.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error Saving: " + ex.Message);
+                MessageBox.Show(Resources.Error_Saving + ex.Message);
             }
             cmd.Connection.Close();
         }
@@ -356,24 +350,20 @@ namespace DBDocs_Editor
         /// Check whether the data exists in the localised or main table
         /// </summary>
         /// <param name="languageId"></param>
-        /// <param name="tableId"></param>
+        /// <param name="fieldId"></param>
         /// <returns></returns>
         public static bool LookupFieldEntryLocalised(int languageId, int fieldId)
         {
-            System.Data.DataSet dbView = new System.Data.DataSet();
-            dbView = ProgSettings.SelectRows("SELECT fieldNotes FROM dbdocsfields_localised where fieldId=" + fieldId + " and languageId=" + languageId + ";");
+            var dbView = SelectRows("SELECT fieldNotes FROM dbdocsfields_localised where fieldId=" + fieldId + " and languageId=" + languageId + ";");
             if (dbView != null)
             {
                 if (dbView.Tables[0].Rows.Count > 0)
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
-            
+
             return false;
         }
 
@@ -381,22 +371,18 @@ namespace DBDocs_Editor
         /// Check whether the data exists in the main table
         /// </summary>
         /// <param name="languageId"></param>
-        /// <param name="tableId"></param>
+        /// <param name="fieldId"></param>
         /// <returns></returns>
         public static bool LookupFieldEntry(int languageId, int fieldId)
         {
-            System.Data.DataSet dbView = new System.Data.DataSet();
-            dbView = ProgSettings.SelectRows("SELECT fieldNotes FROM dbdocsfields where fieldId=" + fieldId + " and languageId=" + languageId + ";");
+            var dbView = SelectRows("SELECT fieldNotes FROM dbdocsfields where fieldId=" + fieldId + " and languageId=" + languageId + ";");
             if (dbView != null)
             {
                 if (dbView.Tables[0].Rows.Count > 0)
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
 
             return false;
@@ -410,8 +396,7 @@ namespace DBDocs_Editor
         /// <returns></returns>
         public static int LookupFieldId(string tableName, string fieldName)
         {
-            System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
-            dbViewSubtable = ProgSettings.SelectRows("SELECT fieldid FROM dbdocsfields where tableName='" + tableName + "' and fieldname='" + fieldName + "';");
+            var dbViewSubtable = SelectRows("SELECT fieldid FROM dbdocsfields where tableName='" + tableName + "' and fieldname='" + fieldName + "';");
             if (dbViewSubtable != null)
             {
                 if (dbViewSubtable.Tables[0].Rows.Count > 0)
@@ -422,19 +407,21 @@ namespace DBDocs_Editor
             return 0;
         }
 
-
         #endregion "dbdocsfields Functions"
-        
+
         #region "dbdocssubTable Functions"
+
         /// <summary>
-        /// Inserts a record into the dbdocsfields table
+        /// Inserts a record into the dbdocsSubtable table
         /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="fieldName">Name of the field.</param>
-        /// <param name="fieldNotes">The field notes.</param>
+        /// <param name="subTableId">Id of the subTable.</param>
+        /// <param name="languageId"></param>
+        /// <param name="subTableName">Name of the subTable.</param>
+        /// <param name="subTableContent">This is the generated markup, build from the Template</param>
+        /// <param name="subTableTemplate">This is the Template used for the table markup</param>
         public static void SubTableInsert(int subTableId, int languageId, string subTableName, string subTableContent, string subTableTemplate)
         {
-            var conn = new MySqlConnection(sqldBconn);
+            var conn = new MySqlConnection(SqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
             cmd.CommandText = "insert  into `dbdocssubtables`(`subtableid`,`languageId`,`subtableName`,`subtablecontent`,`subtabletemplate`) "
@@ -451,26 +438,28 @@ namespace DBDocs_Editor
         }
 
         /// <summary>
-        /// Updates a record in the dbdocsfields table
+        /// Updates a record in the dbdocsSubtable table
         /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="fieldName">Name of the field.</param>
-        /// <param name="fieldNotes">The field notes.</param>
+        /// <param name="subTableId">Id of the subTable.</param>
+        /// <param name="languageId"></param>
+        /// <param name="subTableName">Name of the subTable.</param>
+        /// <param name="subTableContent">This is the generated markup, build from the Template</param>
+        /// <param name="subTableTemplate">This is the Template used for the table markup</param>
         public static void SubTableUpdate(int subTableId, int languageId, string subTableName, string subTableContent, string subTableTemplate)
         {
-            var conn = new MySqlConnection(sqldBconn);
+            var conn = new MySqlConnection(SqldBconn);
             var cmd = new MySqlCommand("", conn);
             cmd.Connection.Open();
 
             // Does this entry exist as a main table entry ?
-            if (LookupSubTableEntry(languageId, subTableId) == true)
+            if (LookupSubTableEntry(languageId, subTableId))
             {
                 // Update dbdocs
                 cmd.CommandText = "update `dbdocssubtables` set `subTableName`=@subTableName,`subTableContent`=@subTableContent,`subTableTemplate`=@subTableTemplate where subTableId=@subTableId and languageId=@languageId;";
             }
             else
             {   // Does this entry exist as a localised entry ?
-                if (LookupSubTableEntryLocalised(languageId, subTableId) == true)
+                if (LookupSubTableEntryLocalised(languageId, subTableId))
                 {
                     // update dbdocs_localised
                     cmd.CommandText = "update `dbdocssubtables_localised` set `subTableContent`=@subTableContent,`subTableTemplate`=@subTableTemplate where subTableId=@subTableId and languageId=@languageId;";
@@ -482,7 +471,7 @@ namespace DBDocs_Editor
                                       + "VALUES (@subtableid, @languageId, @subtablecontent, @subtabletemplate)";
                 }
             }
-            
+
             cmd.Parameters.AddWithValue("@subtableid", subTableId);
             cmd.Parameters.AddWithValue("@languageId", languageId);
             cmd.Parameters.AddWithValue("@subtableName", subTableName);
@@ -493,27 +482,22 @@ namespace DBDocs_Editor
             cmd.Connection.Close();
         }
 
-
         /// <summary>
         /// Check whether the data exists in the localised or main table
         /// </summary>
         /// <param name="languageId"></param>
-        /// <param name="tableId"></param>
+        /// <param name="subtableId"></param>
         /// <returns></returns>
         public static bool LookupSubTableEntryLocalised(int languageId, int subtableId)
         {
-            System.Data.DataSet dbView = new System.Data.DataSet();
-            dbView = ProgSettings.SelectRows("SELECT subtabletemplate FROM dbdocssubtables_localised where subtableId=" + subtableId + " and languageId=" + languageId + ";");
+            var dbView = SelectRows("SELECT subtabletemplate FROM dbdocssubtables_localised where subtableId=" + subtableId + " and languageId=" + languageId + ";");
             if (dbView != null)
             {
                 if (dbView.Tables[0].Rows.Count > 0)
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
 
             return false;
@@ -523,27 +507,24 @@ namespace DBDocs_Editor
         /// Check whether the data exists in the main table
         /// </summary>
         /// <param name="languageId"></param>
-        /// <param name="tableId"></param>
+        /// <param name="subtableId"></param>
         /// <returns></returns>
         public static bool LookupSubTableEntry(int languageId, int subtableId)
         {
-            System.Data.DataSet dbView = new System.Data.DataSet();
-            dbView = ProgSettings.SelectRows("SELECT subtablename FROM dbdocssubtables where subtableId=" + subtableId + " and languageId=" + languageId + ";");
+            var dbView = SelectRows("SELECT subtablename FROM dbdocssubtables where subtableId=" + subtableId + " and languageId=" + languageId + ";");
             if (dbView != null)
             {
                 if (dbView.Tables[0].Rows.Count > 0)
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
 
             return false;
         }
-                #endregion "dbdocsTable Functions"
+
+        #endregion "dbdocssubTable Functions"
 
         /// <summary>
         /// Redisplays the form 'formName' passed
@@ -571,10 +552,10 @@ namespace DBDocs_Editor
             const string keyName = userRoot + "\\" + subkey;
 
             // Concat all the login requirements into a single field
-            string[] connectionString = { serverName, userName, password, dbName };
+            string[] connectionString = { _serverName, _userName, _password, _dbName };
 
             // Write in into the registry as a key call "<servername>-<dbname>"
-            Registry.SetValue(keyName, serverName + "-" + DbName, connectionString);
+            Registry.SetValue(keyName, _serverName + "-" + DbName, connectionString);
 
             // Rebuild the internal list of connections
             PopulateConnections();
@@ -655,14 +636,14 @@ namespace DBDocs_Editor
 
             while (startPos > 0)
             {        //¬subtable:xxx¬
-                startPos = subTableText.IndexOf("¬subtable:", startPos + 1, System.StringComparison.Ordinal);
+                startPos = subTableText.IndexOf("¬subtable:", startPos + 1, StringComparison.Ordinal);
                 if (startPos > 0)
                 {
                     startPos = startPos + 10;
                 }
                 if (startPos <= 0) continue;
 
-                var endPos = subTableText.IndexOf("¬", startPos + 1, System.StringComparison.Ordinal);
+                var endPos = subTableText.IndexOf("¬", startPos + 1, StringComparison.Ordinal);
                 retString = retString + subTableText.Substring(startPos, endPos - startPos) + ",";
             }
             return retString;
@@ -671,33 +652,32 @@ namespace DBDocs_Editor
         /// <summary>
         /// Populates a listbox with the name of each subtable entry found in text
         /// </summary>
-        /// <param name="SourceText"></param>
+        /// <param name="sourceText"></param>
         /// <param name="lstSubTables"></param>
-        public static void ExtractSubTables(string SourceText, ListBox lstSubTables)
+        public static void ExtractSubTables(string sourceText, ListBox lstSubTables)
         {
             lstSubTables.Items.Clear();
-            if (SourceText.Contains("¬subtable:"))
+            if (sourceText.Contains("¬subtable:"))
             {
-                string subtables = GetSubtables(SourceText);
-                string[] stringSeparators = new string[] { "," };
-                string[] subarray = subtables.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+                var subtables = GetSubtables(sourceText);
+                var stringSeparators = new[] { "," };
+                var subarray = subtables.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (string tableid in subarray)
+                foreach (var tableid in subarray)
                 {
                     if (!string.IsNullOrEmpty(tableid))
                     {
-                        System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
-                        dbViewSubtable = ProgSettings.SelectRows("SELECT subtablename FROM dbdocssubtables where subtableid=" + tableid);
+                        var dbViewSubtable = SelectRows("SELECT subtablename FROM dbdocssubtables where subtableid=" + tableid);
                         if (dbViewSubtable != null)
                         {
                             if (dbViewSubtable.Tables[0].Rows.Count > 0)
                             {
-                                lstSubTables.Items.Add(subtables.Replace(",", "") + ":" + dbViewSubtable.Tables[0].Rows[0]["subtablename"].ToString());
+                                lstSubTables.Items.Add(subtables.Replace(",", "") + ":" + dbViewSubtable.Tables[0].Rows[0]["subtablename"]);
                             }
                         }
                     }
                 }
-//                MessageBox.Show("Found subtables: " + subtables);
+                // MessageBox.Show("Found subtables: " + subtables);
             }
         }
 
@@ -708,7 +688,7 @@ namespace DBDocs_Editor
         public static void LoadLangs(ListBox lstLangs)
         {
             // The following command reads all the columns for the selected table
-            var dbViewList = ProgSettings.SelectRows("SELECT * FROM dbdocslanguage");
+            var dbViewList = SelectRows("SELECT * FROM dbdocslanguage");
 
             // Did we return anything
             if (dbViewList != null)
@@ -726,11 +706,11 @@ namespace DBDocs_Editor
                     }
                 }
             }
-            
+
             // Should something horrible go wrong, this will attempt to at least provide an option for english
             if (lstLangs.Items.Count > 0)
-            { 
-                if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0; 
+            {
+                if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
             }
             else
             {
@@ -745,7 +725,7 @@ namespace DBDocs_Editor
         public static void LoadLangs(ToolStripComboBox lstLangs)
         {
             // The following command reads all the columns for the selected table
-            var dbViewList = ProgSettings.SelectRows("SELECT * FROM dbdocslanguage");
+            var dbViewList = SelectRows("SELECT * FROM dbdocslanguage");
 
             // Did we return anything
             if (dbViewList != null)
@@ -781,8 +761,7 @@ namespace DBDocs_Editor
         /// <returns></returns>
         public static string GetNewSubTableId()
         {
-            System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
-            dbViewSubtable = ProgSettings.SelectRows("SELECT max(subtableid) as MaxId FROM dbdocssubtables");
+            var dbViewSubtable = SelectRows("SELECT max(subtableid) as MaxId FROM dbdocssubtables");
             if (dbViewSubtable != null)
             {
                 if (dbViewSubtable.Tables[0].Rows.Count > 0)
@@ -800,8 +779,7 @@ namespace DBDocs_Editor
         /// <returns></returns>
         public static string LookupSubTableId(string subTableName)
         {
-            System.Data.DataSet dbViewSubtable = new System.Data.DataSet();
-            dbViewSubtable = ProgSettings.SelectRows("SELECT subtableid FROM dbdocssubtables where subtableName='" + subTableName + "';");
+            var dbViewSubtable = SelectRows("SELECT subtableid FROM dbdocssubtables where subtableName='" + subTableName + "';");
             if (dbViewSubtable != null)
             {
                 if (dbViewSubtable.Tables[0].Rows.Count > 0)
@@ -838,7 +816,6 @@ namespace DBDocs_Editor
             inText = inText.Replace("<th align=right>", "<th align=right>>");
             inText = inText.Replace("<th align='right'>", "<th align='right'>>");
             inText = inText.Replace("<th align=\"right\">", "<th align=\"right\">>");
-
 
             // Clean up the alignment stuff
             inText = inText.Replace("align='left'", "");
@@ -885,14 +862,12 @@ namespace DBDocs_Editor
             inText = inText.Replace("\r" + "\r", "\r");
             inText = inText.Replace("\n" + "\n", "\n");
 
-
             if (inText.Contains("<table"))
             {
-                int startPos = inText.IndexOf("<table");
-                int endPos = inText.IndexOf(">", startPos + 1) + 1;
-                string sourceText = inText.Substring(startPos, endPos - startPos);
+                var startPos = inText.IndexOf("<table", StringComparison.Ordinal);
+                var endPos = inText.IndexOf(">", startPos + 1, StringComparison.Ordinal) + 1;
+                var sourceText = inText.Substring(startPos, endPos - startPos);
                 inText = inText.Replace(sourceText, "").Trim();
-
             }
             inText = inText.Replace("><b>", ">");
             return inText;
@@ -901,25 +876,25 @@ namespace DBDocs_Editor
         /// <summary>
         /// Converts the Template markup to HTML
         /// </summary>
+        /// <param name="templateHeader"></param>
         /// <param name="templateText"></param>
         /// <returns></returns>
         public static string ConvertTemplateToHtml(string templateHeader, string templateText)
         {
-            bool blnBuild = false;
-            StringBuilder sbHtml = new StringBuilder();
-            string[] strHeaders = null;
+            var blnBuild = false;
+            var sbHtml = new StringBuilder();
             if (templateHeader.EndsWith("|"))
                 templateHeader = templateHeader.Substring(0, templateHeader.Length - 1);
 
-            string[] stringSeparators = new string[] { "|" };
-            strHeaders = templateHeader.Trim().Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
-            
+            var stringSeparators = new[] { "|" };
+            var strHeaders = templateHeader.Trim().Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+
             string[] strHeaderCols = null;
 
             if (templateText.Contains("|"))
                 blnBuild = true;
 
-            if (blnBuild == true)
+            if (blnBuild)
             {
                 sbHtml.AppendLine("<table border='1' cellspacing='1' cellpadding='3' bgcolor='#f0f0f0'>");
                 sbHtml.AppendLine("<tr bgcolor='#f0f0ff'>");
@@ -927,7 +902,7 @@ namespace DBDocs_Editor
 
                 //Process the headers
                 strHeaderCols = new string[strHeaders.GetUpperBound(0) + 1];
-                for (int intHead = 0; intHead <= strHeaders.GetUpperBound(0); intHead++)
+                for (var intHead = 0; intHead <= strHeaders.GetUpperBound(0); intHead++)
                 {
                     if (strHeaders[intHead].StartsWith("<"))
                     {
@@ -948,32 +923,21 @@ namespace DBDocs_Editor
             }
 
             //Now need to process the body
-            string[] strLines = null;
-            string[] strBody = null;
-            string[] stringSeparators2 = new string[] { "\r\n" };
-            strLines = templateText.Split(stringSeparators2, StringSplitOptions.RemoveEmptyEntries);
+            var stringSeparators2 = new[] { "\r\n" };
+            var strLines = templateText.Split(stringSeparators2, StringSplitOptions.RemoveEmptyEntries);
 
-            bool resyncError = false;
-            for (int intLines = 0; intLines <= strLines.GetUpperBound(0); intLines++)
+            var resyncError = false;
+            for (var intLines = 0; intLines <= strLines.GetUpperBound(0); intLines++)
             {
-                if (blnBuild == true)
+                if (blnBuild)
                 {
                     try
                     {
-                        strBody = strLines[intLines].Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
-            
-                        if (intLines % 2 == 0)
-                        {
-                            //               sbHtml.Append("<tr bgcolor='#FAF8FA'>")
-                            sbHtml.Append("<tr bgcolor='#FFFFEE'>");
-                        }
-                        else
-                        {
-                            //                sbHtml.Append("<tr bgcolor='#F8FAFA'>")
-                            sbHtml.Append("<tr bgcolor='#FEFEFF'>");
-                        }
+                        var strBody = strLines[intLines].Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
 
-                        for (int intFields = 0; intFields <= strBody.GetUpperBound(0); intFields++)
+                        sbHtml.Append(intLines % 2 == 0 ? "<tr bgcolor='#FFFFEE'>" : "<tr bgcolor='#FEFEFF'>");
+
+                        for (var intFields = 0; intFields <= strBody.GetUpperBound(0); intFields++)
                         {
                             try
                             {
@@ -994,46 +958,43 @@ namespace DBDocs_Editor
                                     }
                                 }
                             }
-                            catch 
+                            catch
                             {
                                 resyncError = true;
-                            }    
+                            }
                         }
                         sbHtml.AppendLine("</tr>");
-                
                     }
-                    catch 
+                    catch
                     {
                         resyncError = true;
                     }
-
                 }
                 else
                 {
                     sbHtml.AppendLine(strLines[intLines]);
                 }
             }
-            if (blnBuild == true)
+            if (blnBuild)
                 sbHtml.AppendLine("</table>");
 
-            if (resyncError == true) 
-            { 
-                MessageBox.Show("Failures during Resync"); 
+            if (resyncError)
+            {
+                MessageBox.Show(Resources.Failure_during_Resync);
             }
 
             return sbHtml.ToString();
         }
 
-
         /// <summary>
         /// Replace ' with an escaped \' so SQL is happy
         /// </summary>
-        /// <param name="inSQL"></param>
+        /// <param name="inSql"></param>
         /// <returns></returns>
-        public static string PrepareSqlString(string inSQL)
+        public static string PrepareSqlString(string inSql)
         {
-            inSQL = inSQL.Replace("\'", "\\'");
-            return inSQL;
+            inSql = inSql.Replace("\'", "\\'");
+            return inSql;
         }
 
         /// <summary>
@@ -1044,48 +1005,54 @@ namespace DBDocs_Editor
         /// <returns></returns>
         public static DialogResult ShowInputDialog(ref string input, string title)
         {
-            System.Drawing.Size size = new System.Drawing.Size(200, 70);
-            Form inputBox = new Form();
+            var size = new System.Drawing.Size(200, 70);
+            var inputBox = new Form
+            {
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                ClientSize = size,
+                Text = title
+            };
 
-            inputBox.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            inputBox.ClientSize = size;
-            inputBox.Text = title;
-
-            System.Windows.Forms.TextBox textBox = new TextBox();
-            textBox.Size = new System.Drawing.Size(size.Width - 10, 23);
-            textBox.Location = new System.Drawing.Point(5, 5);
-            textBox.Text = input;
+            var textBox = new TextBox
+            {
+                Size = new System.Drawing.Size(size.Width - 10, 23),
+                Location = new System.Drawing.Point(5, 5),
+                Text = input
+            };
             inputBox.Controls.Add(textBox);
 
-            Button okButton = new Button();
-            okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            okButton.Name = "okButton";
-            okButton.Size = new System.Drawing.Size(75, 23);
-            okButton.Text = "&OK";
-            okButton.Location = new System.Drawing.Point(size.Width - 80 - 80, 39);
+            var okButton = new Button
+            {
+                DialogResult = DialogResult.OK,
+                Name = "okButton",
+                Size = new System.Drawing.Size(75, 23),
+                Text = Resources.OK,
+                Location = new System.Drawing.Point(size.Width - 80 - 80, 39)
+            };
             inputBox.Controls.Add(okButton);
 
-            Button cancelButton = new Button();
-            cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            cancelButton.Name = "cancelButton";
-            cancelButton.Size = new System.Drawing.Size(75, 23);
-            cancelButton.Text = "&Cancel";
-            cancelButton.Location = new System.Drawing.Point(size.Width - 80, 39);
+            var cancelButton = new Button
+            {
+                DialogResult = DialogResult.Cancel,
+                Name = "cancelButton",
+                Size = new System.Drawing.Size(75, 23),
+                Text = Resources.Cancel,
+                Location = new System.Drawing.Point(size.Width - 80, 39)
+            };
             inputBox.Controls.Add(cancelButton);
 
             inputBox.AcceptButton = okButton;
             inputBox.CancelButton = cancelButton;
 
-            inputBox.StartPosition = FormStartPosition.CenterParent; 
+            inputBox.StartPosition = FormStartPosition.CenterParent;
 
             DialogResult result = inputBox.ShowDialog();
             input = textBox.Text;
             return result;
         }
 
-       
         /// <summary>
-        /// Replace <br /> with standard \r\n so that text displays correctly in textboxes
+        /// Replace <br/> with standard \r\n so that text displays correctly in textboxes
         /// </summary>
         /// <param name="inText"></param>
         /// <returns></returns>
@@ -1098,18 +1065,16 @@ namespace DBDocs_Editor
         }
 
         /// <summary>
-        /// Replace \r\n with <br /> so that text is stored correctly in db
+        /// Replace \r\n with <br/> so that text is stored correctly in db
         /// </summary>
         /// <param name="inText"></param>
         /// <returns></returns>
         public static string ConvertCrlfToBr(string inText)
         {
-            inText = inText.Replace("\r\n","<br />");
+            inText = inText.Replace("\r\n", "<br />");
             return inText;
         }
 
-
-        
         /// <summary>
         /// Basic Connectin Information Structure
         /// </summary>

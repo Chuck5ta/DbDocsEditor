@@ -3,15 +3,16 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using DBDocs_Editor.Properties;
 
 namespace DBDocs_Editor
 {
-    public partial class frmTables : Form
+    public partial class FrmTables : Form
     {
-        int tableId = 0;
-        bool blnTextChanged = false;
+        private int _tableId;
+        private bool _blnTextChanged;
 
-        public frmTables()
+        public FrmTables()
         {
             InitializeComponent();
         }
@@ -23,19 +24,19 @@ namespace DBDocs_Editor
         /// <param name="e"></param>
         private void lstTables_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string selectedTable = lstTables.Text;
-            tableId = ProgSettings.LookupTableId(selectedTable);
+            var selectedTable = lstTables.Text;
+            _tableId = ProgSettings.LookupTableId(selectedTable);
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
 
-            DataSet dbViewList = null;
+            DataSet dbViewList;
             if (lstLangs.SelectedIndex == 0)
             {   // If English, connect to main table
-                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable`.`languageId`,`dbdocstable`.`tableId`,`dbdocstable`.`tableNotes` FROM `dbdocstable` WHERE `tablename` = '" + selectedTable + "'"); 
+                dbViewList = ProgSettings.SelectRows("SELECT `dbdocstable`.`languageId`,`dbdocstable`.`tableId`,`dbdocstable`.`tableNotes` FROM `dbdocstable` WHERE `tablename` = '" + selectedTable + "'");
             }
             else
             {   // If Non-English, join to localised table and grab field
-                dbViewList = ProgSettings.SelectRows("SELECT COALESCE(`dbdocstable_localised`.`languageid`,-1) AS languageId,`dbdocstable_localised`.`tableNotes`, `dbdocstable`.`tableId`, `dbdocstable`.`tableNotes` as TableNotesEnglish FROM `dbdocstable` LEFT JOIN `dbdocstable_localised` ON `dbdocstable`.`tableId` = `dbdocstable_localised`.`tableId` WHERE `tablename` = '" + selectedTable + "' AND (`dbdocstable_localised`.`languageId`=" + lstLangs.SelectedIndex + " OR `dbdocstable`.`languageId`=0)"); 
+                dbViewList = ProgSettings.SelectRows("SELECT COALESCE(`dbdocstable_localised`.`languageid`,-1) AS languageId,`dbdocstable_localised`.`tableNotes`, `dbdocstable`.`tableId`, `dbdocstable`.`tableNotes` as TableNotesEnglish FROM `dbdocstable` LEFT JOIN `dbdocstable_localised` ON `dbdocstable`.`tableId` = `dbdocstable_localised`.`tableId` WHERE `tablename` = '" + selectedTable + "' AND (`dbdocstable_localised`.`languageId`=" + lstLangs.SelectedIndex + " OR `dbdocstable`.`languageId`=0)");
             }
 
             if (dbViewList != null)
@@ -43,24 +44,24 @@ namespace DBDocs_Editor
                 if (dbViewList.Tables[0].Rows.Count > 0)
                 {
                     if (Convert.ToInt32(dbViewList.Tables[0].Rows[0]["languageId"]) == lstLangs.SelectedIndex)
-                    { 
-                        txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotes"].ToString(); 
+                    {
+                        txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotes"].ToString();
                         chkDBDocsEntry.Checked = true;
                     }
-                    else 
+                    else
                     {
                         txtTableNotes.Text = "";
-                        chkDBDocsEntry.Checked= false;
+                        chkDBDocsEntry.Checked = false;
                     }
 
-                    tableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["TableId"]);
-                        
+                    _tableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["TableId"]);
+
                     // If the 'Use English' if blank checkbox is ticked
-                    if (chkUseEnglish.Checked == true)
+                    if (chkUseEnglish.Checked)
                     {   // If Localised SubTable Template is blank, go grab the English
                         if (string.IsNullOrEmpty(txtTableNotes.Text))
                         {
-                                txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotesEnglish"].ToString();
+                            txtTableNotes.Text = dbViewList.Tables[0].Rows[0]["TableNotesEnglish"].ToString();
                         }
                     }
 
@@ -81,7 +82,7 @@ namespace DBDocs_Editor
                 chkDBDocsEntry.Checked = false;
             }
             btnShowFields.Enabled = true;
-            blnTextChanged = false;
+            _blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -89,7 +90,7 @@ namespace DBDocs_Editor
         private void frmTables_Load(object sender, EventArgs e)
         {
             // Populate the Language Pulldown
-			ProgSettings.LoadLangs(lstLangs);
+            ProgSettings.LoadLangs(lstLangs);
 
             // The following command reads all the columns for the selected table
             DataSet dbViewList = ProgSettings.SelectRows("SELECT T.TABLE_NAME AS TableName, T.ENGINE AS TableEngine, T.TABLE_COMMENT AS TableComment FROM INFORMATION_SCHEMA.Tables T WHERE T.TABLE_NAME <> 'dtproperties' AND T.TABLE_SCHEMA <> 'INFORMATION_SCHEMA' AND t.Table_schema='" + ProgSettings.DbName + "' ORDER BY T.TABLE_NAME");
@@ -111,7 +112,7 @@ namespace DBDocs_Editor
                 }
             }
 
-            blnTextChanged = false;
+            _blnTextChanged = false;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -120,7 +121,7 @@ namespace DBDocs_Editor
             string outputFolder = Application.ExecutablePath;
 
             // Strip the Executable name from the path
-            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\"));
+            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\", StringComparison.Ordinal));
 
             string selectedTable = lstTables.Text;
 
@@ -130,7 +131,7 @@ namespace DBDocs_Editor
                 Directory.CreateDirectory(outputFolder + @"\");
             }
 
-            if (tableId == 0)   // New Record
+            if (_tableId == 0)   // New Record
             {
                 if (lstLangs.SelectedIndex != 0)
                 {   // If English, connect to main table
@@ -148,13 +149,13 @@ namespace DBDocs_Editor
 
                 // Write the entry out to the Database directly
 
-                // For an insert, the record is always saved to the primary table, regardless of the language
-                // Since the system is English based, it should really have an English base record.
+                // For an insert, the record is always saved to the primary table, regardless of the language Since the system is English based, it should really have an English
+                // base record.
 
-                //                       Selected Table        Language ID              Notes
+                // Selected Table Language ID Notes
                 ProgSettings.TableInsert(selectedTable, lstLangs.SelectedIndex, txtTableNotes.Text);
 
-                blnTextChanged = false;
+                _blnTextChanged = false;
                 btnSave.Enabled = false;
                 mnuSave.Enabled = btnSave.Enabled;
             }
@@ -163,7 +164,7 @@ namespace DBDocs_Editor
                 if (lstLangs.SelectedIndex == 0)
                 {   // If English, connect to main table
                     //update `dbdocstable` set `languageId`=xx,`tableName`=yy,`tableNotes`=zz where tableId=aa;
-                    dbDocsTableOutput.AppendLine("update `dbdocstable` set `languageId`=" + lstLangs.SelectedIndex + ", `tableName`='" + selectedTable + "', `tableNotes`='" + ProgSettings.ConvertCrlfToBr(txtTableNotes.Text) + "' where tableId=" + tableId + ";");
+                    dbDocsTableOutput.AppendLine("update `dbdocstable` set `languageId`=" + lstLangs.SelectedIndex + ", `tableName`='" + selectedTable + "', `tableNotes`='" + ProgSettings.ConvertCrlfToBr(txtTableNotes.Text) + "' where tableId=" + _tableId + ";");
 
                     // Open the file for append and write the entries to it
                     using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
@@ -173,8 +174,8 @@ namespace DBDocs_Editor
                 }
                 else
                 {
-                    dbDocsTableOutput.AppendLine("delete from `dbdocstable_localisation` where `languageId`=" + lstLangs.SelectedIndex + " and `tableId`= " + tableId + ";");
-                    dbDocsTableOutput.AppendLine("insert  into `dbdocstable_localisation`(`tableId`,`languageId`,`tableNotes`) values (" + tableId + ", " + lstLangs.SelectedIndex + ", '" + ProgSettings.ConvertCrlfToBr(txtTableNotes.Text) + "');");
+                    dbDocsTableOutput.AppendLine("delete from `dbdocstable_localisation` where `languageId`=" + lstLangs.SelectedIndex + " and `tableId`= " + _tableId + ";");
+                    dbDocsTableOutput.AppendLine("insert  into `dbdocstable_localisation`(`tableId`,`languageId`,`tableNotes`) values (" + _tableId + ", " + lstLangs.SelectedIndex + ", '" + ProgSettings.ConvertCrlfToBr(txtTableNotes.Text) + "');");
 
                     // Open the file for append and write the entries to it
                     using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable_localised.SQL", true))
@@ -183,38 +184,34 @@ namespace DBDocs_Editor
                     }
                 }
 
-                // Write the entry out to the Database directly
-                // For an update the logic to decide which table to update is in the Update function itself
-                
-                //                       Table ID         Language ID          Notes
-                ProgSettings.TableUpdate(tableId, lstLangs.SelectedIndex, ProgSettings.ConvertCrlfToBr(txtTableNotes.Text));
+                // Write the entry out to the Database directly For an update the logic to decide which table to update is in the Update function itself
 
-                blnTextChanged = false;
+                // Table ID Language ID Notes
+                ProgSettings.TableUpdate(_tableId, lstLangs.SelectedIndex, ProgSettings.ConvertCrlfToBr(txtTableNotes.Text));
+
+                _blnTextChanged = false;
                 btnSave.Enabled = false;
                 mnuSave.Enabled = btnSave.Enabled;
-
             }
-            lblStatus.Text = DateTime.Now.ToString() + " Save Complete for " + selectedTable;
+            lblStatus.Text = DateTime.Now + Resources.Save_Complete_for + selectedTable;
         }
-
 
         private void btnShowSubtables_Click(object sender, EventArgs e)
         {
-            var subTableScreen = new frmSubtables { subTableId = 0 };
+            var subTableScreen = new FrmSubtables { SubTableId = 0 };
             subTableScreen.Show();
         }
 
         private void lstSubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
             // The subtable entry in the listbox starts xx:, to need to trim everything after the :
-            int thissubTableId = 0;
             if (lstSubtables.Text.Contains(":"))
             {
-                thissubTableId = Convert.ToInt32(lstSubtables.Text.Substring(0, lstSubtables.Text.IndexOf(":")));
-                var subTableScreen = new frmSubtables { subTableId = thissubTableId };
+                var thissubTableId = Convert.ToInt32(lstSubtables.Text.Substring(0, lstSubtables.Text.IndexOf(":", StringComparison.Ordinal)));
+                var subTableScreen = new FrmSubtables { SubTableId = thissubTableId };
                 subTableScreen.Show();
             }
-            blnTextChanged = false;
+            _blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -222,11 +219,10 @@ namespace DBDocs_Editor
         private void lstLangs_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Are we looking for a localised version ?
-            
-            
+
             if (lstLangs.SelectedIndex == 0)
             {
-                if (ProgSettings.LookupTableEntry(lstLangs.SelectedIndex, tableId) == true)
+                if (ProgSettings.LookupTableEntry(lstLangs.SelectedIndex, _tableId))
                 {
                     chkDBDocsEntry.Checked = true;
                 }
@@ -238,14 +234,14 @@ namespace DBDocs_Editor
             else
             {
                 // Check whether a localised version exists
-                if (ProgSettings.LookupTableEntryLocalised(lstLangs.SelectedIndex, tableId) == true)
+                if (ProgSettings.LookupTableEntryLocalised(lstLangs.SelectedIndex, _tableId))
                 {
                     chkDBDocsEntry.Checked = true;
                 }
                 else
                 {
                     chkDBDocsEntry.Checked = false;
-                    
+
                     // If 'Use English' is not selected, clear the text
                     if (chkUseEnglish.Checked == false)
                     {
@@ -253,14 +249,14 @@ namespace DBDocs_Editor
                     }
                 }
             }
-            blnTextChanged = false;
+            _blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void txtTableNotes_TextChanged(object sender, EventArgs e)
         {
-            blnTextChanged = true;
+            _blnTextChanged = true;
             btnSave.Enabled = true;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -268,11 +264,11 @@ namespace DBDocs_Editor
         private void frmTables_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Has any text changed on the form
-            if (blnTextChanged == true)
+            if (_blnTextChanged)
             {
                 // Ask the user if they which to close without saving
-                var response = MessageBox.Show(this, "You have unsaved changes, continue ?", "Exit Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (response == System.Windows.Forms.DialogResult.No)
+                var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == DialogResult.No)
                 {
                     // Bail out of the form closing
                     e.Cancel = true;
@@ -280,12 +276,12 @@ namespace DBDocs_Editor
                 else
                 {
                     // User said yes to closing anyway
-                    ProgSettings.ShowThisForm(ProgSettings.mainForm);
+                    ProgSettings.ShowThisForm(ProgSettings.MainForm);
                 }
             }
             else
             {   // Nothing changed, close normally
-                ProgSettings.ShowThisForm(ProgSettings.mainForm);
+                ProgSettings.ShowThisForm(ProgSettings.MainForm);
             }
         }
 
@@ -303,26 +299,24 @@ namespace DBDocs_Editor
 
         private void btnCloseWindow_Click(object sender, EventArgs e)
         {
-            if (blnTextChanged == true)
+            if (_blnTextChanged)
             {
-
-                var response = MessageBox.Show(this, "You have unsaved changes, continue ?", "Exit Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (response == System.Windows.Forms.DialogResult.No)
+                var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == DialogResult.No)
                 {
                     return;
                 }
             }
-            ProgSettings.ShowThisForm(ProgSettings.mainForm);
+            ProgSettings.ShowThisForm(ProgSettings.MainForm);
             Close();
         }
 
         private void btnQuit_Click(object sender, EventArgs e)
         {
-            if (blnTextChanged == true)
+            if (_blnTextChanged)
             {
-
-                var response = MessageBox.Show(this, "You have unsaved changes, continue ?", "Exit Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (response == System.Windows.Forms.DialogResult.No)
+                var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == DialogResult.No)
                 {
                     return;
                 }
@@ -334,7 +328,7 @@ namespace DBDocs_Editor
         {
             string selectedTable = lstTables.Text;
 
-            var fieldScreen = new frmFields { TableName = selectedTable };
+            var fieldScreen = new FrmFields { TableName = selectedTable };
             fieldScreen.Show();
         }
 
@@ -348,6 +342,5 @@ namespace DBDocs_Editor
         {
             btnSave_Click(sender, e);
         }
-
     }
 }

@@ -114,4 +114,50 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+    <data name="DBDocs_for_Table" xml:space="preserve">
+    <value>DBDocs for Table: </value>
+  </data>
+    <data name="Save_Complete_for" xml:space="preserve">
+    <value> Save Complete for </value>
+  </data>
+    <data name="You_have_unsaved_changes" xml:space="preserve">
+    <value>You have unsaved changes, continue ?</value>
+  </data>
+    <data name="Exit_Check" xml:space="preserve">
+    <value>Exit Check</value>
+  </data>
+    <data name="Error_Connecting_to_DB" xml:space="preserve">
+    <value>There was an error connecting to the database: 
+</value>
+  </data>
+    <data name="Error_Saving" xml:space="preserve">
+    <value>Error Saving: </value>
+  </data>
+    <data name="Failure_during_Resync" xml:space="preserve">
+    <value>Failures during Resync</value>
+  </data>
+    <data name="OK" xml:space="preserve">
+    <value>&amp;OK</value>
+  </data>
+    <data name="Cancel" xml:space="preserve">
+    <value>&amp;Cancel</value>
+  </data>
+    <data name="SubTable" xml:space="preserve">
+    <value>SubTable: </value>
+  </data>
+    <data name="SubTables" xml:space="preserve">
+    <value>SubTables</value>
+  </data>
+    <data name="DBDocs_Editor_v" xml:space="preserve">
+    <value>DBDocs Editor v</value>
+  </data>
+    <data name="DBDocs__Using_database_" xml:space="preserve">
+    <value>DBDocs: Using database </value>
+  </data>
+    <data name="Please_select_a_database_from_the_list" xml:space="preserve">
+    <value>Please select a database from the list</value>
+  </data>
+    <data name="DBDocs__Using_Server" xml:space="preserve">
+    <value>DBDocs: Using Server </value>
+  </data>
 </root>

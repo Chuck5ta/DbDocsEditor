@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Data;
-using System.IO;
-using System.Text;
 using System.Windows.Forms;
+using DBDocs_Editor.Properties;
 
 namespace DBDocs_Editor
 {
-    public partial class frmSubtablesLookup : Form
+    public partial class FrmSubtablesLookup : Form
     {
-        public int subTableId = 0;
+        public int SubTableId = 0;
 
-        public frmSubtablesLookup()
+        public FrmSubtablesLookup()
         {
             InitializeComponent();
         }
@@ -22,12 +21,11 @@ namespace DBDocs_Editor
         /// <param name="e"></param>
         private void lstsubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string selectedSubtable = lstsubtables.Text;
+            var selectedSubtable = lstsubtables.Text;
             txtSubtableName.Text = selectedSubtable;
-            subTableId = 0;  // Force to new entry before the lookup updates it should it exist
+            SubTableId = 0;  // Force to new entry before the lookup updates it should it exist
 
-            DataSet dbViewList = null;
-            dbViewList = ProgSettings.SelectRows("SELECT subtableid,languageid, subtablecontent,subtabletemplate FROM `dbdocssubtables` WHERE `subtablename` = '" + selectedSubtable + "'");
+            var dbViewList = ProgSettings.SelectRows("SELECT subtableid,languageid, subtablecontent,subtabletemplate FROM `dbdocssubtables` WHERE `subtablename` = '" + selectedSubtable + "'");
 
             if (dbViewList != null)
             {
@@ -36,8 +34,8 @@ namespace DBDocs_Editor
                     txtSubtableContent.Text = dbViewList.Tables[0].Rows[0]["subtablecontent"].ToString();
                     txtSubtableTemplate.Text = dbViewList.Tables[0].Rows[0]["subtabletemplate"].ToString();
 
-                    subTableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["subtableid"]);
-                        
+                    SubTableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["subtableid"]);
+
                     // Render the HTML
                     webBrowse.DocumentText = txtSubtableContent.Text;
 
@@ -67,7 +65,7 @@ namespace DBDocs_Editor
             //ProgSettings.LoadLangs(lstLangs);
 
             DataSet dbViewList;
-            if (subTableId==0)
+            if (SubTableId == 0)
             {
                 // The following command reads all the columns for all the subtables
                 dbViewList = ProgSettings.SelectRows("SELECT subtablename from dbdocssubtables");
@@ -75,7 +73,7 @@ namespace DBDocs_Editor
             else
             {
                 // The following command reads all the columns for just the selected subtable
-                dbViewList = ProgSettings.SelectRows("SELECT subtablename from dbdocssubtables where subtableid=" + subTableId);
+                dbViewList = ProgSettings.SelectRows("SELECT subtablename from dbdocssubtables where subtableid=" + SubTableId);
             }
 
             // Did we return anything
@@ -91,27 +89,26 @@ namespace DBDocs_Editor
                 lstsubtables.Items.Add(fieldName);
             }
 
-            if (subTableId !=0)
+            if (SubTableId != 0)
             {   //Select the first entry if we passed in an Id
-                Text = "SubTable: " + lstsubtables.Text;
+                Text = Resources.SubTable + lstsubtables.Text;
             }
             else
-            { 
-                Text = "SubTables"; 
+            {
+                Text = Resources.SubTables;
             }
-
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            subTableId = Convert.ToInt32(ProgSettings.LookupSubTableId(lstsubtables.Text));
+            SubTableId = Convert.ToInt32(ProgSettings.LookupSubTableId(lstsubtables.Text));
             Close();
-//            MessageBox.Show("Save Complete");
+            // MessageBox.Show("Save Complete");
         }
 
-        private void frmsubtables_FormClosing(object sender, FormClosingEventArgs e)
+        private void FrmSubtablesLookup_FormClosing(object sender, FormClosingEventArgs e)
         {
-            subTableId = 0;
+            SubTableId = 0;
             Close();
         }
     }

@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DBDocs_Editor.Properties
-{
-
-
+namespace DBDocs_Editor.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -22,49 +22,177 @@ namespace DBDocs_Editor.Properties
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources
-    {
-
+    internal class Resources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources()
-        {
+        internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if ((resourceMan == null))
-                {
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DBDocs_Editor.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Cancel.
+        /// </summary>
+        internal static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DBDocs: Using database .
+        /// </summary>
+        internal static string DBDocs__Using_database_ {
+            get {
+                return ResourceManager.GetString("DBDocs__Using_database_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DBDocs: Using Server .
+        /// </summary>
+        internal static string DBDocs__Using_Server {
+            get {
+                return ResourceManager.GetString("DBDocs__Using_Server", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DBDocs Editor v.
+        /// </summary>
+        internal static string DBDocs_Editor_v {
+            get {
+                return ResourceManager.GetString("DBDocs_Editor_v", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DBDocs for Table: .
+        /// </summary>
+        internal static string DBDocs_for_Table {
+            get {
+                return ResourceManager.GetString("DBDocs_for_Table", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There was an error connecting to the database: 
+        ///.
+        /// </summary>
+        internal static string Error_Connecting_to_DB {
+            get {
+                return ResourceManager.GetString("Error_Connecting_to_DB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error Saving: .
+        /// </summary>
+        internal static string Error_Saving {
+            get {
+                return ResourceManager.GetString("Error_Saving", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exit Check.
+        /// </summary>
+        internal static string Exit_Check {
+            get {
+                return ResourceManager.GetString("Exit_Check", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failures during Resync.
+        /// </summary>
+        internal static string Failure_during_Resync {
+            get {
+                return ResourceManager.GetString("Failure_during_Resync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;OK.
+        /// </summary>
+        internal static string OK {
+            get {
+                return ResourceManager.GetString("OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please select a database from the list.
+        /// </summary>
+        internal static string Please_select_a_database_from_the_list {
+            get {
+                return ResourceManager.GetString("Please_select_a_database_from_the_list", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  Save Complete for .
+        /// </summary>
+        internal static string Save_Complete_for {
+            get {
+                return ResourceManager.GetString("Save_Complete_for", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SubTable: .
+        /// </summary>
+        internal static string SubTable {
+            get {
+                return ResourceManager.GetString("SubTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SubTables.
+        /// </summary>
+        internal static string SubTables {
+            get {
+                return ResourceManager.GetString("SubTables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have unsaved changes, continue ?.
+        /// </summary>
+        internal static string You_have_unsaved_changes {
+            get {
+                return ResourceManager.GetString("You_have_unsaved_changes", resourceCulture);
             }
         }
     }

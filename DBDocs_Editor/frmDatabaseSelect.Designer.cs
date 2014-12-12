@@ -1,6 +1,6 @@
 ﻿namespace DBDocs_Editor
 {
-    partial class frmDatabaseSelect
+    partial class FrmDatabaseSelect
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDatabaseSelect));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmDatabaseSelect));
             this.btnConnect = new System.Windows.Forms.Button();
             this.btnQuit = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
@@ -108,7 +108,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "frmDatabaseSelect";
+            this.Name = "FrmDatabaseSelect";
             this.Text = "Select Database";
             this.Load += new System.EventHandler(this.frmDatabaseSelect_Load);
             this.ResumeLayout(false);
