@@ -189,7 +189,7 @@ namespace DBDocs_Editor
                 if (lstLangs.SelectedIndex == 0)
                 {   // If English, connect to main table
                     //update `dbdocsfields` set `fieldnotes`= xxx where `fieldId`= xxx and languageId=yyy;
-                    dbDocsTableOutput.AppendLine("update `dbdocsfields` set `FieldComment` = " + txtFieldComment.Text + ", `fieldNotes` = '" + ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text) + "' where `fieldId`= '" + _fieldId + " and `languageId`= " + lstLangs.SelectedIndex + ";");
+                    dbDocsTableOutput.AppendLine("update `dbdocsfields` set `FieldComment` = '" + txtFieldComment.Text + "', `fieldNotes` = '" + ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text) + "' where `fieldId`= '" + _fieldId + "' and `languageId`= " + lstLangs.SelectedIndex + ";");
 
                     // Open the file for append and write the entries to it
                     using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
