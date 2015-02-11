@@ -174,6 +174,7 @@
             this.txtSubtableContent.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtSubtableContent.Size = new System.Drawing.Size(517, 345);
             this.txtSubtableContent.TabIndex = 9;
+            this.txtSubtableContent.TextChanged += new System.EventHandler(this.txtSubTableName_TextChanged);
             // 
             // tabPage3
             // 
@@ -236,7 +237,7 @@
             this.txtSubTableName.Name = "txtSubTableName";
             this.txtSubTableName.Size = new System.Drawing.Size(441, 20);
             this.txtSubTableName.TabIndex = 22;
-            this.txtSubTableName.TextChanged += new System.EventHandler(this.txtSubTableName_TextChanged);
+            //this.txtSubTableName.TextChanged += new System.EventHandler(this.txtSubTableName_TextChanged);
             // 
             // label5
             // 

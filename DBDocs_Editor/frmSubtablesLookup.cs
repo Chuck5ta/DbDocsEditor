@@ -102,6 +102,7 @@ namespace DBDocs_Editor
         private void btnSave_Click(object sender, EventArgs e)
         {
             SubTableId = Convert.ToInt32(ProgSettings.LookupSubTableId(lstsubtables.Text));
+            FormClosing -= FrmSubtablesLookup_FormClosing;
             Close();
             // MessageBox.Show("Save Complete");
         }
@@ -109,7 +110,7 @@ namespace DBDocs_Editor
         private void FrmSubtablesLookup_FormClosing(object sender, FormClosingEventArgs e)
         {
             SubTableId = 0;
-            Close();
+            //Close();
         }
     }
 }
