@@ -305,16 +305,8 @@ namespace DBDocs_Editor
                     // Bail out of the form closing
                     e.Cancel = true;
                 }
-                else
-                {
-                    // User said yes to closing anyway
-                    ProgSettings.ShowThisForm(ProgSettings.MainForm);
-                }
             }
-            else
-            {   // Nothing changed, close normally
-                ProgSettings.ShowThisForm(ProgSettings.MainForm);
-            }
+            // On this form closing, we should not pop up the main form frmServerSelect but should give focus to the parent one, which will be done by auto
         }
 
         private void chkUseEnglish_Click(object sender, EventArgs e)

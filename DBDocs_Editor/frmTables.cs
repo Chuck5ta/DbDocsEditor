@@ -272,17 +272,10 @@ namespace DBDocs_Editor
                 {
                     // Bail out of the form closing
                     e.Cancel = true;
-                }
-                else
-                {
-                    // User said yes to closing anyway
-                    ProgSettings.ShowThisForm(ProgSettings.MainForm);
+                    return;
                 }
             }
-            else
-            {   // Nothing changed, close normally
-                ProgSettings.ShowThisForm(ProgSettings.MainForm);
-            }
+            ProgSettings.ShowThisForm(ProgSettings.MainForm);
         }
 
         private void chkUseEnglish_Click(object sender, EventArgs e)
