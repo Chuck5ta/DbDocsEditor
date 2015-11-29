@@ -10,7 +10,7 @@ namespace DBDocs_Editor
     public partial class FrmSubtables : Form
     {
         public int SubTableId = 0;
-        private bool _blnTextChanged;
+        private bool blnTextChanged;
 
         public FrmSubtables()
         {
@@ -24,7 +24,7 @@ namespace DBDocs_Editor
         /// <param name="e"></param>
         private void lstsubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string selectedSubtable = lstsubtables.Text;
+            var selectedSubtable = lstsubtables.Text;
             txtSubTableName.Text = selectedSubtable;
             SubTableId = 0; // Force to new entry before the lookup updates it should it exist
 
@@ -108,9 +108,10 @@ namespace DBDocs_Editor
                 txtSubtableContent.Text = "";
                 txtSubtableTemplate.Text = "";
             }
-            _blnTextChanged = false;
+            blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
+            btnDeleteEntry.Enabled = true;
         }
 
         private void frmsubtables_Load(object sender, EventArgs e)
@@ -138,9 +139,9 @@ namespace DBDocs_Editor
             if (dbViewList.Tables[0].Rows.Count <= 0) return;
 
             // for each Field returned, populate the listbox with the table name
-            for (int thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
+            for (var thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
             {
-                string fieldName = dbViewList.Tables[0].Rows[thisRow]["subtablename"].ToString();
+                var fieldName = dbViewList.Tables[0].Rows[thisRow]["subtablename"].ToString();
                 lstsubtables.Items.Add(fieldName);
             }
 
@@ -155,139 +156,151 @@ namespace DBDocs_Editor
                 Text = Resources.SubTables;
             }
 
-            _blnTextChanged = false;
+            blnTextChanged = false;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            // First thing we need to do it sync the other tabs data based on the Template
-            if (txtSubtableTemplate.Text.Contains("\r\n"))
+            if (txtSubTableName.TextLength <= 80)
             {
-                // Uses the first line of the template as the headings
-                string header = txtSubtableTemplate.Text;
-                header = header.Substring(0, header.IndexOf("\r\n", StringComparison.Ordinal));
-
-                // Renders everything beyond the first line as the table body
-                string body = txtSubtableTemplate.Text;
-                body = body.Substring(body.IndexOf("\r\n", StringComparison.Ordinal) + 2,
-                    body.Length - (body.IndexOf("\r\n", StringComparison.Ordinal) + 2));
-
-                // Sync the Content tab with the current template
-                txtSubtableContent.Text = ProgSettings.ConvertTemplateToHtml(header, body);
-
-                // Not technically needed, but render the HTML panel
-                webBrowse.DocumentText = txtSubtableContent.Text;
-            }
-            var dbDocsTableOutput = new StringBuilder();
-            string outputFolder = Application.ExecutablePath;
-
-            // Strip the Executable name from the path
-            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\", StringComparison.Ordinal));
-
-            string selectedTable = lstsubtables.Text;
-
-            // If the output folder doesnt exist, create it
-            if (!Directory.Exists(outputFolder + @"\"))
-            {
-                Directory.CreateDirectory(outputFolder + @"\");
-            }
-
-            if (SubTableId == 0) // New Record
-            {
-                if (lstLangs.SelectedIndex != 0)
+                // First thing we need to do it sync the other tabs data based on the Template
+                if (txtSubtableTemplate.Text.Contains("\r\n"))
                 {
-                    // If English, connect to main table
-                    dbDocsTableOutput.AppendLine("-- WARNING: The default entry should really be in english --");
+                    // Uses the first line of the template as the headings
+                    var header = txtSubtableTemplate.Text;
+                    header = header.Substring(0, header.IndexOf("\r\n", StringComparison.Ordinal));
+
+                    // Renders everything beyond the first line as the table body
+                    var body = txtSubtableTemplate.Text;
+                    body = body.Substring(body.IndexOf("\r\n", StringComparison.Ordinal) + 2,
+                        body.Length - (body.IndexOf("\r\n", StringComparison.Ordinal) + 2));
+
+                    // Sync the Content tab with the current template
+                    txtSubtableContent.Text = ProgSettings.ConvertTemplateToHtml(header, body);
+
+                    // Not technically needed, but render the HTML panel
+                    webBrowse.DocumentText = txtSubtableContent.Text;
+                }
+                var dbDocsTableOutput = new StringBuilder();
+                var outputFolder = Application.ExecutablePath;
+
+                // Strip the Executable name from the path
+                outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\", StringComparison.Ordinal));
+
+                var selectedTable = lstsubtables.Text;
+
+                // If the output folder doesnt exist, create it
+                if (!Directory.Exists(outputFolder + @"\"))
+                {
+                    Directory.CreateDirectory(outputFolder + @"\");
                 }
 
-                int newSubtableId = Convert.ToInt32(ProgSettings.GetNewSubTableId());
-                dbDocsTableOutput.AppendLine(
-                    "insert  into `dbdocssubtables`(`subtableId`,`languageId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" +
-                    newSubtableId + "," + lstLangs.SelectedIndex + ",'" + selectedTable + "','" +
-                    ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" +
-                    ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
-
-                // Open the file for append and write the entries to it
-                using (
-                    var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables.SQL",
-                        true))
+                if (SubTableId == 0) // New Record
                 {
-                    outfile.Write(dbDocsTableOutput.ToString());
-                }
+                    if (lstLangs.SelectedIndex != 0)
+                    {
+                        // If English, connect to main table
+                        dbDocsTableOutput.AppendLine("-- WARNING: The default entry should really be in english --");
+                    }
 
-                // Write the entry out to the Database directly
-
-                // For an insert, the record is always saved to the primary table, regardless of the language Since the system is English based, it should really have an English
-                // base record.
-
-                ProgSettings.SubTableInsert(newSubtableId, lstLangs.SelectedIndex, selectedTable,
-                    txtSubtableContent.Text, txtSubtableTemplate.Text);
-                SubTableId = newSubtableId;
-                _blnTextChanged = false;
-                btnSave.Enabled = false;
-                mnuSave.Enabled = btnSave.Enabled;
-            }
-            else // Updated Record
-            {
-                if (lstLangs.SelectedIndex == 0)
-                {
-                    // If English, connect to main table
-                    dbDocsTableOutput.AppendLine("delete from `dbdocssubtables` where `subtableId`= " + SubTableId +
-                                                 " and languageId=" + lstLangs.SelectedIndex + ";");
+                    var newSubtableId = Convert.ToInt32(ProgSettings.GetNewSubTableId());
                     dbDocsTableOutput.AppendLine(
                         "insert  into `dbdocssubtables`(`subtableId`,`languageId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" +
-                        SubTableId + "," + lstLangs.SelectedIndex + ",'" + selectedTable + "','" +
+                        newSubtableId + "," + lstLangs.SelectedIndex + ",'" + selectedTable + "','" +
                         ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" +
                         ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
 
                     // Open the file for append and write the entries to it
                     using (
                         var outfile =
-                            new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables.SQL", true))
+                            new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables.SQL",
+                                true))
                     {
                         outfile.Write(dbDocsTableOutput.ToString());
                     }
+
+                    // Write the entry out to the Database directly
+
+                    // For an insert, the record is always saved to the primary table, regardless of the language Since the system is English based, it should really have an English
+                    // base record.
+
+                    ProgSettings.SubTableInsert(newSubtableId, lstLangs.SelectedIndex, selectedTable,
+                        txtSubtableContent.Text, txtSubtableTemplate.Text);
+                    SubTableId = newSubtableId;
+                    blnTextChanged = false;
+                    btnSave.Enabled = false;
+                    mnuSave.Enabled = btnSave.Enabled;
                 }
-                else
+                else // Updated Record
                 {
-                    dbDocsTableOutput.AppendLine("delete from `dbdocssubtables_localised` where `subtableId`= " +
-                                                 SubTableId + " and languageId=" + lstLangs.SelectedIndex + ";");
-                    dbDocsTableOutput.AppendLine(
-                        "insert  into `dbdocssubtable_localised`(`subtableId`,`languageId`,`subtablecontent`,`subtableTemplate`) values (" +
-                        SubTableId + "," + lstLangs.SelectedIndex + ",'" +
-                        ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" +
-                        ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
-
-                    // Open the file for append and write the entries to it
-                    using (
-                        var outfile =
-                            new StreamWriter(
-                                outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables_localised.SQL", true))
+                    if (lstLangs.SelectedIndex == 0)
                     {
-                        outfile.Write(dbDocsTableOutput.ToString());
+                        // If English, connect to main table
+                        dbDocsTableOutput.AppendLine("delete from `dbdocssubtables` where `subtableId`= " + SubTableId +
+                                                     " and languageId=" + lstLangs.SelectedIndex + ";");
+                        dbDocsTableOutput.AppendLine(
+                            "insert  into `dbdocssubtables`(`subtableId`,`languageId`,`subtableName`,`subtablecontent`,`subtableTemplate`) values (" +
+                            SubTableId + "," + lstLangs.SelectedIndex + ",'" + selectedTable + "','" +
+                            ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" +
+                            ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
+
+                        // Open the file for append and write the entries to it
+                        using (
+                            var outfile =
+                                new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables.SQL",
+                                    true))
+                        {
+                            outfile.Write(dbDocsTableOutput.ToString());
+                        }
                     }
+                    else
+                    {
+                        dbDocsTableOutput.AppendLine("delete from `dbdocssubtables_localised` where `subtableId`= " +
+                                                     SubTableId + " and languageId=" + lstLangs.SelectedIndex + ";");
+                        dbDocsTableOutput.AppendLine(
+                            "insert  into `dbdocssubtable_localised`(`subtableId`,`languageId`,`subtablecontent`,`subtableTemplate`) values (" +
+                            SubTableId + "," + lstLangs.SelectedIndex + ",'" +
+                            ProgSettings.PrepareSqlString(txtSubtableContent.Text) + "','" +
+                            ProgSettings.PrepareSqlString(txtSubtableTemplate.Text) + "');");
+
+                        // Open the file for append and write the entries to it
+                        using (
+                            var outfile =
+                                new StreamWriter(
+                                    outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables_localised.SQL", true))
+                        {
+                            outfile.Write(dbDocsTableOutput.ToString());
+                        }
+                    }
+
+                    // Write the entry out to the Database directly For an update the logic to decide which table to update is in the Update function itself
+
+                    ProgSettings.SubTableUpdate(SubTableId, lstLangs.SelectedIndex, selectedTable,
+                        txtSubtableContent.Text,
+                        txtSubtableTemplate.Text);
+
+                    blnTextChanged = false;
+                    btnSave.Enabled = false;
+                    mnuSave.Enabled = btnSave.Enabled;
                 }
-
-                // Write the entry out to the Database directly For an update the logic to decide which table to update is in the Update function itself
-
-                ProgSettings.SubTableUpdate(SubTableId, lstLangs.SelectedIndex, selectedTable, txtSubtableContent.Text,
-                    txtSubtableTemplate.Text);
-
-                _blnTextChanged = false;
-                btnSave.Enabled = false;
-                mnuSave.Enabled = btnSave.Enabled;
+                lblStatus.Text = DateTime.Now + Resources.Save_Complete_for + selectedTable;
             }
-            lblStatus.Text = DateTime.Now + Resources.Save_Complete_for + selectedTable;
+            else
+            {
+                //Report that the comment is too long for the db
+                MessageBox.Show(this, Resources.Text_Too_Long, Resources.Error_Saving, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         private void btnRebuildContent_Click(object sender, EventArgs e)
         {
             if (txtSubtableTemplate.Text.Contains("\r\n"))
             {
-                string header = txtSubtableTemplate.Text;
+                var header = txtSubtableTemplate.Text;
                 header = header.Substring(0, header.IndexOf("\r\n", StringComparison.Ordinal));
 
-                string body = txtSubtableTemplate.Text;
+                var body = txtSubtableTemplate.Text;
                 body = body.Substring(body.IndexOf("\r\n", StringComparison.Ordinal) + 2,
                     body.Length - (body.IndexOf("\r\n", StringComparison.Ordinal) + 2));
 
@@ -314,14 +327,14 @@ namespace DBDocs_Editor
                     }
                 }
             }
-            _blnTextChanged = false;
+            blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void txtSubTableName_TextChanged(object sender, EventArgs e)
         {
-            _blnTextChanged = true;
+            blnTextChanged = true;
             btnSave.Enabled = true;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -329,16 +342,14 @@ namespace DBDocs_Editor
         private void frmsubtables_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Has any text changed on the form
-            if (_blnTextChanged)
+            if (!blnTextChanged) return;
+            // Ask the user if they which to close without saving
+            var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check,
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (response == DialogResult.No)
             {
-                // Ask the user if they which to close without saving
-                DialogResult response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check,
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (response == DialogResult.No)
-                {
-                    // Bail out of the form closing
-                    e.Cancel = true;
-                }
+                // Bail out of the form closing
+                e.Cancel = true;
             }
             // On this form closing, we should not pop up the main form frmServerSelect but should give focus to the parent one, which will be done by auto
         }
@@ -357,9 +368,9 @@ namespace DBDocs_Editor
 
         private void btnCloseWindow_Click(object sender, EventArgs e)
         {
-            if (_blnTextChanged)
+            if (blnTextChanged)
             {
-                DialogResult response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check,
+                var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check,
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (response == DialogResult.No)
                 {
@@ -372,9 +383,9 @@ namespace DBDocs_Editor
 
         private void btnQuit_Click(object sender, EventArgs e)
         {
-            if (_blnTextChanged)
+            if (blnTextChanged)
             {
-                DialogResult response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check,
+                var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check,
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (response == DialogResult.No)
                 {
@@ -387,30 +398,28 @@ namespace DBDocs_Editor
         private void btnNewEntry_Click(object sender, EventArgs e)
         {
             // Get the Next Subtable EntryID
-            int thissubTableId = Convert.ToInt32(ProgSettings.GetNewSubTableId());
+            var thissubTableId = Convert.ToInt32(ProgSettings.GetNewSubTableId());
 
-            string thisSubtableName = "";
-            DialogResult returnVal = ProgSettings.ShowInputDialog(ref thisSubtableName, "subTable Name");
+            var thisSubtableName = "";
+            var returnVal = ProgSettings.ShowInputDialog(ref thisSubtableName, "subTable Name");
 
             // If the user clicked ok, add the new table
-            if (returnVal == DialogResult.OK)
-            {
-                // Add to the table
-                ProgSettings.SubTableInsert(thissubTableId, lstLangs.SelectedIndex, thisSubtableName, "To be populated",
-                    "To be populated");
-                SubTableId = thissubTableId;
+            if (returnVal != DialogResult.OK) return;
+            // Add to the table
+            ProgSettings.SubTableInsert(thissubTableId, lstLangs.SelectedIndex, thisSubtableName, "To be populated",
+                "To be populated");
+            SubTableId = thissubTableId;
 
-                // Add it to the listbox and select it
-                lstsubtables.Items.Add(thisSubtableName);
+            // Add it to the listbox and select it
+            lstsubtables.Items.Add(thisSubtableName);
 
-                int intSubTableListIndex = lstsubtables.Items.IndexOf(thisSubtableName);
+            var intSubTableListIndex = lstsubtables.Items.IndexOf(thisSubtableName);
 
-                lstsubtables.SelectedIndex = intSubTableListIndex; // lstsubtables.Items.Count - 1;
+            lstsubtables.SelectedIndex = intSubTableListIndex; // lstsubtables.Items.Count - 1;
 
-                _blnTextChanged = true;
-                btnSave.Enabled = true;
-                mnuSave.Enabled = btnSave.Enabled;
-            }
+            blnTextChanged = true;
+            btnSave.Enabled = true;
+            mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void btnStripTemplate_Click(object sender, EventArgs e)
@@ -420,7 +429,7 @@ namespace DBDocs_Editor
 
         private void txtSubtableTemplate_TextChanged(object sender, EventArgs e)
         {
-            _blnTextChanged = true;
+            blnTextChanged = true;
             btnSave.Enabled = true;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -457,21 +466,20 @@ namespace DBDocs_Editor
 
             // Paste the clipboard to the textbox
             // Determine if there is any text in the Clipboard to paste into the text box.
-            if (Clipboard.GetDataObject().GetDataPresent(DataFormats.Text) == true)
+            var dataObject = Clipboard.GetDataObject();
+            if (dataObject == null || dataObject.GetDataPresent(DataFormats.Text) != true) return;
+            // Determine if any text is selected in the text box.
+            if (thisControl.SelectionLength > 0)
             {
-                // Determine if any text is selected in the text box.
-                if (thisControl.SelectionLength > 0)
-                {
-                    // Ask user if they want to paste over currently selected text.
-                    if (
-                        MessageBox.Show(@"Do you want to paste over current selection?", @"Cut Example",
-                            MessageBoxButtons.YesNo) == DialogResult.No)
-                        // Move selection to the point after the current selection and paste.
-                        thisControl.SelectionStart = thisControl.SelectionStart + thisControl.SelectionLength;
-                }
-                // Paste current text in Clipboard into text box.
-                thisControl.Paste();
+                // Ask user if they want to paste over currently selected text.
+                if (
+                    MessageBox.Show(@"Do you want to paste over current selection?", @"Cut Example",
+                        MessageBoxButtons.YesNo) == DialogResult.No)
+                    // Move selection to the point after the current selection and paste.
+                    thisControl.SelectionStart = thisControl.SelectionStart + thisControl.SelectionLength;
             }
+            // Paste current text in Clipboard into text box.
+            thisControl.Paste();
         }
 
         private void btnMnuSelectAll_Click(object sender, EventArgs e)
@@ -492,15 +500,97 @@ namespace DBDocs_Editor
             var thisControl = (TextBox)ActiveControl;
 
             // Determine if last operation can be undone in text box.
-            if (thisControl.CanUndo == true)
-            {
-                // Undo the last operation.
-                thisControl.Undo();
-                // Clear the undo buffer to prevent last action from being redone.
-                thisControl.ClearUndo();
-            }
+            if (thisControl.CanUndo != true) return;
+            // Undo the last operation.
+            thisControl.Undo();
+            // Clear the undo buffer to prevent last action from being redone.
+            thisControl.ClearUndo();
         }
 
+        private void btnDeleteEntry_Click(object sender, EventArgs e)
+        {
+            var isUsed = false;
+            var dbDocsTableOutput = new StringBuilder();
+            var outputFolder = Application.ExecutablePath;
+            // Strip the Executable name from the path
+            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\", StringComparison.Ordinal));
 
+            if (lstsubtables.SelectedIndex > 0)
+            {
+
+                // Need to check whether the subtable is used or not
+
+                if (ProgSettings.IsSubtableInTable(lstsubtables.Text))
+                {
+                    isUsed = true;
+                }
+
+                if (ProgSettings.IsSubtableLocalisedInTable(lstsubtables.Text))
+                {
+                    isUsed = true;
+                }
+
+                if (ProgSettings.IsSubtableInField(lstsubtables.Text))
+                {
+                    isUsed = true;
+                }
+
+                if (ProgSettings.IsSubtableLocalisedInField(lstsubtables.Text))
+                {
+                    isUsed = true;
+                }
+
+                if (isUsed) return;
+                if (MessageBox.Show(@"Are you sure you wish to delete this subtable ?", @"Delete Subtable",
+                    MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    MessageBox.Show(@"deleted subtable ?", @"Deleted Subtable", MessageBoxButtons.OK);
+                    if (lstLangs.SelectedIndex == 0)
+                    {
+                        // If English, connect to main table
+
+                        dbDocsTableOutput.Append("DELETE FROM dbdocssubtables where subTableId=" +
+                                                 lstsubtables.SelectedIndex + ";");
+
+                        // Open the file for append and write the entries to it
+                        using (
+                            var outfile =
+                                new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables.SQL",
+                                    true))
+                        {
+                            outfile.Write(dbDocsTableOutput.ToString());
+                        }
+
+                        ProgSettings.SubTableDelete(lstsubtables.Text, lstLangs.SelectedIndex);
+
+                        lstsubtables.Items.Remove(lstsubtables.SelectedIndex);
+
+                    }
+                    else
+                    {
+                        dbDocsTableOutput.Append("DELETE FROM dbdocssubtables_localised where languageid=" +
+                                                 lstLangs.SelectedIndex
+                                                 + "and subTableId=" + lstsubtables.SelectedIndex + ";");
+                        // Open the file for append and write the entries to it
+                        using (
+                            var outfile =
+                                new StreamWriter(
+                                    outputFolder + @"\" + ProgSettings.DbName + "_dbdocssubtables_localised.SQL",
+                                    true))
+                        {
+                            outfile.Write(dbDocsTableOutput.ToString());
+                        }
+
+                        ProgSettings.SubTableDelete(lstsubtables.Text, lstLangs.SelectedIndex);
+
+                        lstsubtables.Items.Remove(lstsubtables.SelectedIndex);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show(@"No subtable to delete?", @"Deleted Subtable", MessageBoxButtons.OK);
+            }
+        }
     }
 }

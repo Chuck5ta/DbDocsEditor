@@ -13,8 +13,8 @@ namespace DBDocs_Editor
         // Since we rely on a TableName for the Fields references, set a public one here which can be set by the caller
         public string TableName = "";
 
-        private int _fieldId;
-        private bool _blnTextChanged;
+        private int fieldId;
+        private bool blnTextChanged;
 
         public FrmFields()
         {
@@ -29,7 +29,7 @@ namespace DBDocs_Editor
         private void lstFields_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedField = lstFields.Text;
-            _fieldId = ProgSettings.LookupFieldId(TableName, selectedField);    // Force to new entry before the lookup updates it should it exist
+            fieldId = ProgSettings.LookupFieldId(TableName, selectedField);    // Force to new entry before the lookup updates it should it exist
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
 
@@ -70,7 +70,7 @@ namespace DBDocs_Editor
                         }
                     }
 
-                    _fieldId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["fieldId"]);
+                    fieldId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["fieldId"]);
 
                     // If the 'Use English' if blank checkbox is ticked
                     if (chkUseEnglish.Checked)
@@ -107,7 +107,7 @@ namespace DBDocs_Editor
                 txtFieldComment.Text = "";
                 chkDBDocsEntry.Checked = false;
             }
-            _blnTextChanged = false;
+            blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -118,7 +118,7 @@ namespace DBDocs_Editor
             ProgSettings.LoadLangs(lstLangs);
 
             // The following command reads all the columns for the selected table
-            DataSet dbViewList = ProgSettings.SelectRows("SHOW COLUMNS FROM " + TableName);
+            var dbViewList = ProgSettings.SelectRows("SHOW COLUMNS FROM " + TableName);
 
             // Did we return anything
             if (dbViewList != null)
@@ -137,88 +137,122 @@ namespace DBDocs_Editor
                 }
             }
 
-            _blnTextChanged = false;
+            blnTextChanged = false;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            var dbDocsTableOutput = new StringBuilder();
-            string outputFolder = Application.ExecutablePath;
-
-            // Strip the Executable name from the path
-            outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\", StringComparison.Ordinal));
-
-            string selectedField = lstFields.Text;
-
-            // If the output folder doesnt exist, create it
-            if (!Directory.Exists(outputFolder + @"\"))
+            if (txtFieldComment.TextLength <= 80)
             {
-                Directory.CreateDirectory(outputFolder + @"\");
-            }
+                var dbDocsTableOutput = new StringBuilder();
+                var outputFolder = Application.ExecutablePath;
 
-            if (_fieldId == 0)   // New Record
-            {
-                if (lstLangs.SelectedIndex != 0)
-                {   // If English, connect to main table
-                    dbDocsTableOutput.AppendLine("-- WARNING: The default entry should really be in english --");
-                }
+                // Strip the Executable name from the path
+                outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\", StringComparison.Ordinal));
 
-                //insert  into `dbdocsfields`(`languageId`, `tableName`,`fieldName`,`tableNotes`) values (0,'creature','entry','xxxx');
-                dbDocsTableOutput.AppendLine("insert  into `dbdocsfields` (`languageId`,`tableName`,`fieldName`,`tableComments`,`tableNotes`) values (" + lstLangs.SelectedIndex + ",'" + TableName + "','" + selectedField + "','" + ProgSettings.PrepareSqlString(txtFieldComment.Text) + "','" + ProgSettings.PrepareSqlString(ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text)) + "');");
+                var selectedField = lstFields.Text;
 
-                // Open the file for append and write the entries to it
-                using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
+                // If the output folder doesnt exist, create it
+                if (!Directory.Exists(outputFolder + @"\"))
                 {
-                    outfile.Write(dbDocsTableOutput.ToString());
+                    Directory.CreateDirectory(outputFolder + @"\");
                 }
 
-                // Write the entry out to the Database directly
+                if (fieldId == 0) // New Record
+                {
+                    if (lstLangs.SelectedIndex != 0)
+                    {
+                        // If English, connect to main table
+                        dbDocsTableOutput.AppendLine("-- WARNING: The default entry should really be in english --");
+                    }
 
-                // For an insert, the record is always saved to the primary table, regardless of the language Since the system is English based, it should really have an English
-                // base record.
-
-                // Language Id Selected Table Field Notes
-                ProgSettings.FieldInsert(lstLangs.SelectedIndex, TableName, selectedField, txtFieldComment.Text, ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text));
-
-                _blnTextChanged = false;
-                btnSave.Enabled = false;
-                mnuSave.Enabled = btnSave.Enabled;
-            }
-            else                // Updated Record
-            {
-                if (lstLangs.SelectedIndex == 0)
-                {   // If English, connect to main table
-                    //update `dbdocsfields` set `fieldnotes`= xxx where `fieldId`= xxx and languageId=yyy;
-                    dbDocsTableOutput.AppendLine("update `dbdocsfields` set `FieldComment` = '" + ProgSettings.PrepareSqlString(txtFieldComment.Text) + "', `fieldNotes` = '" + ProgSettings.PrepareSqlString(ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text)) + "' where `fieldId`= '" + _fieldId + "' and `languageId`= " + lstLangs.SelectedIndex + ";");
+                    //insert  into `dbdocsfields`(`languageId`, `tableName`,`fieldName`,`tableNotes`) values (0,'creature','entry','xxxx');
+                    dbDocsTableOutput.AppendLine(
+                        "insert  into `dbdocsfields` (`languageId`,`tableName`,`fieldName`,`tableComments`,`tableNotes`) values (" +
+                        lstLangs.SelectedIndex + ",'" + TableName + "','" + selectedField + "','" +
+                        ProgSettings.PrepareSqlString(txtFieldComment.Text) + "','" +
+                        ProgSettings.PrepareSqlString(ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text)) + "');");
 
                     // Open the file for append and write the entries to it
-                    using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
+                    using (
+                        var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL",
+                            true))
                     {
                         outfile.Write(dbDocsTableOutput.ToString());
                     }
+
+                    // Write the entry out to the Database directly
+
+                    // For an insert, the record is always saved to the primary table, regardless of the language Since the system is English based, it should really have an English
+                    // base record.
+
+                    // Language Id Selected Table Field Notes
+                    ProgSettings.FieldInsert(lstLangs.SelectedIndex, TableName, selectedField, txtFieldComment.Text,
+                        ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text));
+
+                    blnTextChanged = false;
+                    btnSave.Enabled = false;
+                    mnuSave.Enabled = btnSave.Enabled;
                 }
-                else
+                else // Updated Record
                 {
-                    dbDocsTableOutput.AppendLine("delete from `dbdocsfields_localised` where `fieldId`= '" + _fieldId + " and `languageId`= " + lstLangs.SelectedIndex + ";");
-                    dbDocsTableOutput.AppendLine("insert into `dbdocsfields_localised` (`fieldId`,`languageId`,`FieldComment`,`fieldNotes`) values (" + _fieldId + ", " + lstLangs.SelectedIndex + ", '" + ProgSettings.PrepareSqlString(txtFieldComment.Text) + "', '" + ProgSettings.PrepareSqlString(ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text)) + "');");
-
-                    // Open the file for append and write the entries to it
-                    using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable_localised.SQL", true))
+                    if (lstLangs.SelectedIndex == 0)
                     {
-                        outfile.Write(dbDocsTableOutput.ToString());
+                        // If English, connect to main table
+                        //update `dbdocsfields` set `fieldnotes`= xxx where `fieldId`= xxx and languageId=yyy;
+                        dbDocsTableOutput.AppendLine("update `dbdocsfields` set `FieldComment` = '" +
+                                                     ProgSettings.PrepareSqlString(txtFieldComment.Text) +
+                                                     "', `fieldNotes` = '" +
+                                                     ProgSettings.PrepareSqlString(
+                                                         ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text)) +
+                                                     "' where `fieldId`= '" + fieldId + "' and `languageId`= " +
+                                                     lstLangs.SelectedIndex + ";");
+
+                        // Open the file for append and write the entries to it
+                        using (
+                            var outfile =
+                                new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
+                        {
+                            outfile.Write(dbDocsTableOutput.ToString());
+                        }
                     }
+                    else
+                    {
+                        dbDocsTableOutput.AppendLine("delete from `dbdocsfields_localised` where `fieldId`= '" +
+                                                     fieldId + " and `languageId`= " + lstLangs.SelectedIndex + ";");
+                        dbDocsTableOutput.AppendLine(
+                            "insert into `dbdocsfields_localised` (`fieldId`,`languageId`,`FieldComment`,`fieldNotes`) values (" +
+                            fieldId + ", " + lstLangs.SelectedIndex + ", '" +
+                            ProgSettings.PrepareSqlString(txtFieldComment.Text) + "', '" +
+                            ProgSettings.PrepareSqlString(ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text)) + "');");
+
+                        // Open the file for append and write the entries to it
+                        using (
+                            var outfile =
+                                new StreamWriter(
+                                    outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable_localised.SQL", true))
+                        {
+                            outfile.Write(dbDocsTableOutput.ToString());
+                        }
+                    }
+
+                    // Write the entry out to the Database directly For an update the logic to decide which table to update is in the Update function itself
+
+                    // Field ID Language ID Notes
+                    ProgSettings.FieldUpdate(fieldId, lstLangs.SelectedIndex, txtFieldComment.Text,
+                        ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text));
+
+                    blnTextChanged = false;
+                    btnSave.Enabled = false;
+                    mnuSave.Enabled = btnSave.Enabled;
                 }
-
-                // Write the entry out to the Database directly For an update the logic to decide which table to update is in the Update function itself
-
-                // Field ID Language ID Notes
-                ProgSettings.FieldUpdate(_fieldId, lstLangs.SelectedIndex, txtFieldComment.Text, ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text));
-
-                _blnTextChanged = false;
-                btnSave.Enabled = false;
-                mnuSave.Enabled = btnSave.Enabled;
+                lblStatus.Text = DateTime.Now + Resources.Save_Complete_for + selectedField;
             }
-            lblStatus.Text = DateTime.Now + Resources.Save_Complete_for + selectedField;
+            else
+            {
+                //Report that the comment is too long for the db
+                MessageBox.Show(this, Resources.Text_Too_Long, Resources.Error_Saving, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnShowSubtables_Click(object sender, EventArgs e)
@@ -236,7 +270,7 @@ namespace DBDocs_Editor
                 var subTableScreen = new FrmSubtables { SubTableId = thissubTableId };
                 subTableScreen.Show();
             }
-            _blnTextChanged = false;
+            blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -247,7 +281,7 @@ namespace DBDocs_Editor
 
             if (lstLangs.SelectedIndex == 0)
             {
-                if (ProgSettings.LookupFieldEntry(lstLangs.SelectedIndex, _fieldId))
+                if (ProgSettings.LookupFieldEntry(lstLangs.SelectedIndex, fieldId))
                 {
                     chkDBDocsEntry.Checked = true;
                 }
@@ -259,7 +293,7 @@ namespace DBDocs_Editor
             else
             {
                 // Check whether a localised version exists
-                if (ProgSettings.LookupFieldEntryLocalised(lstLangs.SelectedIndex, _fieldId))
+                if (ProgSettings.LookupFieldEntryLocalised(lstLangs.SelectedIndex, fieldId))
                 {
                     chkDBDocsEntry.Checked = true;
                 }
@@ -274,21 +308,21 @@ namespace DBDocs_Editor
                     }
                 }
             }
-            _blnTextChanged = false;
+            blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void txtFieldComment_TextChanged(object sender, EventArgs e)
         {
-            _blnTextChanged = true;
+            blnTextChanged = true;
             btnSave.Enabled = true;
             mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void txtFieldNotes_TextChanged(object sender, EventArgs e)
         {
-            _blnTextChanged = true;
+            blnTextChanged = true;
             btnSave.Enabled = true;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -296,15 +330,13 @@ namespace DBDocs_Editor
         private void frmFields_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Has any text changed on the form
-            if (_blnTextChanged)
+            if (!blnTextChanged) return;
+            // Ask the user if they which to close without saving
+            var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (response == DialogResult.No)
             {
-                // Ask the user if they which to close without saving
-                var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (response == DialogResult.No)
-                {
-                    // Bail out of the form closing
-                    e.Cancel = true;
-                }
+                // Bail out of the form closing
+                e.Cancel = true;
             }
             // On this form closing, we should not pop up the main form frmServerSelect but should give focus to the parent one, which will be done by auto
         }
@@ -323,7 +355,7 @@ namespace DBDocs_Editor
 
         private void btnCloseWindow_Click(object sender, EventArgs e)
         {
-            if (_blnTextChanged)
+            if (blnTextChanged)
             {
                 var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (response == DialogResult.No)
@@ -337,7 +369,7 @@ namespace DBDocs_Editor
 
         private void btnQuit_Click(object sender, EventArgs e)
         {
-            if (_blnTextChanged)
+            if (blnTextChanged)
             {
                 var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (response == DialogResult.No)
@@ -354,14 +386,12 @@ namespace DBDocs_Editor
             lookup.ShowDialog();
 
             // Once the Dialog has closed, has the user selected an entry
-            if (lookup.SubTableId != 0)
-            {
-                var subTableId = lookup.SubTableId;
-                var insertText = "¬subtable:" + subTableId.ToString(CultureInfo.InvariantCulture).Trim() + "¬";
-                var selectionIndex = txtFieldNotes.SelectionStart;
-                txtFieldNotes.Text = txtFieldNotes.Text.Insert(selectionIndex, insertText);
-                txtFieldNotes.SelectionStart = selectionIndex + insertText.Length;
-            }
+            if (lookup.SubTableId == 0) return;
+            var subTableId = lookup.SubTableId;
+            var insertText = "¬subtable:" + subTableId.ToString(CultureInfo.InvariantCulture).Trim() + "¬";
+            var selectionIndex = txtFieldNotes.SelectionStart;
+            txtFieldNotes.Text = txtFieldNotes.Text.Insert(selectionIndex, insertText);
+            txtFieldNotes.SelectionStart = selectionIndex + insertText.Length;
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -391,21 +421,20 @@ namespace DBDocs_Editor
 
             // Paste the clipboard to the textbox
             // Determine if there is any text in the Clipboard to paste into the text box.
-            if (Clipboard.GetDataObject().GetDataPresent(DataFormats.Text) == true)
+            var dataObject = Clipboard.GetDataObject();
+            if (dataObject == null || dataObject.GetDataPresent(DataFormats.Text) != true) return;
+            // Determine if any text is selected in the text box.
+            if (thisControl.SelectionLength > 0)
             {
-                // Determine if any text is selected in the text box.
-                if (thisControl.SelectionLength > 0)
-                {
-                    // Ask user if they want to paste over currently selected text.
-                    if (
-                        MessageBox.Show(@"Do you want to paste over current selection?", @"Cut Example",
-                            MessageBoxButtons.YesNo) == DialogResult.No)
-                        // Move selection to the point after the current selection and paste.
-                        thisControl.SelectionStart = thisControl.SelectionStart + thisControl.SelectionLength;
-                }
-                // Paste current text in Clipboard into text box.
-                thisControl.Paste();
+                // Ask user if they want to paste over currently selected text.
+                if (
+                    MessageBox.Show(@"Do you want to paste over current selection?", @"Cut Example",
+                        MessageBoxButtons.YesNo) == DialogResult.No)
+                    // Move selection to the point after the current selection and paste.
+                    thisControl.SelectionStart = thisControl.SelectionStart + thisControl.SelectionLength;
             }
+            // Paste current text in Clipboard into text box.
+            thisControl.Paste();
         }
 
         private void btnMnuSelectAll_Click(object sender, EventArgs e)
@@ -426,13 +455,11 @@ namespace DBDocs_Editor
             var thisControl = (TextBox)ActiveControl;
 
             // Determine if last operation can be undone in text box.
-            if (thisControl.CanUndo == true)
-            {
-                // Undo the last operation.
-                thisControl.Undo();
-                // Clear the undo buffer to prevent last action from being redone.
-                thisControl.ClearUndo();
-            }
+            if (thisControl.CanUndo != true) return;
+            // Undo the last operation.
+            thisControl.Undo();
+            // Clear the undo buffer to prevent last action from being redone.
+            thisControl.ClearUndo();
         }
 
     }

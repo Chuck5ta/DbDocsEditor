@@ -20,13 +20,11 @@ namespace DBDocs_Editor
         private void frmDatabaseSelect_Load(object sender, EventArgs e)
         {
             var dbViewList = ProgSettings.SelectRows("SHOW DATABASES");
-            if (dbViewList != null)
+            if (dbViewList == null) return;
+            if (dbViewList.Tables[0].Rows.Count <= 0) return;
+            for (var thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
             {
-                if (dbViewList.Tables[0].Rows.Count <= 0) return;
-                for (var thisRow = 0; thisRow <= dbViewList.Tables[0].Rows.Count - 1; thisRow++)
-                {
-                    lstDatabases.Items.Add(dbViewList.Tables[0].Rows[thisRow]["database"].ToString());
-                }
+                lstDatabases.Items.Add(dbViewList.Tables[0].Rows[thisRow]["database"].ToString());
             }
         }
 

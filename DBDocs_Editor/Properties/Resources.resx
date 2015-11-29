@@ -46,7 +46,7 @@
     
     mimetype: application/x-microsoft.net.object.binary.base64
     value   : The object must be serialized with 
-            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
     
     mimetype: application/x-microsoft.net.object.soap.base64
@@ -60,6 +60,7 @@
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
@@ -68,9 +69,10 @@
               <xsd:sequence>
                 <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="name" use="required" type="xsd:string" />
               <xsd:attribute name="type" type="xsd:string" />
               <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
@@ -85,9 +87,10 @@
                 <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
                 <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
               <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
               <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
@@ -114,50 +117,53 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-    <data name="DBDocs_for_Table" xml:space="preserve">
+  <data name="DBDocs_for_Table" xml:space="preserve">
     <value>DBDocs for Table: </value>
   </data>
-    <data name="Save_Complete_for" xml:space="preserve">
+  <data name="Save_Complete_for" xml:space="preserve">
     <value> Save Complete for </value>
   </data>
-    <data name="You_have_unsaved_changes" xml:space="preserve">
+  <data name="You_have_unsaved_changes" xml:space="preserve">
     <value>You have unsaved changes, continue ?</value>
   </data>
-    <data name="Exit_Check" xml:space="preserve">
+  <data name="Exit_Check" xml:space="preserve">
     <value>Exit Check</value>
   </data>
-    <data name="Error_Connecting_to_DB" xml:space="preserve">
+  <data name="Error_Connecting_to_DB" xml:space="preserve">
     <value>There was an error connecting to the database: 
 </value>
   </data>
-    <data name="Error_Saving" xml:space="preserve">
+  <data name="Error_Saving" xml:space="preserve">
     <value>Error Saving: </value>
   </data>
-    <data name="Failure_during_Resync" xml:space="preserve">
+  <data name="Failure_during_Resync" xml:space="preserve">
     <value>Failures during Resync</value>
   </data>
-    <data name="OK" xml:space="preserve">
+  <data name="OK" xml:space="preserve">
     <value>&amp;OK</value>
   </data>
-    <data name="Cancel" xml:space="preserve">
+  <data name="Cancel" xml:space="preserve">
     <value>&amp;Cancel</value>
   </data>
-    <data name="SubTable" xml:space="preserve">
+  <data name="SubTable" xml:space="preserve">
     <value>SubTable: </value>
   </data>
-    <data name="SubTables" xml:space="preserve">
+  <data name="SubTables" xml:space="preserve">
     <value>SubTables</value>
   </data>
-    <data name="DBDocs_Editor_v" xml:space="preserve">
+  <data name="DBDocs_Editor_v" xml:space="preserve">
     <value>DBDocs Editor v</value>
   </data>
-    <data name="DBDocs__Using_database_" xml:space="preserve">
+  <data name="DBDocs__Using_database_" xml:space="preserve">
     <value>DBDocs: Using database </value>
   </data>
-    <data name="Please_select_a_database_from_the_list" xml:space="preserve">
+  <data name="Please_select_a_database_from_the_list" xml:space="preserve">
     <value>Please select a database from the list</value>
   </data>
-    <data name="DBDocs__Using_Server" xml:space="preserve">
+  <data name="DBDocs__Using_Server" xml:space="preserve">
     <value>DBDocs: Using Server </value>
+  </data>
+  <data name="Text_Too_Long" xml:space="preserve">
+    <value>The Comment needs to be shorter than 80 characters</value>
   </data>
 </root>

@@ -9,8 +9,8 @@ namespace DBDocs_Editor
 {
     public partial class FrmTables : Form
     {
-        private int _tableId;
-        private bool _blnTextChanged;
+        private int tableId;
+        private bool blnTextChanged;
 
         public FrmTables()
         {
@@ -25,7 +25,7 @@ namespace DBDocs_Editor
         private void lstTables_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedTable = lstTables.Text;
-            _tableId = ProgSettings.LookupTableId(selectedTable);
+            tableId = ProgSettings.LookupTableId(selectedTable);
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
 
@@ -63,7 +63,7 @@ namespace DBDocs_Editor
                         chkDBDocsEntry.Checked = false;
                     }
 
-                    _tableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["TableId"]);
+                    tableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["TableId"]);
 
                     // If the 'Use English' if blank checkbox is ticked
                     if (chkUseEnglish.Checked)
@@ -92,7 +92,7 @@ namespace DBDocs_Editor
                 chkDBDocsEntry.Checked = false;
             }
             btnShowFields.Enabled = true;
-            _blnTextChanged = false;
+            blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -103,7 +103,7 @@ namespace DBDocs_Editor
             ProgSettings.LoadLangs(lstLangs);
 
             // The following command reads all the columns for the selected table
-            DataSet dbViewList =
+            var dbViewList =
                 ProgSettings.SelectRows(
                     "SELECT T.TABLE_NAME AS TableName, T.ENGINE AS TableEngine, T.TABLE_COMMENT AS TableComment FROM INFORMATION_SCHEMA.Tables T WHERE T.TABLE_NAME <> 'dtproperties' AND T.TABLE_SCHEMA <> 'INFORMATION_SCHEMA' AND T.TABLE_SCHEMA='" +
                     ProgSettings.DbName + "' ORDER BY T.TABLE_NAME");
@@ -125,18 +125,18 @@ namespace DBDocs_Editor
                 }
             }
 
-            _blnTextChanged = false;
+            blnTextChanged = false;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
             var dbDocsTableOutput = new StringBuilder();
-            string outputFolder = Application.ExecutablePath;
+            var outputFolder = Application.ExecutablePath;
 
             // Strip the Executable name from the path
             outputFolder = outputFolder.Substring(0, outputFolder.LastIndexOf(@"\", StringComparison.Ordinal));
 
-            string selectedTable = lstTables.Text;
+            var selectedTable = lstTables.Text;
 
             // If the output folder doesnt exist, create it
             if (!Directory.Exists(outputFolder + @"\"))
@@ -144,7 +144,7 @@ namespace DBDocs_Editor
                 Directory.CreateDirectory(outputFolder + @"\");
             }
 
-            if (_tableId == 0) // New Record
+            if (tableId == 0) // New Record
             {
                 if (lstLangs.SelectedIndex != 0)
                 {
@@ -174,7 +174,7 @@ namespace DBDocs_Editor
                 // Selected Table Language ID Notes
                 ProgSettings.TableInsert(selectedTable, lstLangs.SelectedIndex, txtTableNotes.Text);
 
-                _blnTextChanged = false;
+                blnTextChanged = false;
                 btnSave.Enabled = false;
                 mnuSave.Enabled = btnSave.Enabled;
             }
@@ -188,7 +188,7 @@ namespace DBDocs_Editor
                                                  ", `tableName`='" + selectedTable + "', `tableNotes`='" +
                                                  ProgSettings.PrepareSqlString(
                                                      ProgSettings.ConvertCrlfToBr(txtTableNotes.Text)) +
-                                                 "' where tableId=" + _tableId + ";");
+                                                 "' where tableId=" + tableId + ";");
 
                     // Open the file for append and write the entries to it
                     using (
@@ -201,10 +201,10 @@ namespace DBDocs_Editor
                 else
                 {
                     dbDocsTableOutput.AppendLine("delete from `dbdocstable_localisation` where `languageId`=" +
-                                                 lstLangs.SelectedIndex + " and `tableId`= " + _tableId + ";");
+                                                 lstLangs.SelectedIndex + " and `tableId`= " + tableId + ";");
                     dbDocsTableOutput.AppendLine(
                         "insert  into `dbdocstable_localisation`(`tableId`,`languageId`,`tableNotes`) values (" +
-                        _tableId + ", " + lstLangs.SelectedIndex + ", '" +
+                        tableId + ", " + lstLangs.SelectedIndex + ", '" +
                         ProgSettings.PrepareSqlString(ProgSettings.ConvertCrlfToBr(txtTableNotes.Text)) + "');");
 
                     // Open the file for append and write the entries to it
@@ -220,10 +220,10 @@ namespace DBDocs_Editor
                 // Write the entry out to the Database directly For an update the logic to decide which table to update is in the Update function itself
 
                 // Table ID Language ID Notes
-                ProgSettings.TableUpdate(_tableId, lstLangs.SelectedIndex,
+                ProgSettings.TableUpdate(tableId, lstLangs.SelectedIndex,
                     ProgSettings.ConvertCrlfToBr(txtTableNotes.Text));
 
-                _blnTextChanged = false;
+                blnTextChanged = false;
                 btnSave.Enabled = false;
                 mnuSave.Enabled = btnSave.Enabled;
             }
@@ -247,7 +247,7 @@ namespace DBDocs_Editor
                 var subTableScreen = new FrmSubtables {SubTableId = thissubTableId};
                 subTableScreen.Show();
             }
-            _blnTextChanged = false;
+            blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -258,7 +258,7 @@ namespace DBDocs_Editor
 
             if (lstLangs.SelectedIndex == 0)
             {
-                if (ProgSettings.LookupTableEntry(lstLangs.SelectedIndex, _tableId))
+                if (ProgSettings.LookupTableEntry(lstLangs.SelectedIndex, tableId))
                 {
                     chkDBDocsEntry.Checked = true;
                 }
@@ -270,7 +270,7 @@ namespace DBDocs_Editor
             else
             {
                 // Check whether a localised version exists
-                if (ProgSettings.LookupTableEntryLocalised(lstLangs.SelectedIndex, _tableId))
+                if (ProgSettings.LookupTableEntryLocalised(lstLangs.SelectedIndex, tableId))
                 {
                     chkDBDocsEntry.Checked = true;
                 }
@@ -285,14 +285,14 @@ namespace DBDocs_Editor
                     }
                 }
             }
-            _blnTextChanged = false;
+            blnTextChanged = false;
             btnSave.Enabled = false;
             mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void txtTableNotes_TextChanged(object sender, EventArgs e)
         {
-            _blnTextChanged = true;
+            blnTextChanged = true;
             btnSave.Enabled = true;
             mnuSave.Enabled = btnSave.Enabled;
         }
@@ -300,7 +300,7 @@ namespace DBDocs_Editor
         private void frmTables_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Has any text changed on the form
-            if (_blnTextChanged)
+            if (blnTextChanged)
             {
                 // Ask the user if they which to close without saving
                 var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check,
@@ -329,7 +329,7 @@ namespace DBDocs_Editor
 
         private void btnCloseWindow_Click(object sender, EventArgs e)
         {
-            if (_blnTextChanged)
+            if (blnTextChanged)
             {
                 var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check,
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -344,7 +344,7 @@ namespace DBDocs_Editor
 
         private void btnQuit_Click(object sender, EventArgs e)
         {
-            if (_blnTextChanged)
+            if (blnTextChanged)
             {
                 var response = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check,
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -359,7 +359,7 @@ namespace DBDocs_Editor
 
         private void btnShowFields_Click(object sender, EventArgs e)
         {
-            string selectedTable = lstTables.Text;
+            var selectedTable = lstTables.Text;
 
             var fieldScreen = new FrmFields {TableName = selectedTable};
             fieldScreen.Show();
@@ -426,13 +426,11 @@ namespace DBDocs_Editor
             var thisControl = (TextBox)ActiveControl;
 
             // Determine if last operation can be undone in text box.
-            if (thisControl.CanUndo == true)
-            {
-                // Undo the last operation.
-                thisControl.Undo();
-                // Clear the undo buffer to prevent last action from being redone.
-                thisControl.ClearUndo();
-            }
+            if (thisControl.CanUndo != true) return;
+            // Undo the last operation.
+            thisControl.Undo();
+            // Clear the undo buffer to prevent last action from being redone.
+            thisControl.ClearUndo();
         }
     }
 }

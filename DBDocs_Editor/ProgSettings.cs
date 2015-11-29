@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 using DBDocs_Editor.Properties;
@@ -11,10 +12,10 @@ namespace DBDocs_Editor
 {
     public class ProgSettings
     {   // Common Functions will be added in here
-        private static string _dbName = "";
-        private static string _serverName = "";
-        private static string _userName = "";
-        private static string _password = "";
+        private static string dbName = "";
+        private static string serverName = "";
+        private static string userName = "";
+        private static string password = "";
         public static string SqldBconn = "";
         public static Form MainForm;
 
@@ -26,18 +27,18 @@ namespace DBDocs_Editor
         {
             get
             {
-                return _password;
+                return password;
             }
             set
             {
-                _password = value;
-                if (_dbName != "*")
+                password = value;
+                if (dbName != "*")
                 {
-                    SqldBconn = "SERVER=" + _serverName + ";DATABASE=" + _dbName + ";UID=" + _userName + ";PWD=" + _password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
                 }
                 else
                 {
-                    SqldBconn = "SERVER=" + _serverName + ";UID=" + _userName + ";PWD=" + _password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
                 }
             }
         }
@@ -50,18 +51,18 @@ namespace DBDocs_Editor
         {
             get
             {
-                return _userName;
+                return userName;
             }
             set
             {
-                _userName = value;
-                if (_dbName != "*")
+                userName = value;
+                if (dbName != "*")
                 {
-                    SqldBconn = "SERVER=" + _serverName + ";DATABASE=" + _dbName + ";UID=" + _userName + ";PWD=" + _password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
                 }
                 else
                 {
-                    SqldBconn = "SERVER=" + _serverName + ";UID=" + _userName + ";PWD=" + _password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
                 }
             }
         }
@@ -74,18 +75,18 @@ namespace DBDocs_Editor
         {
             get
             {
-                return _serverName;
+                return serverName;
             }
             set
             {
-                _serverName = value;
-                if (_dbName != "*")
+                serverName = value;
+                if (dbName != "*")
                 {
-                    SqldBconn = "SERVER=" + _serverName + ";DATABASE=" + _dbName + ";UID=" + _userName + ";PWD=" + _password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
                 }
                 else
                 {
-                    SqldBconn = "SERVER=" + _serverName + ";UID=" + _userName + ";PWD=" + _password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
                 }
             }
         }
@@ -98,18 +99,18 @@ namespace DBDocs_Editor
         {
             get
             {
-                return _dbName;
+                return dbName;
             }
             set
             {
-                _dbName = value;
-                if (_dbName != "*")
+                dbName = value;
+                if (dbName != "*")
                 {
-                    SqldBconn = "SERVER=" + _serverName + ";DATABASE=" + _dbName + ";UID=" + _userName + ";PWD=" + _password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
                 }
                 else
                 {
-                    SqldBconn = "SERVER=" + _serverName + ";UID=" + _userName + ";PWD=" + _password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
                 }
             }
         }
@@ -215,16 +216,9 @@ namespace DBDocs_Editor
         public static bool LookupTableEntryLocalised(int languageId, int tableId)
         {
             var dbView = SelectRows("SELECT tableNotes FROM dbdocstable_localised where tableId=" + tableId + " and languageId=" + languageId + ";");
-            if (dbView != null)
-            {
-                if (dbView.Tables[0].Rows.Count > 0)
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            return false;
+            if (dbView == null) return false;
+            if (dbView.Tables[0].Rows.Count <= 0) return false;
+            return true;
         }
 
         /// <summary>
@@ -235,14 +229,9 @@ namespace DBDocs_Editor
         public static int LookupTableId(string tableName)
         {
             var dbViewSubtable = SelectRows("SELECT tableid FROM dbdocstable where tableName='" + tableName + "';");
-            if (dbViewSubtable != null)
-            {
-                if (dbViewSubtable.Tables[0].Rows.Count > 0)
-                {
-                    return Convert.ToInt32(dbViewSubtable.Tables[0].Rows[0]["tableid"]);
-                }
-            }
-            return 0;
+            if (dbViewSubtable == null) return 0;
+            if (dbViewSubtable.Tables[0].Rows.Count <= 0) return 0;
+            return Convert.ToInt32(dbViewSubtable.Tables[0].Rows[0]["tableid"]);
         }
 
         /// <summary>
@@ -254,16 +243,9 @@ namespace DBDocs_Editor
         public static bool LookupTableEntry(int languageId, int tableId)
         {
             var dbView = SelectRows("SELECT tableNotes FROM dbdocstable where tableId=" + tableId + " and languageId=" + languageId + ";");
-            if (dbView != null)
-            {
-                if (dbView.Tables[0].Rows.Count > 0)
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            return false;
+            if (dbView == null) return false;
+            if (dbView.Tables[0].Rows.Count <= 0) return false;
+            return true;
         }
 
         #endregion "dbdocsTable Functions"
@@ -355,16 +337,9 @@ namespace DBDocs_Editor
         public static bool LookupFieldEntryLocalised(int languageId, int fieldId)
         {
             var dbView = SelectRows("SELECT fieldNotes FROM dbdocsfields_localised where fieldId=" + fieldId + " and languageId=" + languageId + ";");
-            if (dbView != null)
-            {
-                if (dbView.Tables[0].Rows.Count > 0)
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            return false;
+            if (dbView == null) return false;
+            if (dbView.Tables[0].Rows.Count <= 0) return false;
+            return true;
         }
 
         /// <summary>
@@ -376,16 +351,9 @@ namespace DBDocs_Editor
         public static bool LookupFieldEntry(int languageId, int fieldId)
         {
             var dbView = SelectRows("SELECT fieldNotes FROM dbdocsfields where fieldId=" + fieldId + " and languageId=" + languageId + ";");
-            if (dbView != null)
-            {
-                if (dbView.Tables[0].Rows.Count > 0)
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            return false;
+            if (dbView == null) return false;
+            if (dbView.Tables[0].Rows.Count <= 0) return false;
+            return true;
         }
 
         /// <summary>
@@ -397,14 +365,9 @@ namespace DBDocs_Editor
         public static int LookupFieldId(string tableName, string fieldName)
         {
             var dbViewSubtable = SelectRows("SELECT fieldid FROM dbdocsfields where tableName='" + tableName + "' and fieldname='" + fieldName + "';");
-            if (dbViewSubtable != null)
-            {
-                if (dbViewSubtable.Tables[0].Rows.Count > 0)
-                {
-                    return Convert.ToInt32(dbViewSubtable.Tables[0].Rows[0]["fieldId"]);
-                }
-            }
-            return 0;
+            if (dbViewSubtable == null) return 0;
+            if (dbViewSubtable.Tables[0].Rows.Count <= 0) return 0;
+            return Convert.ToInt32(dbViewSubtable.Tables[0].Rows[0]["fieldId"]);
         }
 
         #endregion "dbdocsfields Functions"
@@ -435,6 +398,35 @@ namespace DBDocs_Editor
 
             cmd.ExecuteNonQuery();
             cmd.Connection.Close();
+        }
+
+        /// <summary>
+        /// Delete a record from the dbdocsSubtable table
+        /// </summary>
+        /// <param name="subTableName">Name of the subTable.</param>
+        /// <param name="languageId"></param>
+        public static void SubTableDelete(string subTableName, int languageId)
+        {
+            var conn = new MySqlConnection(SqldBconn);
+            var cmd = new MySqlCommand("", conn);
+            var subTableId = LookupSubTableId(subTableName);
+            if (subTableId > 0)
+            {
+                cmd.Connection.Open();
+                if (languageId==0)
+                {
+                    cmd.CommandText = "DELETE FROM `dbdocssubtables` WHERE subTableId = @subTableId and languageId = @languageId";
+                }
+                else
+                {
+                    cmd.CommandText = "DELETE FROM `dbdocssubtables_localised` WHERE subTableId = @subTableId and languageId = @languageId";
+                }
+                cmd.Parameters.AddWithValue("@subTableId", subTableId);
+                cmd.Parameters.AddWithValue("@languageId", languageId);
+
+                cmd.ExecuteNonQuery();
+                cmd.Connection.Close();
+            }
         }
 
         /// <summary>
@@ -491,16 +483,9 @@ namespace DBDocs_Editor
         public static bool LookupSubTableEntryLocalised(int languageId, int subtableId)
         {
             var dbView = SelectRows("SELECT subtabletemplate FROM dbdocssubtables_localised where subtableId=" + subtableId + " and languageId=" + languageId + ";");
-            if (dbView != null)
-            {
-                if (dbView.Tables[0].Rows.Count > 0)
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            return false;
+            if (dbView == null) return false;
+            if (dbView.Tables[0].Rows.Count <= 0) return false;
+            return true;
         }
 
         /// <summary>
@@ -512,16 +497,9 @@ namespace DBDocs_Editor
         public static bool LookupSubTableEntry(int languageId, int subtableId)
         {
             var dbView = SelectRows("SELECT subtablename FROM dbdocssubtables where subtableId=" + subtableId + " and languageId=" + languageId + ";");
-            if (dbView != null)
-            {
-                if (dbView.Tables[0].Rows.Count > 0)
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            return false;
+            if (dbView == null) return false;
+            if (dbView.Tables[0].Rows.Count <= 0) return false;
+            return true;
         }
 
         #endregion "dbdocssubTable Functions"
@@ -534,11 +512,9 @@ namespace DBDocs_Editor
         {
             foreach (Form frm in Application.OpenForms)
             {
-                if (frm == formName)
-                {
-                    frm.Show();
-                    return;
-                }
+                if (frm != formName) continue;
+                frm.Show();
+                return;
             }
         }
 
@@ -552,10 +528,10 @@ namespace DBDocs_Editor
             const string keyName = userRoot + "\\" + subkey;
 
             // Concat all the login requirements into a single field
-            string[] connectionString = { _serverName, _userName, _password, _dbName };
+            string[] connectionString = { serverName, userName, password, dbName };
 
             // Write in into the registry as a key call "<servername>-<dbname>"
-            Registry.SetValue(keyName, _serverName + "-" + DbName, connectionString);
+            Registry.SetValue(keyName, serverName + "-" + DbName, connectionString);
 
             // Rebuild the internal list of connections
             PopulateConnections();
@@ -569,7 +545,7 @@ namespace DBDocs_Editor
         {
             const string subkey = "Software\\MaNGOS\\DBDocsEditor\\Connections";
 
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(subkey, true))
+            using (var key = Registry.CurrentUser.OpenSubKey(subkey, true))
             {
                 if (key == null)
                 {
@@ -591,37 +567,32 @@ namespace DBDocs_Editor
             const string userRoot = "HKEY_CURRENT_USER";
             const string subkey = "Software\\MaNGOS\\DBDocsEditor\\Connections";
 
-            RegistryKey rk = Registry.CurrentUser;
+            var rk = Registry.CurrentUser;
 
             // Open a subKey as read-only
-            RegistryKey dbDocsKey = rk.OpenSubKey(subkey);
-            if (dbDocsKey != null)
+            var dbDocsKey = rk.OpenSubKey(subkey);
+            if (dbDocsKey == null) return null;
+            var names = dbDocsKey.GetValueNames();
+
+            if (names.GetLength(0) <= 0) return null;
+            var allconnections = new List<ConnectionInfo>();
+            var connections = new ConnectionInfo();
+
+            // For every Connection entry in the registry
+            foreach (var connectionstring in names)
             {
-                var names = dbDocsKey.GetValueNames();
+                var theseValues = (string[])Registry.GetValue(userRoot + "\\" + subkey, connectionstring, "");
 
-                if (names.GetLength(0) > 0)
-                {
-                    var allconnections = new List<ConnectionInfo>();
-                    var connections = new ConnectionInfo();
+                // Populate a connectionInfo structure with the values from the registry
+                connections.ServerNameorIp = theseValues[0];
+                connections.DatabaseUserName = theseValues[1];
+                connections.DatabasePassword = theseValues[2];
+                connections.DatabaseName = theseValues[3];
 
-                    // For every Connection entry in the registry
-                    foreach (String connectionstring in names)
-                    {
-                        var theseValues = (string[])Registry.GetValue(userRoot + "\\" + subkey, connectionstring, "");
-
-                        // Populate a connectionInfo structure with the values from the registry
-                        connections.ServerNameorIp = theseValues[0];
-                        connections.DatabaseUserName = theseValues[1];
-                        connections.DatabasePassword = theseValues[2];
-                        connections.DatabaseName = theseValues[3];
-
-                        // Add the structure to a list
-                        allconnections.Add(connections);
-                    }
-                    return allconnections;
-                }
+                // Add the structure to a list
+                allconnections.Add(connections);
             }
-            return null;
+            return allconnections;
         }
 
         /// <summary>
@@ -657,28 +628,22 @@ namespace DBDocs_Editor
         public static void ExtractSubTables(string sourceText, ListBox lstSubTables)
         {
             lstSubTables.Items.Clear();
-            if (sourceText.Contains("¬subtable:"))
-            {
-                var subtables = GetSubtables(sourceText);
-                var stringSeparators = new[] { "," };
-                var subarray = subtables.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+            if (!sourceText.Contains("¬subtable:")) return;
+            var subtables = GetSubtables(sourceText);
+            var stringSeparators = new[] { "," };
+            var subarray = subtables.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (var tableid in subarray)
+            foreach (var tableid in subarray)
+            {
+                if (string.IsNullOrEmpty(tableid)) continue;
+                var dbViewSubtable = SelectRows("SELECT subtablename FROM dbdocssubtables where subtableid=" + tableid);
+                if (dbViewSubtable == null) continue;
+                if (dbViewSubtable.Tables[0].Rows.Count > 0)
                 {
-                    if (!string.IsNullOrEmpty(tableid))
-                    {
-                        var dbViewSubtable = SelectRows("SELECT subtablename FROM dbdocssubtables where subtableid=" + tableid);
-                        if (dbViewSubtable != null)
-                        {
-                            if (dbViewSubtable.Tables[0].Rows.Count > 0)
-                            {
-                                lstSubTables.Items.Add(subtables.Replace(",", "") + ":" + dbViewSubtable.Tables[0].Rows[0]["subtablename"]);
-                            }
-                        }
-                    }
+                    lstSubTables.Items.Add(subtables.Replace(",", "") + ":" + dbViewSubtable.Tables[0].Rows[0]["subtablename"]);
                 }
-                // MessageBox.Show("Found subtables: " + subtables);
             }
+            // MessageBox.Show("Found subtables: " + subtables);
         }
 
         /// <summary>
@@ -762,14 +727,9 @@ namespace DBDocs_Editor
         public static string GetNewSubTableId()
         {
             var dbViewSubtable = SelectRows("SELECT max(subtableid) as MaxId FROM dbdocssubtables");
-            if (dbViewSubtable != null)
-            {
-                if (dbViewSubtable.Tables[0].Rows.Count > 0)
-                {
-                    return Convert.ToString(Convert.ToInt32(dbViewSubtable.Tables[0].Rows[0]["MaxId"].ToString()) + 1);
-                }
-            }
-            return "0";
+            if (dbViewSubtable == null) return "0";
+            if (dbViewSubtable.Tables[0].Rows.Count <= 0) return "0";
+            return Convert.ToString(Convert.ToInt32(dbViewSubtable.Tables[0].Rows[0]["MaxId"].ToString()) + 1);
         }
 
         /// <summary>
@@ -777,17 +737,12 @@ namespace DBDocs_Editor
         /// </summary>
         /// <param name="subTableName"></param>
         /// <returns></returns>
-        public static string LookupSubTableId(string subTableName)
+        public static int LookupSubTableId(string subTableName)
         {
             var dbViewSubtable = SelectRows("SELECT subtableid FROM dbdocssubtables where subtableName='" + subTableName + "';");
-            if (dbViewSubtable != null)
-            {
-                if (dbViewSubtable.Tables[0].Rows.Count > 0)
-                {
-                    return Convert.ToString(dbViewSubtable.Tables[0].Rows[0]["SubTableId"].ToString());
-                }
-            }
-            return "0";
+            if (dbViewSubtable == null) return 0;
+            if (dbViewSubtable.Tables[0].Rows.Count <= 0) return 0;
+            return Convert.ToInt32(Convert.ToString(dbViewSubtable.Tables[0].Rows[0]["SubTableId"].ToString()));
         }
 
         /// <summary>
@@ -942,20 +897,23 @@ namespace DBDocs_Editor
                             try
                             {
                                 strBody[intFields] = strBody[intFields].Trim();
-                                if (strBody[intFields].Length > 0)
+                                if (strBody[intFields].Length <= 0) continue;
+                                if (strHeaderCols[intFields] != "1")
                                 {
-                                    if (strHeaderCols[intFields] == "1")
+                                    if (strHeaderCols[intFields] == "2")
                                     {
-                                        sbHtml.Append("<td align='left' valign='middle'>" + strBody[intFields] + "</td>");
-                                    }
-                                    else if (strHeaderCols[intFields] == "2")
-                                    {
-                                        sbHtml.Append("<td align='right' valign='middle'>" + strBody[intFields] + "</td>");
+                                        sbHtml.Append("<td align='right' valign='middle'>" + strBody[intFields] +
+                                                      "</td>");
                                     }
                                     else
                                     {
-                                        sbHtml.Append("<td align='center' valign='middle'>" + strBody[intFields] + "</td>");
+                                        sbHtml.Append("<td align='center' valign='middle'>" + strBody[intFields] +
+                                                      "</td>");
                                     }
+                                }
+                                else
+                                {
+                                    sbHtml.Append("<td align='left' valign='middle'>" + strBody[intFields] + "</td>");
                                 }
                             }
                             catch
@@ -1046,7 +1004,7 @@ namespace DBDocs_Editor
 
             inputBox.StartPosition = FormStartPosition.CenterParent;
 
-            DialogResult result = inputBox.ShowDialog();
+            var result = inputBox.ShowDialog();
             input = textBox.Text;
             return result;
         }
@@ -1084,6 +1042,45 @@ namespace DBDocs_Editor
             public string DatabaseName;
             public string DatabaseUserName;
             public string DatabasePassword;
+        }
+
+        public static bool IsSubtableInTable(string subtableName)
+        {
+            var subTableId = LookupSubTableId(subtableName);
+            var dbViewSubtable = SelectRows("Select * from dbdocstable where tablenotes like '%¬subtable:" + subTableId.ToString(CultureInfo.InvariantCulture) + "¬%';");
+            if (dbViewSubtable == null) return false;
+            if (dbViewSubtable.Tables[0].Rows.Count <= 0) return false;
+
+            return true;
+        }
+
+        public static bool IsSubtableLocalisedInTable(string subtableName)
+        {
+            var subTableId = LookupSubTableId(subtableName);
+            var dbViewSubtable = SelectRows("Select * from dbdocstable_localised where tableNotes like '%¬subtable:" + subTableId.ToString(CultureInfo.InvariantCulture) + "¬%';");
+            if (dbViewSubtable == null) return false;
+            if (dbViewSubtable.Tables[0].Rows.Count <= 0) return false;
+
+            return true;
+        }
+
+        public static bool IsSubtableInField(string subtableName)
+        {
+            var subTableId = LookupSubTableId(subtableName);
+            var dbViewSubtable = SelectRows("Select * from dbdocsfields where fieldNotes like '%¬subtable:" + subTableId.ToString(CultureInfo.InvariantCulture) + "¬%';");
+            if (dbViewSubtable == null) return false;
+            if (dbViewSubtable.Tables[0].Rows.Count <= 0) return false;
+
+            return true;
+        }
+        public static bool IsSubtableLocalisedInField(string subtableName)
+        {
+            var subTableId = LookupSubTableId(subtableName);
+            var dbViewSubtable = SelectRows("Select * from dbdocsfields_localised where fieldNotes like '%¬subtable:" + subTableId.ToString(CultureInfo.InvariantCulture) + "¬%';");
+            if (dbViewSubtable == null) return false;
+            if (dbViewSubtable.Tables[0].Rows.Count <= 0) return false;
+
+            return true;
         }
     }
 }
