@@ -25,6 +25,7 @@ namespace DBDocs_Editor
         private void lstsubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
             string selectedSubtable = lstsubtables.Text;
+            txtSubTableName.Text = selectedSubtable;
             SubTableId = 0; // Force to new entry before the lookup updates it should it exist
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
@@ -66,14 +67,21 @@ namespace DBDocs_Editor
                     SubTableId = Convert.ToInt32(dbViewList.Tables[0].Rows[0]["subtableid"]);
 
                     // If the 'Use English' if blank checkbox is ticked
-                    if (chkUseEnglish.Checked)
+                    if (chkUseEnglish.Checked && lstLangs.SelectedIndex != 0)
                     {
                         // If Localised SubTable Template is blank, go grab the English
                         if (string.IsNullOrEmpty(txtSubtableTemplate.Text))
                         {
-                            txtSubtableContent.Text = dbViewList.Tables[0].Rows[0]["subtablecontentEnglish"].ToString();
-                            txtSubtableTemplate.Text =
-                                dbViewList.Tables[0].Rows[0]["subtabletemplateEnglish"].ToString();
+                            if (!string.IsNullOrEmpty(dbViewList.Tables[0].Rows[0]["subtablecontentEnglish"].ToString()))
+                            {
+                                txtSubtableContent.Text =
+                                    dbViewList.Tables[0].Rows[0]["subtablecontentEnglish"].ToString();
+                            }
+                            if (!string.IsNullOrEmpty(dbViewList.Tables[0].Rows[0]["subtabletemplateEnglish"].ToString()))
+                            {
+                                txtSubtableTemplate.Text =
+                                    dbViewList.Tables[0].Rows[0]["subtabletemplateEnglish"].ToString();
+                            }
                         }
                     }
 
@@ -413,6 +421,8 @@ namespace DBDocs_Editor
         private void txtSubtableTemplate_TextChanged(object sender, EventArgs e)
         {
             _blnTextChanged = true;
+            btnSave.Enabled = true;
+            mnuSave.Enabled = btnSave.Enabled;
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -430,5 +440,67 @@ namespace DBDocs_Editor
         {
             btnNewEntry_Click(sender, e);
         }
+
+        private void btnMnuCopy_Click(object sender, EventArgs e)
+        {
+            if (ActiveControl.GetType() != typeof(TextBox)) return;
+            var thisControl = (TextBox)ActiveControl;
+
+            // Copy the textbox to the clipboard
+            thisControl.Copy();
+        }
+
+        private void btnMnuPaste_Click(object sender, EventArgs e)
+        {
+            if (ActiveControl.GetType() != typeof(TextBox)) return;
+            var thisControl = (TextBox)ActiveControl;
+
+            // Paste the clipboard to the textbox
+            // Determine if there is any text in the Clipboard to paste into the text box.
+            if (Clipboard.GetDataObject().GetDataPresent(DataFormats.Text) == true)
+            {
+                // Determine if any text is selected in the text box.
+                if (thisControl.SelectionLength > 0)
+                {
+                    // Ask user if they want to paste over currently selected text.
+                    if (
+                        MessageBox.Show(@"Do you want to paste over current selection?", @"Cut Example",
+                            MessageBoxButtons.YesNo) == DialogResult.No)
+                        // Move selection to the point after the current selection and paste.
+                        thisControl.SelectionStart = thisControl.SelectionStart + thisControl.SelectionLength;
+                }
+                // Paste current text in Clipboard into text box.
+                thisControl.Paste();
+            }
+        }
+
+        private void btnMnuSelectAll_Click(object sender, EventArgs e)
+        {
+            if (ActiveControl.GetType() != typeof(TextBox)) return;
+            var thisControl = (TextBox)ActiveControl;
+
+            // Copy the textbox to the clipboard
+            thisControl.Focus();
+            thisControl.SelectAll();
+            thisControl.SelectionStart = 0;
+            thisControl.SelectionLength = thisControl.Text.Length;
+        }
+
+        private void undoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ActiveControl.GetType() != typeof(TextBox)) return;
+            var thisControl = (TextBox)ActiveControl;
+
+            // Determine if last operation can be undone in text box.
+            if (thisControl.CanUndo == true)
+            {
+                // Undo the last operation.
+                thisControl.Undo();
+                // Clear the undo buffer to prevent last action from being redone.
+                thisControl.ClearUndo();
+            }
+        }
+
+
     }
 }

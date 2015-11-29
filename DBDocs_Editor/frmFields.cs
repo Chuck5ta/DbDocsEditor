@@ -164,7 +164,7 @@ namespace DBDocs_Editor
                 }
 
                 //insert  into `dbdocsfields`(`languageId`, `tableName`,`fieldName`,`tableNotes`) values (0,'creature','entry','xxxx');
-                dbDocsTableOutput.AppendLine("insert  into `dbdocsfields` (`languageId`,`tableName`,`fieldName`,`tableComments`,`tableNotes`) values (" + lstLangs.SelectedIndex + ",'" + TableName + "','" + selectedField + "','" + txtFieldComment.Text + "','" + ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text) + "');");
+                dbDocsTableOutput.AppendLine("insert  into `dbdocsfields` (`languageId`,`tableName`,`fieldName`,`tableComments`,`tableNotes`) values (" + lstLangs.SelectedIndex + ",'" + TableName + "','" + selectedField + "','" + ProgSettings.PrepareSqlString(txtFieldComment.Text) + "','" + ProgSettings.PrepareSqlString(ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text)) + "');");
 
                 // Open the file for append and write the entries to it
                 using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
@@ -189,7 +189,7 @@ namespace DBDocs_Editor
                 if (lstLangs.SelectedIndex == 0)
                 {   // If English, connect to main table
                     //update `dbdocsfields` set `fieldnotes`= xxx where `fieldId`= xxx and languageId=yyy;
-                    dbDocsTableOutput.AppendLine("update `dbdocsfields` set `FieldComment` = '" + txtFieldComment.Text + "', `fieldNotes` = '" + ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text) + "' where `fieldId`= '" + _fieldId + "' and `languageId`= " + lstLangs.SelectedIndex + ";");
+                    dbDocsTableOutput.AppendLine("update `dbdocsfields` set `FieldComment` = '" + ProgSettings.PrepareSqlString(txtFieldComment.Text) + "', `fieldNotes` = '" + ProgSettings.PrepareSqlString(ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text)) + "' where `fieldId`= '" + _fieldId + "' and `languageId`= " + lstLangs.SelectedIndex + ";");
 
                     // Open the file for append and write the entries to it
                     using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable.SQL", true))
@@ -200,7 +200,7 @@ namespace DBDocs_Editor
                 else
                 {
                     dbDocsTableOutput.AppendLine("delete from `dbdocsfields_localised` where `fieldId`= '" + _fieldId + " and `languageId`= " + lstLangs.SelectedIndex + ";");
-                    dbDocsTableOutput.AppendLine("insert into `dbdocsfields_localised` (`fieldId`,`languageId`,`FieldComment`,`fieldNotes`) values (" + _fieldId + ", " + lstLangs.SelectedIndex + ", '" + txtFieldComment.Text + "', '" + ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text) + "');");
+                    dbDocsTableOutput.AppendLine("insert into `dbdocsfields_localised` (`fieldId`,`languageId`,`FieldComment`,`fieldNotes`) values (" + _fieldId + ", " + lstLangs.SelectedIndex + ", '" + ProgSettings.PrepareSqlString(txtFieldComment.Text) + "', '" + ProgSettings.PrepareSqlString(ProgSettings.ConvertCrlfToBr(txtFieldNotes.Text)) + "');");
 
                     // Open the file for append and write the entries to it
                     using (var outfile = new StreamWriter(outputFolder + @"\" + ProgSettings.DbName + "_dbdocsTable_localised.SQL", true))
@@ -374,5 +374,66 @@ namespace DBDocs_Editor
         {
             btnSave_Click(sender, e);
         }
+
+        private void btnMnuCopy_Click(object sender, EventArgs e)
+        {
+            if (ActiveControl.GetType() != typeof(TextBox)) return;
+            var thisControl = (TextBox)ActiveControl;
+
+            // Copy the textbox to the clipboard
+            thisControl.Copy();
+        }
+
+        private void btnMnuPaste_Click(object sender, EventArgs e)
+        {
+            if (ActiveControl.GetType() != typeof(TextBox)) return;
+            var thisControl = (TextBox)ActiveControl;
+
+            // Paste the clipboard to the textbox
+            // Determine if there is any text in the Clipboard to paste into the text box.
+            if (Clipboard.GetDataObject().GetDataPresent(DataFormats.Text) == true)
+            {
+                // Determine if any text is selected in the text box.
+                if (thisControl.SelectionLength > 0)
+                {
+                    // Ask user if they want to paste over currently selected text.
+                    if (
+                        MessageBox.Show(@"Do you want to paste over current selection?", @"Cut Example",
+                            MessageBoxButtons.YesNo) == DialogResult.No)
+                        // Move selection to the point after the current selection and paste.
+                        thisControl.SelectionStart = thisControl.SelectionStart + thisControl.SelectionLength;
+                }
+                // Paste current text in Clipboard into text box.
+                thisControl.Paste();
+            }
+        }
+
+        private void btnMnuSelectAll_Click(object sender, EventArgs e)
+        {
+            if (ActiveControl.GetType() != typeof(TextBox)) return;
+            var thisControl = (TextBox)ActiveControl;
+
+            // Copy the textbox to the clipboard
+            thisControl.Focus();
+            thisControl.SelectAll();
+            thisControl.SelectionStart = 0;
+            thisControl.SelectionLength = thisControl.Text.Length;
+        }
+
+        private void undoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ActiveControl.GetType() != typeof(TextBox)) return;
+            var thisControl = (TextBox)ActiveControl;
+
+            // Determine if last operation can be undone in text box.
+            if (thisControl.CanUndo == true)
+            {
+                // Undo the last operation.
+                thisControl.Undo();
+                // Clear the undo buffer to prevent last action from being redone.
+                thisControl.ClearUndo();
+            }
+        }
+
     }
 }
