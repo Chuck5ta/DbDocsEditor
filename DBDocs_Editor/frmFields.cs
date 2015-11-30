@@ -14,7 +14,9 @@ namespace DBDocs_Editor
         public string TableName = "";
 
         private int fieldId;
+        private int selectedListId;
         private bool blnTextChanged;
+        private bool blnSwitchOverride;
 
         public FrmFields()
         {
@@ -30,7 +32,7 @@ namespace DBDocs_Editor
         {
             var blnSwitch = true;
 
-            if (blnTextChanged)
+            if (blnTextChanged && !blnSwitchOverride)
             {
                 // Subtable text has tried to change selection without save, warn them
                 var dialogResult = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo,
@@ -40,14 +42,22 @@ namespace DBDocs_Editor
                 if (dialogResult == DialogResult.No)
                 {
                     blnSwitch = false;
+                    blnSwitchOverride = true;
+                    lstFields.SelectedIndex = selectedListId;
                 }
             }
-
             if (!blnSwitch) return;
+            if (blnSwitchOverride)
+            {
+                blnSwitchOverride = false;
+                return;
+            }
+
             blnTextChanged = false;
 
             var selectedField = lstFields.Text;
             fieldId = ProgSettings.LookupFieldId(TableName, selectedField);    // Force to new entry before the lookup updates it should it exist
+            selectedListId = lstFields.SelectedIndex;
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
 

@@ -10,7 +10,9 @@ namespace DBDocs_Editor
     public partial class FrmTables : Form
     {
         private int tableId;
+        private int selectedListId;
         private bool blnTextChanged;
+        private bool blnSwitchOverride;
 
         public FrmTables()
         {
@@ -26,7 +28,7 @@ namespace DBDocs_Editor
         {
             var blnSwitch = true;
 
-            if (blnTextChanged)
+            if (blnTextChanged && !blnSwitchOverride)
             {
                 // Subtable text has tried to change selection without save, warn them
                 var dialogResult = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo,
@@ -36,14 +38,22 @@ namespace DBDocs_Editor
                 if (dialogResult == DialogResult.No)
                 {
                     blnSwitch = false;
+                    blnSwitchOverride = true;
+                    lstTables.SelectedIndex=selectedListId;
                 }
             }
-
             if (!blnSwitch) return;
+            if (blnSwitchOverride)
+            {
+                blnSwitchOverride = false;
+                return;
+            }
+
             blnTextChanged = false;
 
             var selectedTable = lstTables.Text;
             tableId = ProgSettings.LookupTableId(selectedTable);
+            selectedListId = lstTables.SelectedIndex;
 
             if (lstLangs.SelectedIndex < 0) lstLangs.SelectedIndex = 0;
 
