@@ -28,6 +28,24 @@ namespace DBDocs_Editor
         /// <param name="e"></param>
         private void lstFields_SelectedIndexChanged(object sender, EventArgs e)
         {
+            var blnSwitch = true;
+
+            if (blnTextChanged)
+            {
+                // Subtable text has tried to change selection without save, warn them
+                var dialogResult = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Exclamation);
+
+                // If the user chose no, don't annoy the switch
+                if (dialogResult == DialogResult.No)
+                {
+                    blnSwitch = false;
+                }
+            }
+
+            if (!blnSwitch) return;
+            blnTextChanged = false;
+
             var selectedField = lstFields.Text;
             fieldId = ProgSettings.LookupFieldId(TableName, selectedField);    // Force to new entry before the lookup updates it should it exist
 

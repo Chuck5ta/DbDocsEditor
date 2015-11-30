@@ -24,6 +24,23 @@ namespace DBDocs_Editor
         /// <param name="e"></param>
         private void lstsubtables_SelectedIndexChanged(object sender, EventArgs e)
         {
+            var blnSwitch = true;
+
+            if (blnTextChanged)
+            {
+                // Subtable text has tried to change selection without save, warn them
+                var dialogResult = MessageBox.Show(this, Resources.You_have_unsaved_changes, Resources.Exit_Check, MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Exclamation);
+
+                // If the user chose no, don't annoy the switch
+                if (dialogResult == DialogResult.No)
+                {
+                    blnSwitch = false;
+                }
+            }
+
+            if (!blnSwitch) return;
+            blnTextChanged = false;
             var selectedSubtable = lstsubtables.Text;
             txtSubTableName.Text = selectedSubtable;
             SubTableId = 0; // Force to new entry before the lookup updates it should it exist
@@ -45,7 +62,8 @@ namespace DBDocs_Editor
                 dbViewList =
                     ProgSettings.SelectRows(
                         "SELECT COALESCE(`dbdocstable_localised`.`languageid`,-1) AS languageId,`dbdocssubtables`.`subtableid`, `dbdocssubtables_localised`.`subtabletemplate`, `dbdocssubtables_localised`.`subtablecontent`, `dbdocssubtables`.`subtabletemplate` as subtableTemplateEnglish, `dbdocssubtables`.`subtablecontent` as subTableContentEnglish FROM `dbdocssubtables` LEFT JOIN `dbdocssubtables_localised` ON `dbdocssubtables`.`subtableid` = `dbdocssubtables_localised`.`subtableid` WHERE `subtablename` = '" +
-                        selectedSubtable + "' AND (`dbdocssubtables_localised`.`languageId`=" + lstLangs.SelectedIndex +
+                        selectedSubtable + "' AND (`dbdocssubtables_localised`.`languageId`=" +
+                        lstLangs.SelectedIndex +
                         "  OR `dbdocssubtables`.`languageId`=0);");
             }
 
@@ -72,12 +90,16 @@ namespace DBDocs_Editor
                         // If Localised SubTable Template is blank, go grab the English
                         if (string.IsNullOrEmpty(txtSubtableTemplate.Text))
                         {
-                            if (!string.IsNullOrEmpty(dbViewList.Tables[0].Rows[0]["subtablecontentEnglish"].ToString()))
+                            if (
+                                !string.IsNullOrEmpty(
+                                    dbViewList.Tables[0].Rows[0]["subtablecontentEnglish"].ToString()))
                             {
                                 txtSubtableContent.Text =
                                     dbViewList.Tables[0].Rows[0]["subtablecontentEnglish"].ToString();
                             }
-                            if (!string.IsNullOrEmpty(dbViewList.Tables[0].Rows[0]["subtabletemplateEnglish"].ToString()))
+                            if (
+                                !string.IsNullOrEmpty(
+                                    dbViewList.Tables[0].Rows[0]["subtabletemplateEnglish"].ToString()))
                             {
                                 txtSubtableTemplate.Text =
                                     dbViewList.Tables[0].Rows[0]["subtabletemplateEnglish"].ToString();
