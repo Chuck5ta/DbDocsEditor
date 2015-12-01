@@ -16,6 +16,7 @@ namespace DBDocs_Editor
         private static string serverName = "";
         private static string userName = "";
         private static string password = "";
+        private static string port = "3306";
         public static string SqldBconn = "";
         public static Form MainForm;
 
@@ -34,11 +35,11 @@ namespace DBDocs_Editor
                 password = value;
                 if (dbName != "*")
                 {
-                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";PORT=" + port + ";UID=" + userName + ";PWD=" + password + ";";
                 }
                 else
                 {
-                    SqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";PORT=" + port + ";UID=" + userName + ";PWD=" + password + ";";
                 }
             }
         }
@@ -58,11 +59,35 @@ namespace DBDocs_Editor
                 userName = value;
                 if (dbName != "*")
                 {
-                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";PORT=" + port + ";UID=" + userName + ";PWD=" + password + ";";
                 }
                 else
                 {
-                    SqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";PORT=" + port + ";UID=" + userName + ";PWD=" + password + ";";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the port.
+        /// </summary>
+        /// <value>The name of the user.</value>
+        public static string Port
+        {
+            get
+            {
+                return port;
+            }
+            set
+            {
+                port = value;
+                if (dbName != "*")
+                {
+                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";PORT=" + port + ";UID=" + userName + ";PWD=" + password + ";";
+                }
+                else
+                {
+                    SqldBconn = "SERVER=" + serverName + ";PORT=" + port + ";UID=" + userName + ";PWD=" + password + ";";
                 }
             }
         }
@@ -82,11 +107,11 @@ namespace DBDocs_Editor
                 serverName = value;
                 if (dbName != "*")
                 {
-                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + ";PORT=" + port + dbName + ";UID=" + userName + ";PWD=" + password + ";";
                 }
                 else
                 {
-                    SqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";PORT=" + port + ";UID=" + userName + ";PWD=" + password + ";";
                 }
             }
         }
@@ -106,11 +131,11 @@ namespace DBDocs_Editor
                 dbName = value;
                 if (dbName != "*")
                 {
-                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";DATABASE=" + dbName + ";PORT=" + port + ";UID=" + userName + ";PWD=" + password + ";";
                 }
                 else
                 {
-                    SqldBconn = "SERVER=" + serverName + ";UID=" + userName + ";PWD=" + password + ";";
+                    SqldBconn = "SERVER=" + serverName + ";PORT=" + port + ";UID=" + userName + ";PWD=" + password + ";";
                 }
             }
         }
@@ -528,7 +553,7 @@ namespace DBDocs_Editor
             const string keyName = userRoot + "\\" + subkey;
 
             // Concat all the login requirements into a single field
-            string[] connectionString = { serverName, userName, password, dbName };
+            string[] connectionString = { serverName, userName, password, dbName, port };
 
             // Write in into the registry as a key call "<servername>-<dbname>"
             Registry.SetValue(keyName, serverName + "-" + DbName, connectionString);
@@ -588,7 +613,14 @@ namespace DBDocs_Editor
                 connections.DatabaseUserName = theseValues[1];
                 connections.DatabasePassword = theseValues[2];
                 connections.DatabaseName = theseValues[3];
-
+                if (theseValues.GetUpperBound(0) < 4)
+                {
+                    connections.DatabasePort = "3306";
+                }
+                else
+                {
+                    connections.DatabasePort = theseValues[4];
+                }
                 // Add the structure to a list
                 allconnections.Add(connections);
             }
@@ -1042,6 +1074,7 @@ namespace DBDocs_Editor
             public string DatabaseName;
             public string DatabaseUserName;
             public string DatabasePassword;
+            public string DatabasePort;
         }
 
         public static bool IsSubtableInTable(string subtableName)

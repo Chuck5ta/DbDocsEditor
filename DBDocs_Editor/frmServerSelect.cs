@@ -47,6 +47,7 @@ namespace DBDocs_Editor
             ProgSettings.ServerName = txtServerName.Text;
             ProgSettings.UserName = txtUsername.Text;
             ProgSettings.Password = txtPassword.Text;
+            ProgSettings.Port = txtPort.Text;
 
             ProgSettings.WriteRegistry();
 
@@ -75,6 +76,7 @@ namespace DBDocs_Editor
                 txtPassword.Enabled = true;
                 txtServerName.Enabled = true;
                 txtUsername.Enabled = true;
+                txtPort.Enabled = true;
 
                 // Display Save/Cancel buttons
                 btnCancel.Visible = true;
@@ -93,6 +95,7 @@ namespace DBDocs_Editor
                 txtPassword.Enabled = false;
                 txtServerName.Enabled = false;
                 txtUsername.Enabled = false;
+                txtPort.Enabled = false;
 
                 // Display Save/Cancel buttons
                 btnCancel.Visible = false;
@@ -144,6 +147,7 @@ namespace DBDocs_Editor
                     txtUsername.Text = thisServer.DatabaseUserName;
                     txtPassword.Text = thisServer.DatabasePassword;
                     txtDefaultDB.Text = thisServer.DatabaseName;
+                    txtPort.Text = thisServer.DatabasePort;
 
                     btnEdit.Enabled = true;
                     btnDelete.Enabled = true;
@@ -187,6 +191,7 @@ namespace DBDocs_Editor
             ProgSettings.Password = txtPassword.Text;
             ProgSettings.UserName = txtUsername.Text;
             ProgSettings.ServerName = txtServerName.Text;
+            ProgSettings.Port = txtPort.Text;
 
             if (!txtDefaultDB.Text.Contains("*"))
             {

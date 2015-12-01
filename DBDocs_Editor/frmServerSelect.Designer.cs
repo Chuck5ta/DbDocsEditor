@@ -46,11 +46,13 @@
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.txtServerName = new System.Windows.Forms.TextBox();
             this.btnDelete = new System.Windows.Forms.Button();
+            this.txtPort = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(392, 145);
+            this.btnSave.Location = new System.Drawing.Point(392, 170);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 24);
             this.btnSave.TabIndex = 7;
@@ -103,7 +105,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(305, 145);
+            this.btnCancel.Location = new System.Drawing.Point(305, 170);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 24);
             this.btnCancel.TabIndex = 6;
@@ -142,7 +144,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(240, 122);
+            this.label4.Location = new System.Drawing.Point(240, 147);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(59, 13);
             this.label4.TabIndex = 16;
@@ -169,7 +171,7 @@
             // txtDefaultDB
             // 
             this.txtDefaultDB.Enabled = false;
-            this.txtDefaultDB.Location = new System.Drawing.Point(305, 119);
+            this.txtDefaultDB.Location = new System.Drawing.Point(305, 144);
             this.txtDefaultDB.Name = "txtDefaultDB";
             this.txtDefaultDB.Size = new System.Drawing.Size(162, 20);
             this.txtDefaultDB.TabIndex = 5;
@@ -214,11 +216,31 @@
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
+            // txtPort
+            // 
+            this.txtPort.Enabled = false;
+            this.txtPort.Location = new System.Drawing.Point(305, 118);
+            this.txtPort.Name = "txtPort";
+            this.txtPort.Size = new System.Drawing.Size(162, 20);
+            this.txtPort.TabIndex = 17;
+            this.txtPort.Text = "3306";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(273, 121);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(26, 13);
+            this.label6.TabIndex = 18;
+            this.label6.Text = "Port";
+            // 
             // FrmServerSelect
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(479, 251);
+            this.Controls.Add(this.txtPort);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.txtServerName);
             this.Controls.Add(this.txtUsername);
@@ -266,5 +288,7 @@
         private System.Windows.Forms.TextBox txtUsername;
         private System.Windows.Forms.TextBox txtServerName;
         private System.Windows.Forms.Button btnDelete;
+        private System.Windows.Forms.TextBox txtPort;
+        private System.Windows.Forms.Label label6;
     }
 }
