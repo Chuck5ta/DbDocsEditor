@@ -29,3 +29,8 @@
 #vs files
 *.suo
 *.user
+
+#Temporary Build Files and output folders
+*.sln.ide
+[Bb]in
+[Oo]bj
